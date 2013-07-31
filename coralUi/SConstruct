@@ -1,0 +1,74 @@
+
+import sys
+import os
+import platform
+import sconsUtils
+
+msvc_version = ""
+if os.environ.has_key("MSVC_VERSION"):
+    msvc_version = os.environ["MSVC_VERSION"]
+
+sconsUtils.importBuildEnvs()
+
+coralPath = os.path.join(os.pardir, "coral")
+coralLib = None
+try:
+    Import("coralLib")
+except:
+    coralLib = SConscript(os.path.join(coralPath, "SConstruct"))
+
+if sys.platform.startswith("win"):
+    coralLib = coralLib[1]
+    
+buildMode = sconsUtils.getEnvVar("CORAL_BUILD_MODE")
+
+env = Environment(
+  CPPPATH = [
+    os.path.join(os.pardir),
+    sconsUtils.getEnvVar("CORAL_PYTHON_INCLUDES_PATH"),
+    sconsUtils.getEnvVar("CORAL_IMATH_INCLUDES_PATH"),
+    sconsUtils.getEnvVar("CORAL_BOOST_INCLUDES_PATH"),
+    sconsUtils.getEnvVar("CORAL_GLEW_INCLUDES_PATH")],
+  LIBS = [
+    coralLib,
+    sconsUtils.getEnvVar("CORAL_IMATH_LIB"),
+    sconsUtils.getEnvVar("CORAL_IMATH_IEX_LIB"),
+    sconsUtils.getEnvVar("CORAL_PYTHON_LIB"), 
+    sconsUtils.getEnvVar("CORAL_BOOST_PYTHON_LIB"),
+    sconsUtils.getEnvVar("CORAL_GLEW_LIB")],
+  LIBPATH = [
+    coralPath,
+    sconsUtils.getEnvVar("CORAL_IMATH_LIBS_PATH"),
+    sconsUtils.getEnvVar("CORAL_PYTHON_LIBS_PATH"), 
+    sconsUtils.getEnvVar("CORAL_BOOST_LIBS_PATH"),
+    sconsUtils.getEnvVar("CORAL_GLEW_LIBS_PATH")],
+  SHLIBPREFIX = "",
+  MSVC_VERSION=msvc_version,
+  TARGET_ARCH = platform.machine())
+
+if os.environ.has_key("CORAL_PARALLEL"):
+    if os.environ["CORAL_PARALLEL"] == "CORAL_PARALLEL_TBB":
+        env["CPPPATH"].append(sconsUtils.getEnvVar("CORAL_TBB_INCLUDES_PATH"))
+        env["LIBS"].append(sconsUtils.getEnvVar("CORAL_TBB_LIB"))
+        env["LIBPATH"].append(sconsUtils.getEnvVar("CORAL_TBB_LIBS_PATH"))
+
+if sys.platform.startswith("linux"):
+    pass
+    
+elif sys.platform == "darwin":
+    env["SHLIBSUFFIX"] = ".so"
+    env["FRAMEWORKS"] = ["OpenGL"]
+    
+elif sys.platform.startswith("win"):
+    
+    env["SHLIBSUFFIX"] = ".pyd"
+    env["CXXFLAGS"] = Split("/Zm800 -nologo /EHsc /DBOOST_PYTHON_DYNAMIC_LIB /Z7 /Od /Ob0 /GR /MD /wd4675 /Zc:forScope /Zc:wchar_t /bigobj /MP")
+    env["CCFLAGS"] = "-DCORAL_UI_COMPILE"
+    env["LINKFLAGS"] = Split("/MANIFEST:NO OpenGL32.lib glu32.lib")
+
+target = env.SharedLibrary(
+            target = "_coralUi",
+            source = sconsUtils.findFiles("src", pattern = "*.cpp"),
+            OBJPREFIX = os.path.join("debug" + os.environ["CORAL_BUILD_FLAVOUR"] + buildMode, ""))
+
+Return("target")

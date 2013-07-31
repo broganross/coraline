@@ -1,0 +1,60 @@
+# coral save script
+version = 0.1
+
+def runScript(topNode = 'root'):
+    executeCommand('CreateNode', className = 'ObjImporter', name = 'ObjImporter', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('SetAttributeValue', attribute = topNode + '.ObjImporter.fileName', value = 'cow.obj')
+    
+    executeCommand('CreateNode', className = 'Shader', name = 'Shader', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('SetAttributeValue', attribute = topNode + '.Shader.vertexShaderFilename', value = 'fresnel.vert')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Shader.fragmentShaderFilename', value = 'fresnel.frag')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Shader.reflectance', value = '[0.2] 3')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Shader.ambient', value = '[(0,0.482353,1,1)] 7')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Shader.diffuse', value = '[(0,1,0.917647,1)] 7')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Shader.specular', value = '[(1,1,1,1)] 7')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Shader.es', value = '[3.6] 3')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Shader.envPos', value = '[(0,0,0)] 5')
+    
+    executeCommand('CreateNode', className = 'Image', name = 'Image', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('SetAttributeValue', attribute = topNode + '.Image.filename', value = 'softboxEnv.jpg')
+    
+    executeCommand('CreateNode', className = 'Vec3', name = 'Vec3', specializationPreset = 'single', parentNode = topNode)
+    executeCommand('SetAttributeValue', attribute = topNode + '.Vec3.x', value = '[0] 3')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Vec3.y', value = '[1.3] 3')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Vec3.z', value = '[0] 3')
+    
+    executeCommand('CreateNode', className = 'Shader', name = 'Shader1', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('SetAttributeValue', attribute = topNode + '.Shader1.vertexShaderFilename', value = 'fresnel.vert')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Shader1.fragmentShaderFilename', value = 'fresnel.frag')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Shader1.reflectance', value = '[0.7] 3')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Shader1.ambient', value = '[(0.0784314,0.576471,0.427451,1)] 7')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Shader1.diffuse', value = '[(0.752941,1,0.870588,1)] 7')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Shader1.specular', value = '[(1,1,1,1)] 7')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Shader1.es', value = '[1.1] 3')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Shader1.envPos', value = '[(0,0,0)] 5')
+    
+    executeCommand('CreateNode', className = 'GeoSphere', name = 'GeoSphere', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('SetAttributeValue', attribute = topNode + '.GeoSphere.radius', value = '[37] 3')
+    executeCommand('SetAttributeValue', attribute = topNode + '.GeoSphere.rings', value = '[10] 1')
+    executeCommand('SetAttributeValue', attribute = topNode + '.GeoSphere.sectors', value = '[10] 1')
+    
+    executeCommand('CreateNode', className = 'Vec3', name = 'Vec4', specializationPreset = 'single', parentNode = topNode)
+    executeCommand('SetAttributeValue', attribute = topNode + '.Vec4.x', value = '[-0.4] 3')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Vec4.y', value = '[1] 3')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Vec4.z', value = '[-2.2] 3')
+    
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.ObjImporter.geo', destinationAttribute = topNode + '.Shader.geo')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Image.image', destinationAttribute = topNode + '.Shader.env')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Vec3.vector', destinationAttribute = topNode + '.Shader.lightPos')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.GeoSphere.out', destinationAttribute = topNode + '.Shader1.geo')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Vec4.vector', destinationAttribute = topNode + '.Shader1.lightPos')
+    # nodeEditor save data
+    executeCommand('SetNodeUiData', node = topNode, data = {})
+    executeCommand('SetNodeUiData', node = topNode + '.ObjImporter', data = {'pos': [-244.0, -129.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.Shader', data = {'pos': [22.0, -7.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.Image', data = {'pos': [-214.0, 94.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.Vec3', data = {'pos': [-113.0, 202.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.Shader1', data = {'pos': [54.0, 340.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.GeoSphere', data = {'pos': [-168.0, 381.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.Vec4', data = {'pos': [-129.0, 520.0]})
+    

@@ -1,0 +1,109 @@
+# coral save script
+version = 0.1
+
+def runScript(topNode = 'root'):
+    executeCommand('CreateNode', className = 'Time', name = 'Time', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('SetAttributeValue', attribute = topNode + '.Time.framesPerSecond', value = '[24] 3')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Time.time', value = '[0] 3')
+    
+    executeCommand('CreateNode', className = 'GeoGrid', name = 'GeoGrid', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('SetAttributeValue', attribute = topNode + '.GeoGrid.width', value = '[3.7] 3')
+    executeCommand('SetAttributeValue', attribute = topNode + '.GeoGrid.height', value = '[3] 3')
+    executeCommand('SetAttributeValue', attribute = topNode + '.GeoGrid.widthSubdivisions', value = '[3] 1')
+    executeCommand('SetAttributeValue', attribute = topNode + '.GeoGrid.heightSubdivisions', value = '[4] 1')
+    
+    executeCommand('CreateNode', className = 'CollapsedNode', name = 'Emitter', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('CreateAttribute', name = '1:geo', className = 'PassThroughAttribute', parentNode = topNode + '.Emitter', input = True, specializationOverride = 'Geo')
+    executeCommand('CreateAttribute', name = '3:minLife', className = 'PassThroughAttribute', parentNode = topNode + '.Emitter', input = True, specializationOverride = 'Float')
+    executeCommand('CreateAttribute', name = '4:maxLife', className = 'PassThroughAttribute', parentNode = topNode + '.Emitter', input = True, specializationOverride = 'Float')
+    executeCommand('CreateAttribute', name = '2:time', className = 'PassThroughAttribute', parentNode = topNode + '.Emitter', input = True, specializationOverride = 'Float')
+    executeCommand('CreateAttribute', name = 'particles', className = 'PassThroughAttribute', parentNode = topNode + '.Emitter', output = True)
+    
+    executeCommand('CreateNode', className = 'ConstantArray', name = 'ConstantArray2', specializationPreset = 'none', parentNode = topNode + '.Emitter')
+    
+    executeCommand('CreateNode', className = 'ConstantArray', name = 'ConstantArray1', specializationPreset = 'none', parentNode = topNode + '.Emitter')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Emitter.ConstantArray1.constant', value = '[9.9] 3')
+    
+    executeCommand('CreateNode', className = 'Float', name = 'Float2', specializationPreset = 'none', parentNode = topNode + '.Emitter')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Emitter.Float2.out', value = '[0] 3')
+    
+    executeCommand('CreateNode', className = 'RangeLoop', name = 'RangeLoop', specializationPreset = 'none', parentNode = topNode + '.Emitter')
+    
+    executeCommand('CreateNode', className = 'ConstantArray', name = 'ConstantArray3', specializationPreset = 'none', parentNode = topNode + '.Emitter')
+    
+    executeCommand('CreateNode', className = 'ArraySize', name = 'ArraySize', specializationPreset = 'none', parentNode = topNode + '.Emitter')
+    
+    executeCommand('CreateNode', className = 'RandomNumber', name = 'RandomNumber', specializationPreset = 'none', parentNode = topNode + '.Emitter')
+    
+    executeCommand('CreateNode', className = 'GetGeoPoints', name = 'GetGeoPoints', specializationPreset = 'none', parentNode = topNode + '.Emitter')
+    
+    executeCommand('CreateNode', className = 'Mul', name = 'Mul', specializationPreset = 'none', parentNode = topNode + '.Emitter')
+    
+    executeCommand('CreateNode', className = 'Vec3', name = 'Vec3', specializationPreset = 'none', parentNode = topNode + '.Emitter')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Emitter.Vec3.x', value = '[0] 4')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Emitter.Vec3.z', value = '[0] 4')
+    
+    executeCommand('CreateNode', className = 'Add', name = 'Add', specializationPreset = 'none', parentNode = topNode + '.Emitter')
+    
+    executeCommand('CreateNode', className = 'ConstantArray', name = 'ConstantArray', specializationPreset = 'none', parentNode = topNode + '.Emitter')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Emitter.ConstantArray.constant', value = '[5] 3')
+    
+    executeCommand('CreateNode', className = 'Mul', name = 'Mul1', specializationPreset = 'none', parentNode = topNode + '.Emitter')
+    
+    executeCommand('CreateNode', className = 'Float', name = 'speed', specializationPreset = 'none', parentNode = topNode + '.Emitter')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Emitter.speed.out', value = '[0.05] 3')
+    
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Emitter.ArraySize.size', destinationAttribute = topNode + '.Emitter.ConstantArray2.size')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Emitter.Float2.out', destinationAttribute = topNode + '.Emitter.ConstantArray2.constant')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Emitter.ArraySize.size', destinationAttribute = topNode + '.Emitter.ConstantArray1.size')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Emitter.4:maxLife', destinationAttribute = topNode + '.Emitter.ConstantArray1.constant')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Emitter.ConstantArray2.array', destinationAttribute = topNode + '.Emitter.RangeLoop.start')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Emitter.ConstantArray1.array', destinationAttribute = topNode + '.Emitter.RangeLoop.end')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Emitter.Mul.out', destinationAttribute = topNode + '.Emitter.RangeLoop.step')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Emitter.ArraySize.size', destinationAttribute = topNode + '.Emitter.ConstantArray3.size')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Emitter.Mul1.out', destinationAttribute = topNode + '.Emitter.ConstantArray3.constant')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Emitter.GetGeoPoints.points', destinationAttribute = topNode + '.Emitter.ArraySize.array')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Emitter.ConstantArray.array', destinationAttribute = topNode + '.Emitter.RandomNumber.min')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Emitter.ConstantArray1.array', destinationAttribute = topNode + '.Emitter.RandomNumber.max')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Emitter.1:geo', destinationAttribute = topNode + '.Emitter.GetGeoPoints.geo')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Emitter.ConstantArray3.array', destinationAttribute = topNode + '.Emitter.Mul.in0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Emitter.RandomNumber.out', destinationAttribute = topNode + '.Emitter.Mul.in1')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Emitter.RangeLoop.valueInRange', destinationAttribute = topNode + '.Emitter.Vec3.y')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Emitter.Vec3.vector', destinationAttribute = topNode + '.Emitter.Add.in0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Emitter.GetGeoPoints.points', destinationAttribute = topNode + '.Emitter.Add.in1')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Emitter.Add.out', destinationAttribute = topNode + '.Emitter.particles')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Emitter.ArraySize.size', destinationAttribute = topNode + '.Emitter.ConstantArray.size')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Emitter.3:minLife', destinationAttribute = topNode + '.Emitter.ConstantArray.constant')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Emitter.2:time', destinationAttribute = topNode + '.Emitter.Mul1.in0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Emitter.speed.out', destinationAttribute = topNode + '.Emitter.Mul1.in1')
+    executeCommand('CreateNode', className = 'DrawPoint', name = 'DrawPoint', specializationPreset = 'single size and color', parentNode = topNode)
+    executeCommand('SetAttributeValue', attribute = topNode + '.DrawPoint.sizes', value = '[8] 3')
+    executeCommand('SetAttributeValue', attribute = topNode + '.DrawPoint.colors', value = '[(1,1,1,1)] 7')
+    
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Time.time', destinationAttribute = topNode + '.Emitter.2:time')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.GeoGrid.out', destinationAttribute = topNode + '.Emitter.1:geo')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.GeoGrid.out', destinationAttribute = topNode + '.Emitter.1:geo')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Time.time', destinationAttribute = topNode + '.Emitter.2:time')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Emitter.Add.out', destinationAttribute = topNode + '.Emitter.particles')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Emitter.particles', destinationAttribute = topNode + '.DrawPoint.points')
+    # nodeEditor save data
+    executeCommand('SetNodeUiData', node = topNode, data = {})
+    executeCommand('SetNodeUiData', node = topNode + '.Time', data = {'pos': [-432.71428571428555, 42.869047619047592]})
+    executeCommand('SetNodeUiData', node = topNode + '.GeoGrid', data = {'pos': [-368.28571428571422, -194.85714285714289]})
+    executeCommand('SetNodeUiData', node = topNode + '.Emitter', data = {'attributes': [{'name': '1:geo', 'pos': [-120.00000000000006, -66.153846153846189]}, {'name': '2:time', 'pos': [-116.92307692307701, 307.69230769230779]}, {'name': '3:minLife', 'pos': [-126.15384615384622, 52.307692307692335]}, {'name': '4:maxLife', 'pos': [-129.23076923076931, 206.15384615384625]}, {'name': 'particles', 'pos': [1809.2307692307709, 503.84615384615455]}], 'pos': [-117.15319940476172, -8.4738095238094502]})
+    executeCommand('SetNodeUiData', node = topNode + '.Emitter.ConstantArray2', data = {'pos': [663.0, 10.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.Emitter.ConstantArray1', data = {'pos': [365.0, 293.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.Emitter.Float2', data = {'pos': [534.0, 84.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.Emitter.RangeLoop', data = {'pos': [1149.3333333333335, 156.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.Emitter.ConstantArray3', data = {'pos': [636.00000000000057, 537.66666666666708]})
+    executeCommand('SetNodeUiData', node = topNode + '.Emitter.ArraySize', data = {'pos': [182.0, 41.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.Emitter.RandomNumber', data = {'pos': [838.66666666666674, 371.99999999999977]})
+    executeCommand('SetNodeUiData', node = topNode + '.Emitter.GetGeoPoints', data = {'pos': [38.0, -16.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.Emitter.Mul', data = {'pos': [1083.666666666667, 440.66666666666708]})
+    executeCommand('SetNodeUiData', node = topNode + '.Emitter.Vec3', data = {'pos': [1396.6666666666665, 209.33333333333314]})
+    executeCommand('SetNodeUiData', node = topNode + '.Emitter.Add', data = {'pos': [1590.0000000000005, 352.77777777777783]})
+    executeCommand('SetNodeUiData', node = topNode + '.Emitter.ConstantArray', data = {'pos': [356.0, 176.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.Emitter.Mul1', data = {'pos': [531.25000000000011, 712.50000000000011]})
+    executeCommand('SetNodeUiData', node = topNode + '.Emitter.speed', data = {'pos': [236.25000000000006, 838.75000000000011]})
+    executeCommand('SetNodeUiData', node = topNode + '.DrawPoint', data = {'pos': [113.99999999999989, 104.66666666666663]})
+    

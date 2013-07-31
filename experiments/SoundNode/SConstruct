@@ -1,0 +1,14 @@
+
+import coralBuilder
+
+import os
+print os.getcwd()
+
+# To build this pugin you'll need the fmod library: http://www.fmod.org/index.php/download
+
+env = coralBuilder.buildEnv()
+env.Append(LIBS = "fmodex")
+env.Append(CPPPATH = os.environ["CORAL_FMOD_INCLUDES"])
+env.Append(LIBPATH = os.environ["CORAL_FMOD_LIBS_PATH"])
+
+module = coralBuilder.buildModule("coralMedia", ["coralMedia.cpp"], env)

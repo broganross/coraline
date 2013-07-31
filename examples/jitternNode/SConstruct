@@ -1,0 +1,4 @@
+
+import coralBuilder
+
+module = coralBuilder.buildModule("jitterNode", ["JitterNode.cpp"])

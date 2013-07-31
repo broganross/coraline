@@ -1,0 +1,68 @@
+
+import sys
+import os
+import platform
+import sconsUtils
+
+os.environ["CORAL_BUILD_FLAVOUR"] = "coralMaya"
+
+msvc_version = ""
+if os.environ.has_key("MSVC_VERSION"):
+    msvc_version = os.environ["MSVC_VERSION"]
+
+sconsUtils.importBuildEnvs()
+
+coralPath = os.path.join(os.pardir, "coral")
+coralLib = None
+try:
+    Import("coralLib")
+except:
+    coralLib = SConscript(os.path.join(coralPath, "SConstruct"))
+
+if sys.platform.startswith("win"):
+    coralLib = coralLib[1]
+
+env = Environment(
+    CPPPATH = [
+        os.path.join(os.pardir), 
+        sconsUtils.getEnvVar("CORAL_IMATH_INCLUDES_PATH"),
+        sconsUtils.getEnvVar("CORAL_PYTHON_INCLUDES_PATH"), 
+        sconsUtils.getEnvVar("CORAL_BOOST_INCLUDES_PATH"), 
+        sconsUtils.getEnvVar("CORAL_MAYA_INCLUDES_PATH")],
+    LIBS = [
+        coralLib, 
+        "Imath",
+        sconsUtils.getEnvVar("CORAL_PYTHON_LIB"), 
+        sconsUtils.getEnvVar("CORAL_BOOST_PYTHON_LIB"),
+        "Foundation", "OpenMaya", "OpenMayaAnim", "OpenMayaUI"],
+    LIBPATH = [
+        coralPath, 
+        sconsUtils.getEnvVar("CORAL_IMATH_LIBS_PATH"),
+        sconsUtils.getEnvVar("CORAL_PYTHON_LIBS_PATH"), 
+        sconsUtils.getEnvVar("CORAL_BOOST_LIBS_PATH"),
+        sconsUtils.getEnvVar("CORAL_MAYA_LIBS_PATH")],
+    SHLIBPREFIX = "",
+	MSVC_VERSION=msvc_version,
+    TARGET_ARCH = platform.machine())
+
+if sys.platform.startswith("linux"):
+    env.Append(CCFLAGS = "-m64 -D_BOOL -DLINUX -DREQUIRE_IOSTREAM -O3")
+elif sys.platform == "darwin":
+    env.Append(CCFLAGS = "-DOSMac_ -DOSMacOSX_ -m64 -D_BOOL -DREQUIRE_IOSTREAM -O3")
+    env["SHLIBSUFFIX"] = ".so"
+    
+elif sys.platform.startswith("win"):
+    env["SHLIBSUFFIX"] = ".pyd"
+    env["CXXFLAGS"] = Split("/Zm800 -nologo /EHsc /DBOOST_PYTHON_DYNAMIC_LIB /DGLUT_BUILDING_LIB /Z7 /Od /Ob0 /GR /MD /wd4675 /Zc:forScope /Zc:wchar_t /MP")
+    env["LINKFLAGS"] = Split("/MANIFEST:NO /INCREMENTAL:NO OpenGL32.lib glu32.lib")
+    env["CCFLAGS"] = Split("-DCORAL_MAYA_COMPILE -DNT_PLUGIN -DREQUIRE_IOSTREAM")
+    env.Append(CPPPATH = sconsUtils.getEnvVar("CORAL_OPENGL_INCLUDES_PATH"))
+    env.Append(LIBS = sconsUtils.getEnvVar("CORAL_OPENGL_LIB"))
+    env.Append(LIBPATH = sconsUtils.getEnvVar("CORAL_OPENGL_LIBS_PATH"))
+
+target = env.SharedLibrary(
+            target = "_coralMaya",
+            source = sconsUtils.findFiles("src", pattern = "*.cpp"),
+            OBJPREFIX = os.path.join("debugCoralMaya", ""))
+
+Return("target")

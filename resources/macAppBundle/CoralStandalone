@@ -1,0 +1,15 @@
+#!/bin/sh
+
+path=`dirname $0`
+pythonhome=$path/../Frameworks/Python.framework/Versions/2.6
+export PYTHONHOME=$pythonhome
+export DYLD_LIBRARY_PATH=$path/../MacOS:$DYLD_LIBRARY_PATH
+export DYLD_LIBRARY_PATH=$path/../coral:$DYLD_LIBRARY_PATH
+export DYLD_LIBRARY_PATH=$path/../coral/coral:$DYLD_LIBRARY_PATH
+export DYLD_LIBRARY_PATH=$path/../coral/coral/coralUi:$DYLD_LIBRARY_PATH
+export DYLD_LIBRARY_PATH=$PYTHONHOME:$DYLD_LIBRARY_PATH
+
+export PYTHONPATH=$PYTHONPATH:$path/../coral
+
+export DYLD_FRAMEWORK_PATH=$path/../Frameworks:$DYLD_FRAMEWORK_PATH
+exec "$path/python" "$path/../coral/launchApp.py"

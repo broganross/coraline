@@ -1,0 +1,216 @@
+# coral save script
+version = 0.1
+
+def runScript(topNode = 'root'):
+    executeCommand('CreateNode', className = 'GetGeoPoints', name = 'GetGeoPoints', specializationPreset = 'none', parentNode = topNode)
+    
+    executeCommand('CreateNode', className = 'GetSimulationStep', name = 'getLocation', specializationPreset = 'none', parentNode = topNode)
+    
+    executeCommand('CreateNode', className = 'Time', name = 'Time', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('SetAttributeValue', attribute = topNode + '.Time.framesPerSecond', value = '[24] 3')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Time.time', value = '[0] 3')
+    
+    executeCommand('CreateNode', className = 'GetSimulationStep', name = 'getVelocity', specializationPreset = 'none', parentNode = topNode)
+    
+    executeCommand('CreateNode', className = 'ConstantArray', name = 'ConstantArray', specializationPreset = 'none', parentNode = topNode)
+    
+    executeCommand('CreateNode', className = 'ArraySize', name = 'ArraySize', specializationPreset = 'none', parentNode = topNode)
+    
+    executeCommand('CreateNode', className = 'Vec3', name = 'initialVelocity', specializationPreset = 'single', parentNode = topNode)
+    executeCommand('SetAttributeValue', attribute = topNode + '.initialVelocity.x', value = '[0] 3')
+    executeCommand('SetAttributeValue', attribute = topNode + '.initialVelocity.y', value = '[0] 3')
+    executeCommand('SetAttributeValue', attribute = topNode + '.initialVelocity.z', value = '[0] 3')
+    
+    executeCommand('CreateNode', className = 'String', name = 'globalLocation', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('SetAttributeValue', attribute = topNode + '.globalLocation.string', value = 'loc')
+    
+    executeCommand('CreateNode', className = 'String', name = 'globalVelocity', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('SetAttributeValue', attribute = topNode + '.globalVelocity.string', value = 'vel')
+    
+    executeCommand('CreateNode', className = 'SetSimulationStep', name = 'setLocation', specializationPreset = 'none', parentNode = topNode)
+    
+    executeCommand('CreateNode', className = 'SetSimulationStep', name = 'setVelocity', specializationPreset = 'none', parentNode = topNode)
+    
+    executeCommand('CreateNode', className = 'Add', name = 'Add', specializationPreset = 'none', parentNode = topNode)
+    
+    executeCommand('CreateNode', className = 'Add', name = 'Add1', specializationPreset = 'none', parentNode = topNode)
+    
+    executeCommand('CreateNode', className = 'ProcessSimulation', name = 'ProcessSimulation', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('CreateAttribute', name = 'data1', className = 'NumericAttribute', parentNode = topNode + '.ProcessSimulation', input = True)
+    executeCommand('SetupDynamicAttribute', attribute = topNode + '.ProcessSimulation.data1', affect = [topNode + '.ProcessSimulation.out'], affectedBy = [], allowedSpecialization = ['Int','IntArray','Float','FloatArray','Vec3','Vec3Array','Col4','Col4Array','Quat','QuatArray','Matrix44','Matrix44Array'], specializationLinkedTo = [topNode + '.ProcessSimulation.out'], specializationLinkedBy = [])
+    executeCommand('SetAttributeValue', attribute = topNode + '.ProcessSimulation.getDataFrom', value = '[{0:"data0",1:"data1",},0]')
+    
+    executeCommand('CreateNode', className = 'DrawPoint', name = 'DrawPoint', specializationPreset = 'single size and color', parentNode = topNode)
+    executeCommand('SetAttributeValue', attribute = topNode + '.DrawPoint.sizes', value = '[5] 3')
+    executeCommand('SetAttributeValue', attribute = topNode + '.DrawPoint.colors', value = '[(1,1,1,1)] 7')
+    
+    executeCommand('CreateNode', className = 'CollapsedNode', name = 'flock', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('CreateAttribute', name = 'location', className = 'PassThroughAttribute', parentNode = topNode + '.flock', input = True, specializationOverride = 'Vec3Array')
+    executeCommand('CreateAttribute', name = 'velocity', className = 'PassThroughAttribute', parentNode = topNode + '.flock', input = True, specializationOverride = 'Vec3Array')
+    executeCommand('CreateAttribute', name = 'acceleration', className = 'PassThroughAttribute', parentNode = topNode + '.flock', output = True, specializationOverride = 'Vec3Array')
+    executeCommand('CreateAttribute', name = 'range', className = 'PassThroughAttribute', parentNode = topNode + '.flock', input = True, specializationOverride = 'Float')
+    
+    executeCommand('CreateNode', className = 'ForLoop', name = 'averageNeighbours', specializationPreset = 'none', parentNode = topNode + '.flock')
+    executeCommand('CreateAttribute', name = 'output', className = 'PassThroughAttribute', parentNode = topNode + '.flock.averageNeighbours', output = True, specializationOverride = 'Vec3Array')
+    executeCommand('CreateAttribute', name = 'range', className = 'PassThroughAttribute', parentNode = topNode + '.flock.averageNeighbours', input = True, specializationOverride = 'Float')
+    
+    executeCommand('CreateNode', className = 'FindPointsInRange', name = 'FindPointsInRange', specializationPreset = 'none', parentNode = topNode + '.flock.averageNeighbours')
+    executeCommand('SetAttributeValue', attribute = topNode + '.flock.averageNeighbours.FindPointsInRange.range', value = '[5] 3')
+    
+    executeCommand('CreateNode', className = 'LoopInput', name = 'LoopInput', specializationPreset = 'none', parentNode = topNode + '.flock.averageNeighbours')
+    
+    executeCommand('CreateNode', className = 'Average', name = 'Average', specializationPreset = 'none', parentNode = topNode + '.flock.averageNeighbours')
+    
+    executeCommand('CreateNode', className = 'LoopOutput', name = 'LoopOutput', specializationPreset = 'none', parentNode = topNode + '.flock.averageNeighbours')
+    
+    executeCommand('CreateNode', className = 'BuildArray', name = 'BuildArray', specializationPreset = 'none', parentNode = topNode + '.flock.averageNeighbours')
+    executeCommand('CreateAttribute', name = 'in0', className = 'NumericAttribute', parentNode = topNode + '.flock.averageNeighbours.BuildArray', input = True)
+    executeCommand('CreateAttribute', name = 'in1', className = 'NumericAttribute', parentNode = topNode + '.flock.averageNeighbours.BuildArray', input = True)
+    executeCommand('SetupDynamicAttribute', attribute = topNode + '.flock.averageNeighbours.BuildArray.in0', affect = [topNode + '.flock.averageNeighbours.BuildArray.array'], affectedBy = [], allowedSpecialization = ['Int','Float','Vec3','Col4','Matrix44'], specializationLinkedTo = [topNode + '.flock.averageNeighbours.BuildArray.array'], specializationLinkedBy = [])
+    executeCommand('SetupDynamicAttribute', attribute = topNode + '.flock.averageNeighbours.BuildArray.in1', affect = [topNode + '.flock.averageNeighbours.BuildArray.array'], affectedBy = [], allowedSpecialization = ['Int','Float','Vec3','Col4','Matrix44'], specializationLinkedTo = [topNode + '.flock.averageNeighbours.BuildArray.array'], specializationLinkedBy = [])
+    
+    executeCommand('CreateNode', className = 'DrawLine', name = 'DrawLine', specializationPreset = 'single', parentNode = topNode + '.flock.averageNeighbours')
+    executeCommand('SetAttributeValue', attribute = topNode + '.flock.averageNeighbours.DrawLine.thickness', value = '[1] 3')
+    executeCommand('SetAttributeValue', attribute = topNode + '.flock.averageNeighbours.DrawLine.colors', value = '[(0,1,0.317647,0.784314)] 7')
+    
+    executeCommand('CreateNode', className = 'DrawLine', name = 'DrawLine1', specializationPreset = 'single', parentNode = topNode + '.flock.averageNeighbours')
+    executeCommand('SetAttributeValue', attribute = topNode + '.flock.averageNeighbours.DrawLine1.thickness', value = '[1] 3')
+    executeCommand('SetAttributeValue', attribute = topNode + '.flock.averageNeighbours.DrawLine1.colors', value = '[(0,0.819608,1,0.0784314)] 7')
+    
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.flock.averageNeighbours.LoopInput.localElement', destinationAttribute = topNode + '.flock.averageNeighbours.FindPointsInRange.point')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.flock.averageNeighbours.range', destinationAttribute = topNode + '.flock.averageNeighbours.FindPointsInRange.range')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.flock.averageNeighbours.globalArray', destinationAttribute = topNode + '.flock.averageNeighbours.FindPointsInRange.points')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.flock.averageNeighbours.globalArray', destinationAttribute = topNode + '.flock.averageNeighbours.LoopInput.globalArray')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.flock.averageNeighbours.FindPointsInRange.pointsInRange', destinationAttribute = topNode + '.flock.averageNeighbours.Average.in')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.flock.averageNeighbours.Average.out', destinationAttribute = topNode + '.flock.averageNeighbours.LoopOutput.localElement')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.flock.averageNeighbours.LoopOutput.globalArray', destinationAttribute = topNode + '.flock.averageNeighbours.output')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.flock.averageNeighbours.Average.out', destinationAttribute = topNode + '.flock.averageNeighbours.BuildArray.in0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.flock.averageNeighbours.LoopInput.localElement', destinationAttribute = topNode + '.flock.averageNeighbours.BuildArray.in1')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.flock.averageNeighbours.BuildArray.array', destinationAttribute = topNode + '.flock.averageNeighbours.DrawLine.points')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.flock.averageNeighbours.FindPointsInRange.pointsInRange', destinationAttribute = topNode + '.flock.averageNeighbours.DrawLine1.points')
+    executeCommand('CreateNode', className = 'Mul', name = 'Mul', specializationPreset = 'none', parentNode = topNode + '.flock')
+    
+    executeCommand('CreateNode', className = 'Normalize', name = 'Normalize', specializationPreset = 'none', parentNode = topNode + '.flock')
+    
+    executeCommand('CreateNode', className = 'Sub', name = 'Sub1', specializationPreset = 'none', parentNode = topNode + '.flock')
+    
+    executeCommand('CreateNode', className = 'Sub', name = 'Sub', specializationPreset = 'none', parentNode = topNode + '.flock')
+    
+    executeCommand('CreateNode', className = 'Float', name = 'Float', specializationPreset = 'none', parentNode = topNode + '.flock')
+    executeCommand('SetAttributeValue', attribute = topNode + '.flock.Float.out', value = '[0.001] 3')
+    
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.flock.location', destinationAttribute = topNode + '.flock.averageNeighbours.globalArray')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.flock.range', destinationAttribute = topNode + '.flock.averageNeighbours.range')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.flock.averageNeighbours.LoopOutput.globalArray', destinationAttribute = topNode + '.flock.averageNeighbours.output')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.flock.Sub1.out', destinationAttribute = topNode + '.flock.Mul.in0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.flock.Float.out', destinationAttribute = topNode + '.flock.Mul.in1')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.flock.Mul.out', destinationAttribute = topNode + '.flock.acceleration')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.flock.Sub.out', destinationAttribute = topNode + '.flock.Normalize.element')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.flock.Normalize.normalized', destinationAttribute = topNode + '.flock.Sub1.in0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.flock.velocity', destinationAttribute = topNode + '.flock.Sub1.in1')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.flock.averageNeighbours.output', destinationAttribute = topNode + '.flock.Sub.in0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.flock.location', destinationAttribute = topNode + '.flock.Sub.in1')
+    executeCommand('CreateNode', className = 'ForLoop', name = 'drawDirection', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('CreateAttribute', name = 'input', className = 'PassThroughAttribute', parentNode = topNode + '.drawDirection', input = True)
+    
+    executeCommand('CreateNode', className = 'LoopInput', name = 'LoopInput', specializationPreset = 'none', parentNode = topNode + '.drawDirection')
+    
+    executeCommand('CreateNode', className = 'LoopInput', name = 'LoopInput1', specializationPreset = 'none', parentNode = topNode + '.drawDirection')
+    
+    executeCommand('CreateNode', className = 'BuildArray', name = 'BuildArray', specializationPreset = 'none', parentNode = topNode + '.drawDirection')
+    executeCommand('CreateAttribute', name = 'in0', className = 'NumericAttribute', parentNode = topNode + '.drawDirection.BuildArray', input = True)
+    executeCommand('CreateAttribute', name = 'in1', className = 'NumericAttribute', parentNode = topNode + '.drawDirection.BuildArray', input = True)
+    executeCommand('SetupDynamicAttribute', attribute = topNode + '.drawDirection.BuildArray.in0', affect = [topNode + '.drawDirection.BuildArray.array'], affectedBy = [], allowedSpecialization = ['Int','Float','Vec3','Col4','Matrix44'], specializationLinkedTo = [topNode + '.drawDirection.BuildArray.array'], specializationLinkedBy = [])
+    executeCommand('SetupDynamicAttribute', attribute = topNode + '.drawDirection.BuildArray.in1', affect = [topNode + '.drawDirection.BuildArray.array'], affectedBy = [], allowedSpecialization = ['Int','Float','Vec3','Col4','Matrix44'], specializationLinkedTo = [topNode + '.drawDirection.BuildArray.array'], specializationLinkedBy = [])
+    
+    executeCommand('CreateNode', className = 'DrawLine', name = 'DrawLine', specializationPreset = 'single', parentNode = topNode + '.drawDirection')
+    executeCommand('SetAttributeValue', attribute = topNode + '.drawDirection.DrawLine.thickness', value = '[1] 3')
+    executeCommand('SetAttributeValue', attribute = topNode + '.drawDirection.DrawLine.colors', value = '[(1,1,1,1)] 7')
+    
+    executeCommand('CreateNode', className = 'Add', name = 'Add', specializationPreset = 'none', parentNode = topNode + '.drawDirection')
+    
+    executeCommand('CreateNode', className = 'Normalize', name = 'Normalize', specializationPreset = 'none', parentNode = topNode + '.drawDirection')
+    
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.drawDirection.globalArray', destinationAttribute = topNode + '.drawDirection.LoopInput.globalArray')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.drawDirection.input', destinationAttribute = topNode + '.drawDirection.LoopInput1.globalArray')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.drawDirection.LoopInput.localElement', destinationAttribute = topNode + '.drawDirection.BuildArray.in0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.drawDirection.Add.out', destinationAttribute = topNode + '.drawDirection.BuildArray.in1')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.drawDirection.BuildArray.array', destinationAttribute = topNode + '.drawDirection.DrawLine.points')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.drawDirection.LoopInput.localElement', destinationAttribute = topNode + '.drawDirection.Add.in0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.drawDirection.Normalize.normalized', destinationAttribute = topNode + '.drawDirection.Add.in1')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.drawDirection.LoopInput1.localElement', destinationAttribute = topNode + '.drawDirection.Normalize.element')
+    executeCommand('CreateNode', className = 'GeoSphere', name = 'GeoSphere', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('SetAttributeValue', attribute = topNode + '.GeoSphere.radius', value = '[10] 3')
+    executeCommand('SetAttributeValue', attribute = topNode + '.GeoSphere.rings', value = '[10] 1')
+    executeCommand('SetAttributeValue', attribute = topNode + '.GeoSphere.sectors', value = '[10] 1')
+    
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.GeoSphere.out', destinationAttribute = topNode + '.GetGeoPoints.geo')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.globalLocation.string', destinationAttribute = topNode + '.getLocation.storageKey')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.GetGeoPoints.points', destinationAttribute = topNode + '.getLocation.source')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Time.time', destinationAttribute = topNode + '.getLocation.step')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.getLocation.data', destinationAttribute = topNode + '.flock.location')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.globalVelocity.string', destinationAttribute = topNode + '.getVelocity.storageKey')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.ConstantArray.array', destinationAttribute = topNode + '.getVelocity.source')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Time.time', destinationAttribute = topNode + '.getVelocity.step')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.getVelocity.data', destinationAttribute = topNode + '.flock.velocity')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.ArraySize.size', destinationAttribute = topNode + '.ConstantArray.size')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.initialVelocity.vector', destinationAttribute = topNode + '.ConstantArray.constant')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.GetGeoPoints.points', destinationAttribute = topNode + '.ArraySize.array')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.globalLocation.string', destinationAttribute = topNode + '.setLocation.storageKey')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Add1.out', destinationAttribute = topNode + '.setLocation.data')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.globalVelocity.string', destinationAttribute = topNode + '.setVelocity.storageKey')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Add.out', destinationAttribute = topNode + '.setVelocity.data')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.setVelocity.result', destinationAttribute = topNode + '.drawDirection.input')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.getVelocity.data', destinationAttribute = topNode + '.Add.in0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.flock.acceleration', destinationAttribute = topNode + '.Add.in1')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.getLocation.data', destinationAttribute = topNode + '.Add1.in0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Add.out', destinationAttribute = topNode + '.Add1.in1')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.setLocation.result', destinationAttribute = topNode + '.ProcessSimulation.data0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.setVelocity.result', destinationAttribute = topNode + '.ProcessSimulation.data1')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.ProcessSimulation.out', destinationAttribute = topNode + '.DrawPoint.points')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.getLocation.data', destinationAttribute = topNode + '.flock.location')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.getVelocity.data', destinationAttribute = topNode + '.flock.velocity')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.flock.range', destinationAttribute = topNode + '.flock.averageNeighbours.range')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.flock.Mul.out', destinationAttribute = topNode + '.flock.acceleration')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.setLocation.result', destinationAttribute = topNode + '.drawDirection.globalArray')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.setVelocity.result', destinationAttribute = topNode + '.drawDirection.input')
+    # nodeEditor save data
+    executeCommand('SetNodeUiData', node = topNode, data = {})
+    executeCommand('SetNodeUiData', node = topNode + '.GetGeoPoints', data = {'pos': [-634.0, -256.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.getLocation', data = {'pos': [85.0, -80.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.Time', data = {'pos': [-552.49579831932749, 223.53571428571419]})
+    executeCommand('SetNodeUiData', node = topNode + '.getVelocity', data = {'pos': [76.0, 113.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.ConstantArray', data = {'pos': [-361.0, -35.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.ArraySize', data = {'pos': [-464.0, -108.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.initialVelocity', data = {'pos': [-576.92307692307691, -3.0769230769230873]})
+    executeCommand('SetNodeUiData', node = topNode + '.globalLocation', data = {'pos': [-80.0, -184.49999999999994]})
+    executeCommand('SetNodeUiData', node = topNode + '.globalVelocity', data = {'pos': [-117.99999999999996, 277.00000000000034]})
+    executeCommand('SetNodeUiData', node = topNode + '.setLocation', data = {'pos': [963.9411764705892, 54.392156862745253]})
+    executeCommand('SetNodeUiData', node = topNode + '.setVelocity', data = {'pos': [934.00000000000045, 271.50000000000011]})
+    executeCommand('SetNodeUiData', node = topNode + '.Add', data = {'pos': [645.44117647058863, 201.1764705882353]})
+    executeCommand('SetNodeUiData', node = topNode + '.Add1', data = {'pos': [804.26470588235338, 106.02941176470591]})
+    executeCommand('SetNodeUiData', node = topNode + '.ProcessSimulation', data = {'pos': [1133.5294117647063, 170.14705882352951]})
+    executeCommand('SetNodeUiData', node = topNode + '.DrawPoint', data = {'pos': [1309.1372549019611, 233.83333333333337]})
+    executeCommand('SetNodeUiData', node = topNode + '.flock', data = {'attributes': [{'name': 'location', 'pos': [-466.49206349206355, -185.84126984126991]}, {'name': 'range', 'pos': [-486.4285714285715, 192.28571428571433]}, {'name': 'velocity', 'pos': [-513.34920634920627, -57.269841269841351]}, {'name': 'acceleration', 'pos': [451.81376518218599, 217.2091125249018]}], 'pos': [370.84615384615381, 72.230769230769226]})
+    executeCommand('SetNodeUiData', node = topNode + '.flock.averageNeighbours', data = {'attributes': [{'name': 'globalArray', 'pos': [-490.98412698412744, 262.57142857142867]}, {'name': 'range', 'pos': [-418.90756302521027, 496.40336134453793]}, {'name': 'output', 'pos': [858.99999999999977, 488.14285714285728]}], 'pos': [-284.38095238095229, -4.4761904761902258]})
+    executeCommand('SetNodeUiData', node = topNode + '.flock.averageNeighbours.FindPointsInRange', data = {'pos': [148.33333333333314, 330.6666666666668]})
+    executeCommand('SetNodeUiData', node = topNode + '.flock.averageNeighbours.LoopInput', data = {'pos': [-178.55555555555588, 175.00000000000009]})
+    executeCommand('SetNodeUiData', node = topNode + '.flock.averageNeighbours.Average', data = {'pos': [422.99999999999977, 422.14285714285728]})
+    executeCommand('SetNodeUiData', node = topNode + '.flock.averageNeighbours.LoopOutput', data = {'pos': [613.0, 482.14285714285728]})
+    executeCommand('SetNodeUiData', node = topNode + '.flock.averageNeighbours.BuildArray', data = {'pos': [756.85714285714312, 289.14285714285722]})
+    executeCommand('SetNodeUiData', node = topNode + '.flock.averageNeighbours.DrawLine', data = {'pos': [886.0, 323.42857142857156]})
+    executeCommand('SetNodeUiData', node = topNode + '.flock.averageNeighbours.DrawLine1', data = {'pos': [890.5714285714289, 206.57142857142878]})
+    executeCommand('SetNodeUiData', node = topNode + '.flock.Mul', data = {'pos': [331.76470588235298, 61.176470588235304]})
+    executeCommand('SetNodeUiData', node = topNode + '.flock.Normalize', data = {'pos': [39.0, -74.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.flock.Sub1', data = {'pos': [220.41176470588235, -18.64705882352942]})
+    executeCommand('SetNodeUiData', node = topNode + '.flock.Sub', data = {'pos': [-88.0, -151.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.flock.Float', data = {'pos': [207.69230769230779, 160.00000000000009]})
+    executeCommand('SetNodeUiData', node = topNode + '.drawDirection', data = {'attributes': [{'name': 'globalArray', 'pos': [-162.0, -1.0]}, {'name': 'input', 'pos': [-335.0, 122.0]}], 'pos': [1249.333333333333, 432.00000000000017]})
+    executeCommand('SetNodeUiData', node = topNode + '.drawDirection.LoopInput', data = {'pos': [7.0, -54.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.drawDirection.LoopInput1', data = {'pos': [-208.0, 114.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.drawDirection.BuildArray', data = {'pos': [405.0, 63.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.drawDirection.DrawLine', data = {'pos': [552.0, 119.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.drawDirection.Add', data = {'pos': [235.0, 77.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.drawDirection.Normalize', data = {'pos': [-34.0, 225.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.GeoSphere', data = {'pos': [-955.0, -225.00000000000003]})
+    

@@ -1,0 +1,86 @@
+
+import sys
+import os
+import distutils
+import sconsUtils
+
+os.environ["CORAL_BUILD_FLAVOUR"] = "coralMaya"
+
+sconsUtils.importBuildEnvs()
+
+coralPath = os.path.join(os.pardir, os.pardir, "coral")
+coralLib = None
+try:
+    Import("coralLib")
+except:
+    coralLib = SConscript(os.path.join(coralPath, "SConstruct"))
+
+
+coralMayaPath = os.path.join(os.pardir)
+coralMayaLib = None
+try:
+    Import("coralMayaLib")
+except:
+    coralMayaLib = SConscript(os.path.join(coralMayaPath, "SConstruct"), exports = {"coralLib": coralLib})
+
+coralUiPath = os.path.join(os.pardir, os.pardir, "coralUi")
+coralUiLib = None
+try:
+    Import("coralUiLib")
+except:
+    coralUiLib = SConscript(os.path.join(coralUiPath, "SConstruct"), exports = {"coralLib": coralLib})
+
+if sys.platform.startswith("win"):
+    coralLib = coralLib[1]
+    coralMayaLib = coralMayaLib[1]
+    coralUiLib = coralUiLib[1]
+
+env = Environment(
+  CPPPATH = [
+    os.path.join(os.pardir, os.pardir), 
+    os.path.join(coralMayaPath, "src"), 
+    sconsUtils.getEnvVar("CORAL_MAYA_INCLUDES_PATH"), 
+    sconsUtils.getEnvVar("CORAL_PYTHON_INCLUDES_PATH"),
+    sconsUtils.getEnvVar("CORAL_BOOST_INCLUDES_PATH"), 
+    sconsUtils.getEnvVar("CORAL_GLEW_INCLUDES_PATH")], 
+  LIBS = [
+    coralLib, 
+    coralUiLib, 
+    coralMayaLib, 
+    sconsUtils.getEnvVar("CORAL_PYTHON_LIB"),
+    sconsUtils.getEnvVar("CORAL_GLEW_LIB"), 
+    sconsUtils.getEnvVar("CORAL_BOOST_PYTHON_LIB"),
+    "Foundation", "OpenMaya", "OpenMayaAnim", "OpenMayaUI"],
+  LIBPATH = [
+    coralPath, 
+    coralUiPath, 
+    coralMayaPath, 
+    sconsUtils.getEnvVar("CORAL_PYTHON_LIBS_PATH"), 
+    sconsUtils.getEnvVar("CORAL_MAYA_LIBS_PATH"),
+    sconsUtils.getEnvVar("CORAL_BOOST_LIBS_PATH"),
+    sconsUtils.getEnvVar("CORAL_GLEW_LIBS_PATH")])
+
+targetName = "coralMayaPlugin"
+
+if sys.platform.startswith("linux"):
+    env.Append(CCFLAGS = "-m64 -D_BOOL -DLINUX -DREQUIRE_IOSTREAM -O3")
+    env.Append(SHLIBPREFIX = "")
+elif sys.platform == "darwin":
+    env.Append(CCFLAGS = "-DOSMac_ -DOSMacOSX_ -m64 -D_BOOL -DREQUIRE_IOSTREAM -O3")
+    targetName += ".bundle"
+    env["FRAMEWORKS"] = ["OpenGL"]
+
+elif sys.platform.startswith("win"):
+    env["SHLIBPREFIX"] = ""
+    env["SHLIBSUFFIX"] = ".mll"
+    env["CXXFLAGS"] = Split("/Zm800 -nologo /EHsc /DBOOST_PYTHON_DYNAMIC_LIB /Z7 /Od /Ob0 /GR /MD /wd4675 /Zc:forScope /Zc:wchar_t")
+    env["LINKFLAGS"] = Split("/MANIFEST:NO /INCREMENTAL:NO /export:initializePlugin /export:uninitializePlugin OpenGL32.lib glu32.lib")
+    env["CCFLAGS"] = Split("-DWIN64 -DNDEBUG -D_WINDOWS -D_USRDLL -DNT_PLUGIN -DREQUIRE_IOSTREAM")
+
+
+target = env.LoadableModule(
+            target = targetName,
+            source = sconsUtils.findFiles("src", pattern = "*.cpp"),
+            OBJPREFIX = os.path.join(os.pardir, "debugCoralMaya", ""))
+
+Return("target")

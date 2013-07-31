@@ -1,0 +1,49 @@
+
+import sys
+import os
+import platform
+import sconsUtils
+
+msvc_version = ""
+if os.environ.has_key("MSVC_VERSION"):
+    msvc_version = os.environ["MSVC_VERSION"]
+
+sconsUtils.importBuildEnvs()
+
+buildMode = sconsUtils.getEnvVar("CORAL_BUILD_MODE")
+
+
+env = Environment(
+  CPPPATH = [
+    os.path.join(os.pardir, "coral", "src"),
+    sconsUtils.getEnvVar("CORAL_IMATH_INCLUDES_PATH"),
+    sconsUtils.getEnvVar("CORAL_PYTHON_INCLUDES_PATH"), 
+    sconsUtils.getEnvVar("CORAL_BOOST_INCLUDES_PATH")],
+  LIBS = [
+    sconsUtils.getEnvVar("CORAL_IMATH_LIB"),
+    sconsUtils.getEnvVar("CORAL_IMATH_IEX_LIB"),
+    sconsUtils.getEnvVar("CORAL_PYTHON_LIB"), 
+    sconsUtils.getEnvVar("CORAL_BOOST_PYTHON_LIB")],
+  LIBPATH = [
+    sconsUtils.getEnvVar("CORAL_IMATH_LIBS_PATH"),
+    sconsUtils.getEnvVar("CORAL_PYTHON_LIBS_PATH"), 
+    sconsUtils.getEnvVar("CORAL_BOOST_LIBS_PATH")],
+  SHLIBPREFIX = "",
+  MSVC_VERSION=msvc_version,
+  TARGET_ARCH = platform.machine())
+
+
+if sys.platform == "darwin":
+    env["SHLIBSUFFIX"] = ".so"
+elif sys.platform.startswith("win"):
+    env["SHLIBSUFFIX"] = ".pyd"
+    env["CXXFLAGS"] = Split("/Zm800 -nologo /EHsc /DBOOST_PYTHON_DYNAMIC_LIB /Z7 /Od /Ob0 /GR /MD /wd4675 /Zc:forScope /Zc:wchar_t /MP")
+    env["CCFLAGS"] = "-DBOOST_PYTHON_MAX_ARITY=16"
+    env["LINKFLAGS"] = ["/MANIFEST:NO"]
+
+target = env.SharedLibrary(
+            target = "Imath",
+            source = sconsUtils.findFiles("ImathPythonWrapper", pattern = "*.cpp"),
+            OBJPREFIX = os.path.join(os.pardir, "debug" + buildMode, ""))
+
+Return("target")

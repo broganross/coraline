@@ -1,0 +1,71 @@
+# coral save script
+version = 0.1
+
+def runScript(topNode = 'root'):
+    executeCommand('CreateNode', className = 'GeoCube', name = 'GeoCube', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('SetAttributeValue', attribute = topNode + '.GeoCube.width', value = '[5.000000] 3')
+    executeCommand('SetAttributeValue', attribute = topNode + '.GeoCube.height', value = '[20.000000] 3')
+    executeCommand('SetAttributeValue', attribute = topNode + '.GeoCube.depth', value = '[5.000000] 3')
+    executeCommand('SetAttributeValue', attribute = topNode + '.GeoCube.widthSubdivisions', value = '[5] 1')
+    executeCommand('SetAttributeValue', attribute = topNode + '.GeoCube.heightSubdivisions', value = '[20] 1')
+    executeCommand('SetAttributeValue', attribute = topNode + '.GeoCube.depthSubdivisions', value = '[5] 1')
+    
+    executeCommand('CreateNode', className = 'DrawGeo', name = 'DrawGeo', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('SetAttributeValue', attribute = topNode + '.DrawGeo.smooth', value = 'True')
+    executeCommand('SetAttributeValue', attribute = topNode + '.DrawGeo.flat', value = 'True')
+    executeCommand('SetAttributeValue', attribute = topNode + '.DrawGeo.wireframe', value = 'False')
+    executeCommand('SetAttributeValue', attribute = topNode + '.DrawGeo.points', value = 'False')
+    executeCommand('SetAttributeValue', attribute = topNode + '.DrawGeo.normals', value = 'False')
+    
+    executeCommand('CreateNode', className = 'CollapsedNode', name = 'Twister', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('CreateAttribute', name = 'geo', className = 'PassThroughAttribute', parentNode = topNode + '.Twister', input = True)
+    executeCommand('CreateAttribute', name = 'output', className = 'PassThroughAttribute', parentNode = topNode + '.Twister', output = True)
+    executeCommand('CreateAttribute', name = 'twistMultiplier', className = 'PassThroughAttribute', parentNode = topNode + '.Twister', input = True, specializationOverride = 'Float')
+    
+    executeCommand('CreateNode', className = 'GetGeoPoints', name = 'GetGeoPoints', specializationPreset = 'none', parentNode = topNode + '.Twister')
+    
+    executeCommand('CreateNode', className = 'Vec3ToFloats', name = 'Vec3ToFloats', specializationPreset = 'none', parentNode = topNode + '.Twister')
+    
+    executeCommand('CreateNode', className = 'SetGeoPoints', name = 'SetGeoPoints', specializationPreset = 'none', parentNode = topNode + '.Twister')
+    
+    executeCommand('CreateNode', className = 'Mul', name = 'Mul1', specializationPreset = 'none', parentNode = topNode + '.Twister')
+    
+    executeCommand('CreateNode', className = 'Matrix44', name = 'Matrix44', specializationPreset = 'none', parentNode = topNode + '.Twister')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Twister.Matrix44.translateX', value = '[0.000000] 4')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Twister.Matrix44.translateY', value = '[0.000000] 4')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Twister.Matrix44.translateZ', value = '[0.000000] 4')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Twister.Matrix44.eulerX', value = '[0.000000] 4')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Twister.Matrix44.eulerZ', value = '[0.000000] 4')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Twister.Matrix44.scaleX', value = '[1.000000] 4')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Twister.Matrix44.scaleY', value = '[1.000000] 4')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Twister.Matrix44.scaleZ', value = '[1.000000] 4')
+    
+    executeCommand('CreateNode', className = 'Mul', name = 'Mul', specializationPreset = 'none', parentNode = topNode + '.Twister')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Twister.Mul.in1', value = '[6.800000] 3')
+    
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Twister.geo', destinationAttribute = topNode + '.Twister.GetGeoPoints.geo')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Twister.GetGeoPoints.points', destinationAttribute = topNode + '.Twister.Vec3ToFloats.vector')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Twister.geo', destinationAttribute = topNode + '.Twister.SetGeoPoints.inGeo')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Twister.Mul1.out', destinationAttribute = topNode + '.Twister.SetGeoPoints.points')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Twister.SetGeoPoints.outGeo', destinationAttribute = topNode + '.Twister.output')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Twister.GetGeoPoints.points', destinationAttribute = topNode + '.Twister.Mul1.in0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Twister.Matrix44.matrix', destinationAttribute = topNode + '.Twister.Mul1.in1')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Twister.Mul.out', destinationAttribute = topNode + '.Twister.Matrix44.eulerY')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Twister.Vec3ToFloats.y', destinationAttribute = topNode + '.Twister.Mul.in0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Twister.twistMultiplier', destinationAttribute = topNode + '.Twister.Mul.in1')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.GeoCube.out', destinationAttribute = topNode + '.Twister.geo')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Twister.output', destinationAttribute = topNode + '.DrawGeo.geo')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.GeoCube.out', destinationAttribute = topNode + '.Twister.geo')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Twister.SetGeoPoints.outGeo', destinationAttribute = topNode + '.Twister.output')
+    # nodeEditor save data
+    executeCommand('SetNodeUiData', node = topNode, data = {})
+    executeCommand('SetNodeUiData', node = topNode + '.GeoCube', data = {'pos': [-135.0, -297.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.DrawGeo', data = {'pos': [373.41176470588221, -114.41176470588243]})
+    executeCommand('SetNodeUiData', node = topNode + '.Twister', data = {'attributes': [{'name': 'geo', 'pos': [-400.00000000000034, -242.22222222222243]}, {'name': 'output', 'pos': [1116.0000000000009, -53.666666666666913]}, {'name': 'twistMultiplier', 'pos': [-167.0, 252.0]}], 'pos': [148.99690402476779, -148.58462332301343]})
+    executeCommand('SetNodeUiData', node = topNode + '.Twister.GetGeoPoints', data = {'pos': [-232.99999999999989, -75.058823529411768]})
+    executeCommand('SetNodeUiData', node = topNode + '.Twister.Vec3ToFloats', data = {'pos': [-92.705882352941046, -6.5882352941176237]})
+    executeCommand('SetNodeUiData', node = topNode + '.Twister.SetGeoPoints', data = {'pos': [925.13445378151278, -199.0168067226891]})
+    executeCommand('SetNodeUiData', node = topNode + '.Twister.Mul1', data = {'pos': [823.48739495798304, -130.13445378151263]})
+    executeCommand('SetNodeUiData', node = topNode + '.Twister.Matrix44', data = {'pos': [635.66386554621863, -33.252100840336091]})
+    executeCommand('SetNodeUiData', node = topNode + '.Twister.Mul', data = {'pos': [134.0, 86.0]})
+    

@@ -1,0 +1,63 @@
+# coral save script
+version = 0.1
+
+def runScript(topNode = 'root'):
+    executeCommand('CreateNode', className = 'ObjImporter', name = 'ObjImporter', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('SetAttributeValue', attribute = topNode + '.ObjImporter.fileName', value = 'geo.obj')
+    
+    executeCommand('CreateNode', className = 'DrawGeo', name = 'DrawGeo', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('SetAttributeValue', attribute = topNode + '.DrawGeo.smooth', value = 'True')
+    executeCommand('SetAttributeValue', attribute = topNode + '.DrawGeo.flat', value = 'False')
+    executeCommand('SetAttributeValue', attribute = topNode + '.DrawGeo.wireframe', value = 'False')
+    executeCommand('SetAttributeValue', attribute = topNode + '.DrawGeo.points', value = 'False')
+    executeCommand('SetAttributeValue', attribute = topNode + '.DrawGeo.normals', value = 'False')
+    
+    executeCommand('CreateNode', className = 'ImportCIOTransforms', name = 'walk', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('SetAttributeValue', attribute = topNode + '.walk.file', value = 'anim.cio')
+    
+    executeCommand('CreateNode', className = 'ImportCIOTransforms', name = 'bindPose', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('SetAttributeValue', attribute = topNode + '.bindPose.file', value = 'bindPose.cio')
+    executeCommand('SetAttributeValue', attribute = topNode + '.bindPose.time', value = '[0] 3')
+    
+    executeCommand('CreateNode', className = 'SkinWeightDeformer', name = 'SkinWeightDeformer', specializationPreset = 'none', parentNode = topNode)
+    
+    executeCommand('CreateNode', className = 'GetGeoPoints', name = 'GetGeoPoints', specializationPreset = 'none', parentNode = topNode)
+    
+    executeCommand('CreateNode', className = 'ImportCIOSkinWeights', name = 'ImportCIOSkinWeights', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('SetAttributeValue', attribute = topNode + '.ImportCIOSkinWeights.file', value = 'skinWeights.cio')
+    
+    executeCommand('CreateNode', className = 'SetGeoPoints', name = 'SetGeoPoints', specializationPreset = 'none', parentNode = topNode)
+    
+    executeCommand('CreateNode', className = 'Time', name = 'Time', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('SetAttributeValue', attribute = topNode + '.Time.framesPerSecond', value = '[24] 3')
+    executeCommand('SetAttributeValue', attribute = topNode + '.Time.time', value = '[0] 3')
+    
+    executeCommand('CreateNode', className = 'RangeLoop', name = 'RangeLoop', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('SetAttributeValue', attribute = topNode + '.RangeLoop.start', value = '[0] 3')
+    executeCommand('SetAttributeValue', attribute = topNode + '.RangeLoop.end', value = '[28] 3')
+    
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.SetGeoPoints.outGeo', destinationAttribute = topNode + '.DrawGeo.geo')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.RangeLoop.valueInRange', destinationAttribute = topNode + '.walk.time')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.ImportCIOSkinWeights.vertices', destinationAttribute = topNode + '.SkinWeightDeformer.skinWeightVertices')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.ImportCIOSkinWeights.deformers', destinationAttribute = topNode + '.SkinWeightDeformer.skinWeightDeformers')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.ImportCIOSkinWeights.weights', destinationAttribute = topNode + '.SkinWeightDeformer.skinWeightValues')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.GetGeoPoints.points', destinationAttribute = topNode + '.SkinWeightDeformer.points')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.walk.out', destinationAttribute = topNode + '.SkinWeightDeformer.deformers')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.bindPose.out', destinationAttribute = topNode + '.SkinWeightDeformer.bindPoseDeformers')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.ObjImporter.geo', destinationAttribute = topNode + '.GetGeoPoints.geo')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.ObjImporter.geo', destinationAttribute = topNode + '.SetGeoPoints.inGeo')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.SkinWeightDeformer.outPoints', destinationAttribute = topNode + '.SetGeoPoints.points')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.Time.time', destinationAttribute = topNode + '.RangeLoop.step')
+    # nodeEditor save data
+    executeCommand('SetNodeUiData', node = topNode, data = {})
+    executeCommand('SetNodeUiData', node = topNode + '.ObjImporter', data = {'pos': [-370.22807017543852, -18.403508771929779]})
+    executeCommand('SetNodeUiData', node = topNode + '.DrawGeo', data = {'pos': [470.00000000000023, 180.66666666666686]})
+    executeCommand('SetNodeUiData', node = topNode + '.walk', data = {'pos': [-358.47368421052636, 452.26315789473688]})
+    executeCommand('SetNodeUiData', node = topNode + '.bindPose', data = {'pos': [-365.26315789473682, 288.42105263157896]})
+    executeCommand('SetNodeUiData', node = topNode + '.SkinWeightDeformer', data = {'pos': [10.771929824561425, 173.54385964912279]})
+    executeCommand('SetNodeUiData', node = topNode + '.GetGeoPoints', data = {'pos': [-158.66666666666663, 106.00000000000009]})
+    executeCommand('SetNodeUiData', node = topNode + '.ImportCIOSkinWeights', data = {'pos': [-388.0, 126.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.SetGeoPoints', data = {'pos': [276.66666666666663, 75.000000000000085]})
+    executeCommand('SetNodeUiData', node = topNode + '.Time', data = {'pos': [-825.42857142857133, 328.57142857142867]})
+    executeCommand('SetNodeUiData', node = topNode + '.RangeLoop', data = {'pos': [-584.0, 365.85714285714289]})
+    

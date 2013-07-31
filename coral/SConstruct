@@ -1,0 +1,72 @@
+
+import sys
+import os
+import platform
+import sconsUtils
+
+sconsUtils.importBuildEnvs()
+
+buildMode = sconsUtils.getEnvVar("CORAL_BUILD_MODE")
+
+msvc_version = ""
+if os.environ.has_key("MSVC_VERSION"):
+    msvc_version = os.environ["MSVC_VERSION"]
+
+env = Environment(
+  CPPPATH = [
+    sconsUtils.getEnvVar("CORAL_IMATH_INCLUDES_PATH"),
+    sconsUtils.getEnvVar("CORAL_PYTHON_INCLUDES_PATH"), 
+    sconsUtils.getEnvVar("CORAL_BOOST_INCLUDES_PATH"),
+    sconsUtils.getEnvVar("CORAL_OIIO_INCLUDES_PATH")],
+  LIBS = [
+    sconsUtils.getEnvVar("CORAL_IMATH_LIB"),
+    sconsUtils.getEnvVar("CORAL_IMATH_IEX_LIB"),
+    sconsUtils.getEnvVar("CORAL_PYTHON_LIB"), 
+    sconsUtils.getEnvVar("CORAL_BOOST_PYTHON_LIB"),
+    sconsUtils.getEnvVar("CORAL_OIIO_LIB")],
+  LIBPATH = [
+    sconsUtils.getEnvVar("CORAL_IMATH_LIBS_PATH"),
+    sconsUtils.getEnvVar("CORAL_PYTHON_LIBS_PATH"), 
+    sconsUtils.getEnvVar("CORAL_BOOST_LIBS_PATH"),
+    sconsUtils.getEnvVar("CORAL_OIIO_LIBS_PATH")],
+  SHLIBPREFIX = "",
+  MSVC_VERSION=msvc_version,
+  TARGET_ARCH = platform.machine())
+
+if os.environ.has_key("CORAL_PARALLEL"):
+    if os.environ["CORAL_PARALLEL"] == "CORAL_PARALLEL_TBB":
+        env["CPPPATH"].append(sconsUtils.getEnvVar("CORAL_TBB_INCLUDES_PATH"))
+        env["LIBS"].append(sconsUtils.getEnvVar("CORAL_TBB_LIB"))
+        env["LIBPATH"].append(sconsUtils.getEnvVar("CORAL_TBB_LIBS_PATH"))
+
+if sys.platform.startswith("linux"):
+    pass
+
+elif sys.platform == "darwin":
+    env["SHLIBSUFFIX"] = ".so"
+    
+elif sys.platform.startswith("win"):
+    env["SHLIBSUFFIX"] = ".pyd"
+    env["CXXFLAGS"] = Split("/Zm800 -nologo /EHsc /DBOOST_PYTHON_DYNAMIC_LIB /Z7 /Od /Ob0 /GR /MD /wd4675 /Zc:forScope /Zc:wchar_t /bigobj /MP /openmp")
+    env["CCFLAGS"] = ["-DCORAL_COMPILE"]
+    env["LINKFLAGS"] = ["/MANIFEST:NO"]
+    if os.environ.has_key("CORAL_OPENMP"):
+        env["CCFLAGS"].append("-DCORAL_OPENMP")
+
+if os.environ.has_key("CORAL_PARALLEL"):
+    parallel =  os.environ["CORAL_PARALLEL"]
+    if parallel:
+        print "* Using parallel computation: ", parallel
+        env["CCFLAGS"].append("-D" + parallel)
+
+builtinNodes = sconsUtils.findFiles("builtinNodes", pattern = "*.cpp")
+pythonWrapperFiles = sconsUtils.findFiles("pythonWrappers", pattern = "*.cpp")
+srcFiles = sconsUtils.findFiles("src", pattern = "*.cpp")
+cppFiles = builtinNodes + pythonWrapperFiles + srcFiles
+
+target = env.SharedLibrary(
+            target = "_coral",
+            source = cppFiles,
+            OBJPREFIX = os.path.join("debug" + os.environ["CORAL_BUILD_FLAVOUR"] + buildMode, ""))
+
+Return("target")
