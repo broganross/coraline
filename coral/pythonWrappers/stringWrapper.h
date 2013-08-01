@@ -69,6 +69,10 @@ void string_setStringValues(String &self, boost::python::list pyList){
 	self.setStringValues(convertedList);
 }
 
+void string_setStringValueAt(String &self, unsigned int id, std::string value){
+	self.setStringValueAt(id, value);
+}
+
 int string_type(String &self){
 	return int(self.type());
 }
@@ -92,7 +96,7 @@ void stringWrapper(){
 		.def("isArray", &String::isArray)
 		.def("size", &String::size)
 		.def("resize", &String::resize)
-		.def("setStringValueAt", &String::setStringValueAt)
+		.def("setStringValueAt", string_setStringValueAt)
 		.def("setStringValues", string_setStringValues)
 		.def("stringValueAt", &String::stringValueAt)
 		.def("stringValues", string_stringValues)

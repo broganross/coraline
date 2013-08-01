@@ -178,7 +178,7 @@ class NodeView(QtGui.QGraphicsView):
                 if not newNodeName:
                     continue
                 newNode = coralApp.findNode(newNodeName)
-                newNode.findAttribute("filepath").value().setStringValue(str(url.toString()))
+                newNode.findAttribute("filepath").value().setStringValueAt(0, str(url.toString()))
                 sceneItem = nodeEditor.NodeEditor.findNodeUi(newNode.id())
                 scenePos = self.mapToScene(event.pos())
                 sceneItem.setPos(scenePos)

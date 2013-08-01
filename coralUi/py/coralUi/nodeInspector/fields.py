@@ -291,10 +291,10 @@ class StringValueField(AttributeField):
 
    
     def setAttributeValue(self, attribute, value):
-        attribute.outValue().setStringValue(value)
+        attribute.outValue().setStringValueAt(0, value)
     
     def getAttributeValue(self, attribute):
-        return attribute.value().stringValue()
+        return attribute.value().stringValueAt(0)
     
     def setWidgetValue(self, widget, value):
         if type(widget) is FilePathWidget:
