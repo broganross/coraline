@@ -136,6 +136,22 @@ void numericNodesWrapper(){
 	boost::python::to_python_converter<std::vector<int>, pythonWrapperUtils::stdVectorToPythonList<int> >();
 	boost::python::to_python_converter<std::vector<float>, pythonWrapperUtils::stdVectorToPythonList<float> >();
 
+	boost::python::enum_<Numeric::Type>("Type")
+		.value("numericTypeAny", Numeric::numericTypeAny)
+		.value("numericTypeInt", Numeric::numericTypeInt)
+		.value("numericTypeIntArray", Numeric::numericTypeIntArray)
+		.value("numericTypeFloat", Numeric::numericTypeFloat)
+		.value("numericTypeFloatArray", Numeric::numericTypeFloatArray)
+		.value("numericTypeVec3", Numeric::numericTypeVec3)
+		.value("numericTypeVec3Array", Numeric::numericTypeVec3Array)
+		.value("numericTypeCol4", Numeric::numericTypeCol4)
+		.value("numericTypeCol4Array", Numeric::numericTypeCol4Array)
+		.value("numericTypeQuat", Numeric::numericTypeQuat)
+		.value("numericTypeQuatArray", Numeric::numericTypeQuatArray)
+		.value("numericTypeMatrix44", Numeric::numericTypeMatrix44)
+		.value("numericTypeMatrix44Array", Numeric::numericTypeMatrix44Array)
+	;
+
 	boost::python::class_<Numeric, boost::shared_ptr<Numeric>, boost::python::bases<Value>, boost::noncopyable>("Numeric", boost::python::no_init)
 		.def("__init__", pythonWrapperUtils::__init__<Numeric>)
 		.def("copy", &Numeric::copy)
