@@ -83,6 +83,10 @@ int Enum::currentIndex(){
 	return _currentIndex;
 }
 
+std::string Enum::currentText(int id){
+	return _enum[id];
+}
+
 void Enum::setCurrentIndexChangedCallback(Node * parentNode, void(*callback)(Node *, Enum *)){
 	_currentIndexChangedCallback = callback;
 	_parentNode = parentNode;

@@ -46,6 +46,7 @@ void enumWrapper(){
 		.def("entries", &Enum::entries)
 		.def("setCurrentIndex", &Enum::setCurrentIndex)
 		.def("currentIndex", &Enum::currentIndex)
+		.def("currentText", &Enum::currentText)
 	;
 	
 	pythonWrapperUtils::pythonWrapper<EnumAttribute, Attribute>("EnumAttribute");

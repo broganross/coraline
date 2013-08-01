@@ -51,7 +51,8 @@ public:
 	std::string asString();
 	void setFromString(const std::string &value);
 	void setCurrentIndexChangedCallback(Node * parentNode, void(*callback)(Node *, Enum *));
-	
+	std::string currentText(int id);
+
 private:
 	int _currentIndex;
 	std::map<int, std::string> _enum;
