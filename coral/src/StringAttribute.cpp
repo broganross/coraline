@@ -34,7 +34,7 @@ String::String():
 	_slices(1){
 
 	_valuesSliced.resize(1);
-	_valiesSliced[0].resize(1);
+	_valuesSliced[0].resize(1);
 	_valuesSliced[0][0] = "";
 }
 
@@ -82,6 +82,7 @@ void String::resizeSlice(unsigned int slice, unsigned int newSize){
 		}
 	}
 }
+
 
 bool String::isArrayType(String::Type type){
 	bool arrayType = false;

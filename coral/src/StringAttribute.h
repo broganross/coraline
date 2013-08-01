@@ -61,14 +61,14 @@ namespace coral{
 		void resize(unsigned int newSize);
 		void resizeSlice(unsigned int slice, unsigned int newSize);
 		void resizeSlices(unsigned int slices);
-		bool isArrayType(std::string type);
+		bool isArrayType(String::Type type);
 		void setStringValueAt(unsigned int id, std::string& value);
 		void setStringValues(const std::vector<std::string> &values);
 		void setStringValueAtSlice(unsigned int slice, unsigned int id, std::string& value);
 		void setStringValuesSlice(unsigned int slice, const std::vector<std::string> &values);
 		const std::string stringValueAt(unsigned int id);
 		const std::vector<std::string> &stringValues();
-		std:string stringValueAtSlice(unsigned int slice, unsigned int id);
+		std::string stringValueAtSlice(unsigned int slice, unsigned int id);
 		const std::vector<std::string> &valuesSlice(unsigned int slice);
 
 	private:

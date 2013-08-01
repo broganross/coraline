@@ -2352,7 +2352,7 @@ void SetSimulationStep::updateQuat(const std::string &storageKey, Numeric *data,
 }
 
 void SetSimulationStep::resizedSlices(unsigned int slices){
-	_globalNumericStorage[_storageKey->value()->stringValue()].resizeSlices(slices);
+	_globalNumericStorage[_storageKey->value()->stringValueAt(0)].resizeSlices(slices);
 }
 
 void SetSimulationStep::updateSlice(Attribute *attribute, unsigned int slice){
@@ -2361,7 +2361,7 @@ void SetSimulationStep::updateSlice(Attribute *attribute, unsigned int slice){
 			tbb::mutex::scoped_lock lock(_globalMutex); // block setting _globalNumericStorage from two different threads
 		#endif
 
-		(this->*_selectedOperation)(_storageKey->value()->stringValue(), _data->value(), _result->outValue(), slice);
+		(this->*_selectedOperation)(_storageKey->value()->stringValueAt(0), _data->value(), _result->outValue(), slice);
 	}
 }
 
@@ -2486,7 +2486,7 @@ void GetSimulationStep::updateSlice(Attribute *attribute, unsigned int slice){
 			stepVal = step->intValueAtSlice(slice, 0);
 		}
 
-		(this->*_selectedOperation)(_storageKey->value()->stringValue(), stepVal, _source->value(), _data->outValue(), slice);
+		(this->*_selectedOperation)(_storageKey->value()->stringValueAt(0), stepVal, _source->value(), _data->outValue(), slice);
 	}
 }
 

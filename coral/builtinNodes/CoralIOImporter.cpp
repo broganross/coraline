@@ -238,13 +238,14 @@ ImportCIOTransforms::ImportCIOTransforms(const std::string &name, Node *parent):
 	
 	setAttributeAllowedSpecialization(_time, "Float");
 	setAttributeAllowedSpecialization(_out, "Matrix44Array");
+	setAttributeAllowedSpecialization(_file, "Path");
 	
 	setAttributeAffect(_file, _out);
 	setAttributeAffect(_time, _out);
 }
 
 void ImportCIOTransforms::updateSlice(Attribute *attribute, unsigned int slice){
-	std::string filename = _file->value()->stringValue();
+	std::string filename = _file->value()->stringValueAt(0);
 	filename = NetworkManager::resolveFilename(filename);
 
 	Numeric *time = _time->value();
@@ -302,6 +303,7 @@ ImportCIOSkinWeights::ImportCIOSkinWeights(const std::string &name, Node *parent
 	setAttributeAllowedSpecialization(_vertices, "IntArray");
 	setAttributeAllowedSpecialization(_deformers, "IntArray");
 	setAttributeAllowedSpecialization(_weights, "FloatArray");
+	setAttributeAllowedSpecialization(_file, "Path");
 
 	setAttributeAffect(_file, _vertices);
 	setAttributeAffect(_file, _deformers);
@@ -309,7 +311,7 @@ ImportCIOSkinWeights::ImportCIOSkinWeights(const std::string &name, Node *parent
 }
 
 void ImportCIOSkinWeights::updateSlice(Attribute *attribute, unsigned int slice){
-	std::string filename = _file->value()->stringValue();
+	std::string filename = _file->value()->stringValueAt(0);
 	filename = NetworkManager::resolveFilename(filename);
 
 	std::string version;

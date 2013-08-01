@@ -155,6 +155,9 @@ DrawNode(name, parent){
 	addInputAttribute(_vertexShaderFilename);
 	addInputAttribute(_fragmentShaderFilename);
 
+	setAttributeAllowedSpecialization(_vertexShaderFilename, "Path");
+	setAttributeAllowedSpecialization(_fragmentShaderFilename, "Path");
+
 	catchAttributeDirtied(_geo);
 	catchAttributeDirtied(_vertexShaderFilename);
 	catchAttributeDirtied(_fragmentShaderFilename);
@@ -403,8 +406,8 @@ void ShaderNode::updateDynamicDataFromShaders(const std::string &vertexShaderFil
 }
 
 void ShaderNode::recompileShader(){
-	std::string vertexShaderFilename = NetworkManager::resolveFilename(_vertexShaderFilename->value()->stringValue());
-	std::string fragmentShaderFilename = NetworkManager::resolveFilename(_fragmentShaderFilename->value()->stringValue());
+	std::string vertexShaderFilename = NetworkManager::resolveFilename(_vertexShaderFilename->value()->stringValueAt(0));
+	std::string fragmentShaderFilename = NetworkManager::resolveFilename(_fragmentShaderFilename->value()->stringValueAt(0));
 	
 	if(vertexShaderFilename.empty()){
 		_recompileShaderLog = "Error: Could not find the vertex file : p";
@@ -479,8 +482,8 @@ void ShaderNode::attributeDirtied(Attribute *attribute){
 
 	if(!_initialized){
 		if(attribute == _vertexShaderFilename || attribute == _fragmentShaderFilename){
-			std::string vertexShaderFilename = _vertexShaderFilename->value()->stringValue();
-			std::string fragmentShaderFilename = _fragmentShaderFilename->value()->stringValue();
+			std::string vertexShaderFilename = _vertexShaderFilename->value()->stringValueAt(0);
+			std::string fragmentShaderFilename = _fragmentShaderFilename->value()->stringValueAt(0);
 
 			if(!vertexShaderFilename.empty() && !fragmentShaderFilename.empty()){
 				recompileShader();

@@ -94,8 +94,8 @@ void stringWrapper(){
 		.def("resize", &String::resize)
 		.def("setStringValueAt", &String::setStringValueAt)
 		.def("setStringValues", string_setStringValues)
-		.def("stringValueAt", &tring::stringValueAt)
-		.def("stringValues", string_stringValue)
+		.def("stringValueAt", &String::stringValueAt)
+		.def("stringValues", string_stringValues)
 		.def("createUnwrapped", pythonWrapperUtils::createUnwrapped<String>)
 		.staticmethod("createUnwrapped")
 	;
