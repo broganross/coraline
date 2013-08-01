@@ -47,17 +47,35 @@ namespace coral{
 				pathTypeArray
 			};
 
-		void setStringValue(std::string value);
-		const std::string &stringValue();
+		String();
 		std::string asString();
+		std::string asScript();
+		std::string sliceAsString(unsigned int slice);
 		void setFromString(const std::string &value);
 		void setType(String::Type type);
 		String::Type type();
-
+		bool isArray();
+		unsigned int size();
+		unsigned int sizeSlice(unsigned int slice);
+		unsigned int slices(){return _slices;}
+		void resize(unsigned int newSize);
+		void resizeSlice(unsigned int slice, unsigned int newSize);
+		void resizeSlices(unsigned int slices);
+		bool isArrayType(String::Type type);
+		void setStringValueAt(unsigned int id, std::string& value);
+		void setStringValues(const std::vector<std::string> &values);
+		void setStringValueAtSlice(unsigned int slice, unsigned int id, std::string& value);
+		void setStringValuesSlice(unsigned int slice, const std::vector<std::string> &values);
+		const std::string stringValueAt(unsigned int id);
+		const std::vector<std::string> &stringValues();
+		std::string stringValueAtSlice(unsigned int slice, unsigned int id);
+		const std::vector<std::string> &valuesSlice(unsigned int slice);
 
 	private:
 		std::string _value;
+		std::vector<std::vector<std::string> > _valuesSliced;
 		Type _type;
+		unsigned int _slices;
 	};
 
 	//! Stores a String value and allows for strings to be manipulated by a Node.	
@@ -66,7 +84,6 @@ namespace coral{
 		StringAttribute(const std::string &name, Node *parent);
 
 		String *value();
-
 		String *outValue();
 
 		/*! Will display this attribute in the NodeInspector as an aditable text box, rather then the usual one-line field.*/

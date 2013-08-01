@@ -210,7 +210,7 @@ bool readLine(std::istream& stream, std::vector<Imath::V3f> &vertices, std::vect
 void ObjImporter::updateSlice(Attribute *attribute, unsigned int slice){
 
 	// read
-	std::string filename = _fileName->value()->stringValue();
+	std::string filename = _fileName->value()->stringValueAt(0);
 	filename = NetworkManager::resolveFilename(filename);
 
 	std::ifstream stream(filename.c_str(), std::ios::in | std::ios::ate);

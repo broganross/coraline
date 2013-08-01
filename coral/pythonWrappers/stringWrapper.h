@@ -36,6 +36,10 @@
 
 using namespace coral;
 
+std::vector<std::string> string_stringValues(String &self){
+	return self.stringValues();
+}
+
 int string_stringTypeAny(){
 	return int(String::stringTypeAny);
 }
@@ -44,12 +48,25 @@ int string_stringType(){
 	return int(String::stringType);
 }
 
+int string_stringTypeArray(){
+	return int(String::stringTypeArray);
+}
+
 int string_pathType(){
 	return int(String::pathType);
 }
 
-std::string string_stringValue(String &self){
-	return self.stringValue();
+int string_pathTypeArray(){
+	return int(String::pathTypeArray);
+}
+
+void string_setStringValues(String &self, boost::python::list pyList){
+	std::vector<std::string> convertedList;
+	for(int i=0; i < boost::python::len(pyList); ++i){
+		std::string val = boost::python::extract<std::string>(pyList[i]);
+		convertedList.push_back(val);
+	}
+	self.setStringValues(convertedList);
 }
 
 int string_type(String &self){
@@ -64,14 +81,21 @@ void stringWrapper(){
 	boost::python::enum_<String::Type>("Type")
 		.value("stringTypeAny", String::stringTypeAny)
 		.value("stringType", String::stringType)
+		.value("stringTypeArray", String::stringTypeArray)
 		.value("pathType",String::pathType)
+		.value("pathTypeArray", String::pathTypeArray)
 	;
 	boost::python::class_<String, boost::shared_ptr<String>, boost::python::bases<Value>, boost::noncopyable>("String", boost::python::no_init)
 		.def("__init__", pythonWrapperUtils::__init__<String>)
 		.def("type", string_type)
 		.def("setType", string_setType)
-		.def("setStringValue", &String::setStringValue)
-		.def("stringValue", string_stringValue)
+		.def("isArray", &String::isArray)
+		.def("size", &String::size)
+		.def("resize", &String::resize)
+		.def("setStringValueAt", &String::setStringValueAt)
+		.def("setStringValues", string_setStringValues)
+		.def("stringValueAt", &String::stringValueAt)
+		.def("stringValues", string_stringValues)
 		.def("createUnwrapped", pythonWrapperUtils::createUnwrapped<String>)
 		.staticmethod("createUnwrapped")
 	;

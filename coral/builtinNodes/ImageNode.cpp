@@ -40,7 +40,7 @@ ImageNode::ImageNode(const std::string &name, Node *parent): Node(name, parent){
 
 	setAttributeAffect(_fileName, _image);
 
-	setAttributeAllowedSpecialization(_fileName, "String");
+	setAttributeAllowedSpecialization(_fileName, "Path");
 }
 
 ImageNode::~ImageNode(){
@@ -48,7 +48,7 @@ ImageNode::~ImageNode(){
 }
 
 void ImageNode::updateSlice(Attribute *attribute, unsigned int slice){
-	std::string filename = _fileName->value()->stringValue();
+	std::string filename = _fileName->value()->stringValueAt(0);
 	filename = NetworkManager::resolveFilename(filename);
 
 	if(!filename.empty()){
