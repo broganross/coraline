@@ -38,9 +38,21 @@ class StringNode : public Node{
 public:
 	StringNode(const std::string &name, Node *parent) : Node(name, parent){
 		_string = new StringAttribute("string", this);
+		setAttributeAllowedSpecialization(_string, "String");
 		addOutputAttribute(_string);
 	}
 
+private:
+	StringAttribute *_string;
+};
+
+class FilePathNode:public Node{
+public:
+	FilePathNode(const std::string &name, Node *parent) : Node(name, parent){
+		_string = new StringAttribute("filepath", this);
+		setAttributeAllowedSpecialization(_string, "Path");
+		addOutputAttribute(_string);
+	}
 private:
 	StringAttribute *_string;
 };

@@ -37,6 +37,7 @@ from ... import utils
 from ...observer import Observer
 from ... import Imath
 
+
 class ObjectField(QtGui.QWidget):
     def __init__(self, label, coralObject, parentWidget):
         QtGui.QWidget.__init__(self, parentWidget)
@@ -65,6 +66,7 @@ class ObjectField(QtGui.QWidget):
     
     def coralObject(self):
         return self._coralObject()
+
 
 class AttributeField(ObjectField):
     def __init__(self, coralAttribute, parentWidget):
@@ -134,6 +136,7 @@ class AttributeField(ObjectField):
         
         return attrs
 
+
 class CustomDoubleSpinBox(QtGui.QDoubleSpinBox):
     def __init__(self, parent):
         QtGui.QDoubleSpinBox.__init__(self, parent)
@@ -144,6 +147,7 @@ class CustomDoubleSpinBox(QtGui.QDoubleSpinBox):
         QtGui.QDoubleSpinBox.wheelEvent(self, wheelEvent)
         
         self._wheelCallback()
+
 
 class FloatValueField(AttributeField):
     def __init__(self, coralAttribute, parentWidget):
@@ -168,6 +172,7 @@ class FloatValueField(AttributeField):
     def getWidgetValue(self, widget):
         return widget.value()
 
+
 class CustomIntSpinBox(QtGui.QSpinBox):
     def __init__(self, parent):
         QtGui.QSpinBox.__init__(self, parent)
@@ -178,6 +183,7 @@ class CustomIntSpinBox(QtGui.QSpinBox):
         QtGui.QSpinBox.wheelEvent(self, wheelEvent)
         
         self._wheelCallback()
+
         
 class IntValueField(AttributeField):
     def __init__(self, coralAttribute, parentWidget):
@@ -201,6 +207,7 @@ class IntValueField(AttributeField):
     def getWidgetValue(self, widget):
         return widget.value()
 
+
 class BoolValueField(AttributeField):
     def __init__(self, coralAttribute, parentWidget):
         AttributeField.__init__(self, coralAttribute, parentWidget)
@@ -221,6 +228,7 @@ class BoolValueField(AttributeField):
 
     def getWidgetValue(self, widget):
         return widget.isChecked()
+
 
 class CustomLineEdit(QtGui.QLineEdit):
     def __init__(self, parent):
@@ -255,22 +263,33 @@ class CustomLineEdit(QtGui.QLineEdit):
         else:
             event.ignore()
 
+
 class StringValueField(AttributeField):
     def __init__(self, coralAttribute, parentWidget):
         AttributeField.__init__(self, coralAttribute, parentWidget)
 
-        if coralAttribute.longString():
+        if not coralAttribute.isPassThrough() and coralAttribute.longString():
             textEdit = QtGui.QTextEdit(self)
             textEdit.setLineWrapMode(QtGui.QTextEdit.NoWrap)
             textEdit.setAcceptRichText(False)
-            textEdit.setMaximumHeight(100)
-
+            textEdit.setMaximumHeight(150)
             self.setAttributeWidget(textEdit, "textChanged()")
 
             self.layout().setAlignment(textEdit, QtCore.Qt.AlignTop)
+        elif coralAttribute.isPassThrough() and coralAttribute.connectedNonPassThrough().longString():
+            textEdit = QtGui.QTextEdit(self)
+            textEdit.setLineWrapMode(QtGui.QTextEdit.NoWrap)
+            textEdit.setAcceptRichText(False)
+            textEdit.setMaximumHeight(150)
+            self.setAttributeWidget(textEdit, "textChanged()")
+
+            self.layout().setAlignment(textEdit, QtCore.Qt.AlignTop)
+        elif coralAttribute.specialization() == ["Path"]:
+            self.setAttributeWidget(FilePathWidget(self), "completed()")
         else:    
             self.setAttributeWidget(CustomLineEdit(self), "editingFinished()")
-    
+
+   
     def setAttributeValue(self, attribute, value):
         attribute.outValue().setStringValue(value)
     
@@ -278,19 +297,51 @@ class StringValueField(AttributeField):
         return attribute.value().stringValue()
     
     def setWidgetValue(self, widget, value):
-        if type(widget) is QtGui.QTextEdit:
+        if type(widget) is FilePathWidget:
+            widget.textEdit().setText(value)
+        elif type(widget) is QtGui.QTextEdit:
             widget.setPlainText(value)
         else:    
             widget.setText(value)
     
     def getWidgetValue(self, widget):
         text = ""
-        if type(widget) is QtGui.QTextEdit:
+        if type(widget) is FilePathWidget:
+            text = widget.textEdit().text()
+        elif type(widget) is QtGui.QTextEdit:
             text = widget.toPlainText()
         else:
             text = widget.text()
 
         return str(text)
+
+
+class FilePathWidget(QtGui.QWidget):
+    completed = QtCore.pyqtSignal()
+    def __init__(self, parent=None):
+        super(FilePathWidget, self).__init__(parent)
+#         self._txt = CustomLineEdit(self)
+        self._txt = QtGui.QLineEdit()
+        self._btn = QtGui.QPushButton(self)
+        self._btn.setText("...")
+        self._btn.setMaximumWidth(25)
+        self.setLayout(QtGui.QHBoxLayout(self))
+        self.layout().addWidget(self._txt)
+        self.layout().addWidget(self._btn)
+
+#         self._txt.editingFinished.connect(self.completed.emit)
+        self._txt.textChanged.connect(self.completed.emit)
+        self._btn.clicked.connect(self._fileDialog)
+
+    def _fileDialog(self):
+        v = QtGui.QFileDialog.getExistingDirectory(self, "get directory")
+        if v:
+            self._txt.setText(v)
+            self._txt.editingFinished.emit()
+
+    def textEdit(self):
+        return self._txt
+
 
 class NameField(ObjectField):
     def __init__(self, coralNode, parentWidget):

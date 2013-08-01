@@ -30,6 +30,14 @@
 
 using namespace coral;
 
+String::Type String::type(){
+	return _type;
+}
+
+void String::setType(String::Type type){
+	_type = type;
+}
+
 void String::setStringValue(std::string value)
 {
 	_value = value;
@@ -61,6 +69,7 @@ StringAttribute::StringAttribute(const std::string &name, Node *parent)
 	
 	std::vector<std::string> allowedSpecialization;
 	allowedSpecialization.push_back("String");
+	allowedSpecialization.push_back("Path");
 	setAllowedSpecialization(allowedSpecialization);
 }
 
@@ -82,4 +91,27 @@ void StringAttribute::setLongString(bool value)
 bool StringAttribute::longString()
 {
 	return _longString;
+}
+
+void StringAttribute::onSettingSpecialization(const std::vector<std::string> &specialization){
+	if (specialization.size() == 1){
+		std::string typeStr = specialization[0];
+		outValue()->setType(stringTypeFromString(typeStr));
+	} else {
+		outValue()->setType(String::stringTypeAny);
+	}
+}
+
+String::Type StringAttribute::stringTypeFromString(const std::string &typeStr){
+	String::Type type = String::stringTypeAny;
+	if (typeStr == "String"){
+		type = String::stringType;
+	} else if (typeStr == "Path") {
+		type = String::pathType;
+	} else if (typeStr == "StringArray") {
+		type = String::stringTypeArray;
+	} else if (typeStr == "PathArray") {
+		type = String::pathTypeArray;
+	}
+	return type;
 }

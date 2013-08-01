@@ -36,13 +36,40 @@
 
 using namespace coral;
 
+int string_stringTypeAny(){
+	return int(String::stringTypeAny);
+}
+
+int string_stringType(){
+	return int(String::stringType);
+}
+
+int string_pathType(){
+	return int(String::pathType);
+}
+
 std::string string_stringValue(String &self){
 	return self.stringValue();
 }
 
+int string_type(String &self){
+	return int(self.type());
+}
+
+void string_setType(String &self, String::Type type){
+	self.setType(type);
+}
+
 void stringWrapper(){
+	boost::python::enum_<String::Type>("Type")
+		.value("stringTypeAny", String::stringTypeAny)
+		.value("stringType", String::stringType)
+		.value("pathType",String::pathType)
+	;
 	boost::python::class_<String, boost::shared_ptr<String>, boost::python::bases<Value>, boost::noncopyable>("String", boost::python::no_init)
 		.def("__init__", pythonWrapperUtils::__init__<String>)
+		.def("type", string_type)
+		.def("setType", string_setType)
 		.def("setStringValue", &String::setStringValue)
 		.def("stringValue", string_stringValue)
 		.def("createUnwrapped", pythonWrapperUtils::createUnwrapped<String>)
@@ -53,6 +80,7 @@ void stringWrapper(){
 	pythonWrapperUtils::pythonWrapper<StringAttribute, Attribute>("StringAttribute")
 		.def("setLongString", &StringAttribute::setLongString)
 		.def("longString", &StringAttribute::longString);
+	pythonWrapperUtils::pythonWrapper<FilePathNode, Node>("FilePathNode");
 }
 
 #endif

@@ -39,16 +39,25 @@ namespace coral{
 	//! Wraps an std::string, used by StringAttribute.
 	class CORAL_EXPORT String : public Value{
 	public:
-		void setStringValue(std::string value);
+		enum Type{
+				stringTypeAny = 0,
+				stringType,
+				stringTypeArray,
+				pathType,
+				pathTypeArray
+			};
 
+		void setStringValue(std::string value);
 		const std::string &stringValue();
-	
 		std::string asString();
-	
 		void setFromString(const std::string &value);
+		void setType(String::Type type);
+		String::Type type();
+
 
 	private:
 		std::string _value;
+		Type _type;
 	};
 
 	//! Stores a String value and allows for strings to be manipulated by a Node.	
@@ -62,8 +71,9 @@ namespace coral{
 
 		/*! Will display this attribute in the NodeInspector as an aditable text box, rather then the usual one-line field.*/
 		void setLongString(bool value);
-
 		bool longString();
+		void onSettingSpecialization(const std::vector<std::string> &specialization);
+		String::Type stringTypeFromString(const std::string &typeStr);
 
 	private:
 		bool _longString;

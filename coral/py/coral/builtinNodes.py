@@ -114,6 +114,7 @@ def loadPlugin():
     
     plugin.registerAttribute("StringAttribute", _coral.StringAttribute)
     plugin.registerNode("String", _coral.StringNode, tags = ["generic"])
+    plugin.registerNode("FilePath", _coral.FilePathNode, tags=["generic"])
     plugin.registerNode("Time", timeNode.TimeNode, tags = ["generic"])
     plugin.registerNode("ImportCIOTransforms", _coral.ImportCIOTransforms, tags = ["generic"])
     plugin.registerNode("ImportCIOSkinWeights", _coral.ImportCIOSkinWeights, tags = ["generic"])
