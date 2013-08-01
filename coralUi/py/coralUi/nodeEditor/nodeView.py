@@ -169,6 +169,21 @@ class NodeView(QtGui.QGraphicsView):
                 scenePos = self.mapToScene(event.pos())
                 sceneItem.setPos(scenePos)
                 self.setSelectedItems([sceneItem])
+        elif event.mimeData().hasUrls():
+            event.accept()
+            for url in event.mimeData().urls():
+                parentNode = nodeEditor.NodeEditor.focusedInstance().currentNode().fullName()
+                newNodeName = coralApp.executeCommand("CreateNode", className="FilePath",
+                                                      name="FilePath", parentNode=parentNode)
+                if not newNodeName:
+                    continue
+                newNode = coralApp.findNode(newNodeName)
+                newNode.findAttribute("filepath").value().setStringValue(str(url.toString()))
+                sceneItem = nodeEditor.NodeEditor.findNodeUi(newNode.id())
+                scenePos = self.mapToScene(event.pos())
+                sceneItem.setPos(scenePos)
+                self.setSelectedItems([sceneItem])
+
         
     def setSelectedItems(self, items):
         self.scene().clearSelection()

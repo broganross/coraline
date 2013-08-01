@@ -195,8 +195,9 @@ def apply():
         "Shift+G": _explodeClicked,
         "Ctrl+S": _saveNetworkClicked,
         "Ctrl+O": _openNetworkClicked,
-        "Shift+Tab": _nodeBoxSearch,
-        "H": _toggleGrid}
+        "Tab": _nodeBoxSearch,
+        "H": _toggleGrid,
+        "Ctrl+Q" : coralUi.CoralUiData.app.exit}
     
     mainWin.setShortcutsMap(shprtcutsMap)
 
