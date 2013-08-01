@@ -31,6 +31,7 @@ import os
 import sys
 import fnmatch
 import string
+import traceback
 
 if os.environ.has_key("CORAL_BUILD_FLAVOUR") == False:
     os.environ["CORAL_BUILD_FLAVOUR"] = ""
@@ -102,12 +103,16 @@ def importBuildEnvs():
     
     if "buildEnv" not in sys.modules.keys():
         try:
+            sys.path.append(os.path.join(os.path.dirname(__file__), "buildEnvs"))
             import buildEnv
+            print buildEnv.__file__
             print "* Coral Build: imported buildEnv.py"
         except:
             if tryedImportingBuildEnv == False:
                 print "Coral Build: Tried importing buildEnv.py but failed."
                 tryedImportingBuildEnv = True
+                print traceback.format_exc()
+
 
 def getEnvVar(varName):
     var = ""

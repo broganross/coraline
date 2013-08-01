@@ -173,8 +173,7 @@ def buildDevTree(coralLib, coralUiLib, imathLib):
     shutil.rmtree(installDir, ignore_errors = True)
     
     buildMainTree(coralLib, coralUiLib, imathLib, installDir)
-    
-    
+
 def buildOsXApp(coralLib, coralUiLib, imathLib):
     print "* building app bundle"
     
