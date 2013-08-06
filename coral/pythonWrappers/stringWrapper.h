@@ -40,6 +40,10 @@ std::vector<std::string> string_stringValues(String &self){
 	return self.stringValues();
 }
 
+std::vector<std::string> string_pathValues(String &self){
+	return self.pathValues();
+}
+
 int string_stringTypeAny(){
 	return int(String::stringTypeAny);
 }
@@ -100,8 +104,14 @@ void stringWrapper(){
 		.def("setStringValues", string_setStringValues)
 		.def("stringValueAt", &String::stringValueAt)
 		.def("stringValues", string_stringValues)
+		.def("pathValues", string_stringValues)
 		.def("createUnwrapped", pythonWrapperUtils::createUnwrapped<String>)
 		.staticmethod("createUnwrapped")
+		.add_static_property("stringTypeAny", string_stringTypeAny)
+		.add_static_property("stringType", string_stringType)
+		.add_static_property("stringTypeArray", string_stringTypeArray)
+		.add_static_property("pathType", string_pathType)
+		.add_static_property("pathTypeArray", string_pathTypeArray)
 	;
 	
 	pythonWrapperUtils::pythonWrapper<StringNode, Node>("StringNode");
