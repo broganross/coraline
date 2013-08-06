@@ -68,6 +68,7 @@ namespace coral{
 		void setStringValuesSlice(unsigned int slice, const std::vector<std::string> &values);
 		const std::string stringValueAt(unsigned int id);
 		const std::vector<std::string> &stringValues();
+		const std::vector<std::string> &pathValues();
 		std::string stringValueAtSlice(unsigned int slice, unsigned int id);
 		const std::vector<std::string> &valuesSlice(unsigned int slice);
 

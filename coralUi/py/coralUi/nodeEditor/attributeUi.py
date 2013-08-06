@@ -101,10 +101,9 @@ class AttributeUi(QtGui.QGraphicsWidget):
     def label(self):
         return self._label
     
-    '''
-    Override this method to return a more detailed toolTip.
-    '''
     def toolTip(self):
+        ''' Override this method to return a more detailed toolTip.
+        '''
         return self.coralAttribute().shortDebugInfo()
     
     def _disconnected(self):
@@ -179,6 +178,7 @@ class AttributeUi(QtGui.QGraphicsWidget):
         return self._labelSuffix
 
     def specialized(self):
+        """ Update the attribute's UI to show proper specialization colors, and connections """
         self._updateLabel()
         
         specialization = self.coralAttribute().specialization()

@@ -83,7 +83,6 @@ void String::resizeSlice(unsigned int slice, unsigned int newSize){
 	}
 }
 
-
 bool String::isArrayType(String::Type type){
 	bool arrayType = false;
 	if( type == stringTypeArray || type == pathTypeArray){
@@ -102,6 +101,10 @@ const std::string String::stringValueAt(unsigned int id){
 
 const std::vector<std::string> &String::stringValues()
 {
+	return _valuesSliced[0];
+}
+
+const std::vector<std::string> &String::pathValues(){
 	return _valuesSliced[0];
 }
 
@@ -210,6 +213,8 @@ void String::resizeSlices(unsigned int slices){
 		_slices - slices;
 	}
 }
+
+
 
 StringAttribute::StringAttribute(const std::string &name, Node *parent)
 	: Attribute(name, parent)

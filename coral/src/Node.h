@@ -51,30 +51,31 @@ public:
 
 	void addInputAttribute(Attribute *attribute);
 	void addOutputAttribute(Attribute *attribute);
+	void removeAttribute(Attribute *attribute);
+	Attribute *inputAttributeAt(int position);
+	Attribute *outputAttributeAt(int position);
+	const std::vector<Attribute*> &inputAttributes();
+	const std::vector<Attribute*> &outputAttributes();
+	Attribute *findAttribute(const std::string &name);
+	std::vector<Attribute*> attributes();
+	const std::vector<Attribute*> &dynamicAttributes();
+	bool allowDynamicAttributes();
+
 	void addNode(Node *node);
 	Node *parent();
 	void setParent(Node *parent);
 	Node *nodeAt(int position);
-	Attribute *inputAttributeAt(int position);
-	Attribute *outputAttributeAt(int position);
 	void removeNode(Node *node);
-	void removeAttribute(Attribute *attribute);
 	bool containsNode(Node *node);
 	std::vector <Node*> nodes();
-	const std::vector<Attribute*> &inputAttributes();
-	const std::vector<Attribute*> &outputAttributes();
 	Node *findNode(const std::string &name);
-	Attribute *findAttribute(const std::string &name);
 	bool isInvalid();
 	bool isValid();
 	std::string invalidityMessage();
-	std::vector<Attribute*> attributes();
 	bool updateEnabled();
 	int computeTimeTicks();
 	int computeTimeMilliseconds();
 	int computeTimeSeconds();
-	const std::vector<Attribute*> &dynamicAttributes();
-	bool allowDynamicAttributes();
 	void enableSpecializationPreset(const std::string &preset);
 	std::string enabledSpecializationPreset();
 

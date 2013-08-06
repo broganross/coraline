@@ -474,7 +474,7 @@ void Numeric::setFromString(const std::string &value){
 	std::string tmp = stringUtils::replace(value, "\n", "");
 	std::vector<std::string> fields;
 	stringUtils::split(tmp, fields, " ");
-	
+
 	if(fields.size() == 2){
 		std::string valuesStr = stringUtils::strip(fields[0], "[]");
 		Numeric::Type type = Numeric::Type(stringUtils::parseInt(fields[1]));
