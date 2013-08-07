@@ -118,8 +118,8 @@ class MainWindow(QtGui.QMainWindow):
         MainWindow._registeredWidgets[widgetName] = widget
     
     @staticmethod
-    def _init():
-        MainWindow._globalInstance = MainWindow()
+    def _init(parent=None):
+        MainWindow._globalInstance = MainWindow(parent)
     
     @staticmethod
     def globalInstance():
@@ -153,16 +153,18 @@ class MainWindow(QtGui.QMainWindow):
     
     def __init__(self, parent = None):
         QtGui.QMainWindow.__init__(self, parent)
-        
+
+        self._infoBox = InfoBox(self)         
         self._menuBar = QtGui.QMenuBar()
         self._messageLoggedObserver = Observer()
         
-        self.setWindowTitle("coral")
+        self.setWindowTitle("coraline")
         self.resize(900, 500)
         self.setMenuBar(self._menuBar)
         self.setDockOptions(QtGui.QMainWindow.AllowTabbedDocks | QtGui.QMainWindow.AllowNestedDocks | QtGui.QMainWindow.AnimatedDocks)
         
         self._menuBar.clear()
+
 
         coralApp.addMessageLoggedObserver(self._messageLoggedObserver, self._messageLogged)
     
@@ -203,7 +205,7 @@ class MainWindow(QtGui.QMainWindow):
         return dock
     
     def _restoreLastOpenWindows(self, settings):
-        widgetsLastOpen = settings.value("openWidgets").toString()
+        widgetsLastOpen = settings.value("openWidgets")
         if widgetsLastOpen:
             widgetsLastOpen = eval(str(widgetsLastOpen))
         
@@ -211,6 +213,8 @@ class MainWindow(QtGui.QMainWindow):
         for dockWidget in self.dockWidgets():
             openWidgetsName.append(str(dockWidget.windowTitle()))
         
+        if not widgetsLastOpen:
+            return
         for widgetName in widgetsLastOpen:
             if widgetName not in openWidgetsName:
                 if MainWindow._registeredWidgets.has_key(widgetName):
@@ -221,18 +225,21 @@ class MainWindow(QtGui.QMainWindow):
         settings = self.settings()
         
         self._restoreLastOpenWindows(settings)
-        geometry = str(settings.value("mainWinGeometry").toString())
-        if geometry:
-            geometry = eval(geometry)
-            self.move(geometry[0], geometry[1])
-            self.resize(geometry[2], geometry[3])
-        
-        self.restoreState(settings.value("mainWinState").toByteArray())
-        
-        lastFileDialogDir = settings.value("lastFileDialogDir").toString()
+
+        lastFileDialogDir = settings.value("lastFileDialogDir")
         if lastFileDialogDir:
             MainWindow._lastFileDialogDir = lastFileDialogDir
-    
+        
+        geometry = str(settings.value("mainWinGeometry"))
+        if geometry:
+            geometry = eval(geometry)
+        if not geometry:
+            return
+        self.move(geometry[0], geometry[1])
+        self.resize(geometry[2], geometry[3])
+        
+        self.restoreState(settings.value("mainWinState"))
+
     def settings(self):
         return QtCore.QSettings(self.windowTitle())
     

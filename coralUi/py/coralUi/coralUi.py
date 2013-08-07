@@ -61,24 +61,27 @@ def init(configModule = None):
     from nodeEditor.nodeEditor import NodeEditor
     
     coralApp.init()
-    
+
     CoralUiData.app = QtCore.QCoreApplication.instance()
     if CoralUiData.app is None:
         CoralUiData.app = QtGui.QApplication(sys.argv)
     else:
         coralApp.logInfo("using existing QApplication")
-    
+     
     MainWindow._init()
     NodeEditor._init()
-    
+ 
     import builtinUis
     loadPluginUiModule(builtinUis)
-    
+     
     import builtinDrawNodes
     coralApp.loadPluginModule(builtinDrawNodes)
     
     if configModule:
         configModule.apply()
+    else:
+        MainWindow.globalInstance().show()
+    
     
     if os.environ.has_key("CORAL_STARTUP_SCRIPT"):
         startupScriptFile = os.environ["CORAL_STARTUP_SCRIPT"]
@@ -111,7 +114,7 @@ def mainWindow():
     return MainWindow.globalInstance()
 
 # Sets arbitrary data that can be retrieved later using dropData().
-# This global data is usefull for simplified drag & drop data retrieving.
+# This global data is useful for simplified drag & drop data retrieving.
 def setDropData(data, type):
     CoralUiData.dropData = DropData(data, type)
 

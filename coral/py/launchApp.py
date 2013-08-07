@@ -25,7 +25,17 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # </license>
+import sys
 
+import sip
+
+sip.setapi(u'QDate', 2)
+sip.setapi(u'QDateTime', 2)
+sip.setapi(u'QString', 2)
+sip.setapi(u'QTextStream', 2)
+sip.setapi(u'QTime', 2)
+sip.setapi(u'QUrl', 2)
+sip.setapi(u'QVariant', 2)
 
 from coral import coralApp
 from coral.coralUi import coralUi
@@ -35,5 +45,5 @@ coralUi.init(configModule = coralStandaloneConfig)
 coralApp.scanAutoLoadPaths()
 coralUi.scanAutoLoadPaths()
 coralUi.startApp()
-
 coralApp.finalize()
+# sys.exit()
