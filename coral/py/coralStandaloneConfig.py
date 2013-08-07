@@ -145,11 +145,11 @@ def apply():
     from coral.coralUi.scriptEditor import ScriptEditor
     from coral.coralUi.viewport import ViewportWidget
     from coral.coralUi.visualDebugger import VisualDebugger
-    
+
     mainWin = MainWindow.globalInstance()
-    mainWin.setWindowTitle("coral standalone")
-    
-    settingsStored = mainWin.settings().value("settingsStored").toBool()
+    mainWin.setWindowTitle("coraline standalone")
+
+    settingsStored = mainWin.settings().value("settingsStored")
     if not settingsStored:
         nodeBox = NodeBox(mainWin)
         nodeBoxDock = mainWin.dockWidget(nodeBox, QtCore.Qt.LeftDockWidgetArea)
@@ -206,5 +206,6 @@ def apply():
     mainWin.show()
 
     from coral import coralApp
+    coralApp.setVerboseLevel(coralApp.VerboseLevel.logDebugs)
     coralApp.logInfo("coral v" + coralApp.version())
 

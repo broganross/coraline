@@ -47,7 +47,7 @@ class VerboseLevel:
     logDebugs = 3
 
 class CoralAppData:
-    version = 0.3
+    version = 0.4
     nodeClasses = {}
     classNameTags = {}
     attributeClasses = {}
@@ -233,7 +233,6 @@ def _notifyRemovedAttributeObserver(parentNode, attributeRemoved):
         observer.setData("parentNodeId", parentNode.id())
         observer.setData("attributeRemovedId", attributeRemoved.id())
         observer.notify()
-
 
 def _notifyNodeConnectionChanged(node, attribute):
     for observer in CoralAppData.nodeConnectionChangedObservers.observers(node.id()):
