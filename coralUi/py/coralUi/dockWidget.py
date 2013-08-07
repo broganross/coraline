@@ -42,11 +42,12 @@ class DockWidget(QtGui.QDockWidget):
     
     def _restoreSettings(self):
         mainWin = mainWindow.MainWindow.globalInstance()
-        geometry = str(mainWin.settings().value(self.windowTitle() + "_geometry").toString())
+        geometry = str(mainWin.settings().value(self.windowTitle() + "_geometry"))
         if geometry:
             geometry = eval(geometry)
-            self.move(geometry[0], geometry[1])
-            self.resize(geometry[2], geometry[3])
+            if geometry:
+                self.move(geometry[0], geometry[1])
+                self.resize(geometry[2], geometry[3])
         
     def _storeSettings(self):
         mainWin = mainWindow.MainWindow.globalInstance()

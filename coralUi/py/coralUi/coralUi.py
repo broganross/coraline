@@ -70,7 +70,7 @@ def init(configModule = None):
     
     MainWindow._init()
     NodeEditor._init()
-    
+
     import builtinUis
     loadPluginUiModule(builtinUis)
     
@@ -79,6 +79,10 @@ def init(configModule = None):
     
     if configModule:
         configModule.apply()
+    else:
+        MainWindow.globalInstance().show()
+#     MainWindow.globalInstance().show()
+    
     
     if os.environ.has_key("CORAL_STARTUP_SCRIPT"):
         startupScriptFile = os.environ["CORAL_STARTUP_SCRIPT"]
@@ -105,13 +109,13 @@ def application():
     return CoralUiData.app
 
 def startApp():
-    return CoralUiData.app.exec_()
+    return sys.exit(CoralUiData.app.exec_())
 
 def mainWindow():
     return MainWindow.globalInstance()
 
 # Sets arbitrary data that can be retrieved later using dropData().
-# This global data is usefull for simplified drag & drop data retrieving.
+# This global data is useful for simplified drag & drop data retrieving.
 def setDropData(data, type):
     CoralUiData.dropData = DropData(data, type)
 
