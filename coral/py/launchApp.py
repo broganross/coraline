@@ -37,19 +37,13 @@ sip.setapi(u'QTime', 2)
 sip.setapi(u'QUrl', 2)
 sip.setapi(u'QVariant', 2)
 
-from    PyQt4   import  QtGui
-
-app = QtGui.QApplication(sys.argv)
-
 from coral import coralApp
 from coral.coralUi import coralUi
 import coralStandaloneConfig
 
-
 coralUi.init(configModule = coralStandaloneConfig)
-# coralUi.init()
 coralApp.scanAutoLoadPaths()
 coralUi.scanAutoLoadPaths()
 coralUi.startApp()
-
 coralApp.finalize()
+# sys.exit()

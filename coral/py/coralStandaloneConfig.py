@@ -153,10 +153,10 @@ def apply():
     if not settingsStored:
         nodeBox = NodeBox(mainWin)
         nodeBoxDock = mainWin.dockWidget(nodeBox, QtCore.Qt.LeftDockWidgetArea)
-    
+     
         nodeInspector = NodeInspector(mainWin)
         mainWin.dockWidget(nodeInspector, QtCore.Qt.RightDockWidgetArea)
-    
+     
     nodeEditor = NodeEditor(mainWin)
     mainWin.setCentralWidget(nodeEditor)
     nodeEditor.nodeView().centerOn(0.0, 0.0)
@@ -167,7 +167,7 @@ def apply():
     mainWin.registerWidget("viewport", ViewportWidget)
     mainWin.registerWidget("script editor", ScriptEditor)
     mainWin.registerWidget("visual debugger", VisualDebugger)
-    
+     
     # menu config
     fileMenu = mainWin.menuBar().addMenu("File")
     fileMenu.addAction("Clear All...", _clearAllClicked)
@@ -175,12 +175,12 @@ def apply():
     fileMenu.addAction("Open Network...", _openNetworkClicked)
     fileMenu.addSeparator()
     fileMenu.addAction("Save CollapsedNode...", _saveCollapsedNodeClicked)
-    
+     
     editMenu = mainWin.menuBar().addMenu("Edit")
     editMenu.addAction("Collpase Nodes", _collapseClicked)
     editMenu.addAction("Explode Collapsed Node", _explodeClicked)
     editMenu.addSeparator()
-    
+     
     windowMenu = mainWin.menuBar().addMenu("Window")
     windowMenu.addAction("About", _aboutClicked)
     windowMenu.addAction("Open Node Editor", _openNodeEditorClicked)
@@ -189,7 +189,7 @@ def apply():
     windowMenu.addAction("Open Script Editor", _openScriptEditorClicked)
     windowMenu.addAction("Open Viewport", _openViewportClicked)
     windowMenu.addAction("Open Visual Debugger", _openVisualDebuggerClicked)
-    
+     
     # shortcuts
     shprtcutsMap = {
         "Shift+G": _explodeClicked,
@@ -198,14 +198,13 @@ def apply():
         "Tab": _nodeBoxSearch,
         "H": _toggleGrid,
         "Ctrl+Q" : coralUi.CoralUiData.app.exit}
-    
+     
     mainWin.setShortcutsMap(shprtcutsMap)
-
+ 
     mainWin.restoreSettings()
 
     mainWin.show()
 
     from coral import coralApp
-    coralApp.setVerboseLevel(coralApp.VerboseLevel.logDebugs)
     coralApp.logInfo("coral v" + coralApp.version())
 

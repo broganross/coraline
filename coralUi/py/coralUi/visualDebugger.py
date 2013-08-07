@@ -31,6 +31,7 @@ import weakref
 from PyQt4 import QtGui, QtCore
 
 from nodeEditor import nodeEditor
+from mainWindow import MainWindow
 from ..observer import Observer
 from .. import coralApp
 from .. import _coral
@@ -180,11 +181,12 @@ class VisualDebugger(QtGui.QWidget):
         
         self._tabWidget.addTab(self._nodeDebugInfo, "Node Debug Info")
         self._tabWidget.addTab(self._profiler, "Profiler")
-        
+                
     def sizeHint(self):
         return QtCore.QSize(250, 300)
         
     def closeEvent(self, event):
         self._profiler._timer.stop()
         self._nodeDebugInfo._selectedNodesChangedObserver = Observer()
+
         

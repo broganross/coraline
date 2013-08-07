@@ -61,19 +61,19 @@ def init(configModule = None):
     from nodeEditor.nodeEditor import NodeEditor
     
     coralApp.init()
-    
+
     CoralUiData.app = QtCore.QCoreApplication.instance()
     if CoralUiData.app is None:
         CoralUiData.app = QtGui.QApplication(sys.argv)
     else:
         coralApp.logInfo("using existing QApplication")
-    
+     
     MainWindow._init()
     NodeEditor._init()
-
+ 
     import builtinUis
     loadPluginUiModule(builtinUis)
-    
+     
     import builtinDrawNodes
     coralApp.loadPluginModule(builtinDrawNodes)
     
@@ -81,7 +81,6 @@ def init(configModule = None):
         configModule.apply()
     else:
         MainWindow.globalInstance().show()
-#     MainWindow.globalInstance().show()
     
     
     if os.environ.has_key("CORAL_STARTUP_SCRIPT"):
@@ -109,7 +108,7 @@ def application():
     return CoralUiData.app
 
 def startApp():
-    return sys.exit(CoralUiData.app.exec_())
+    return CoralUiData.app.exec_()
 
 def mainWindow():
     return MainWindow.globalInstance()

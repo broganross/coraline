@@ -96,7 +96,7 @@ class ScriptEditor(QtGui.QWidget):
     def _restoreSettings(self):
         mainWin = MainWindow.globalInstance()
         settings = mainWin.settings()
-        self._scriptTextEdit.setPlainText(settings.value("scriptEditorText").toString())
+        self._scriptTextEdit.setPlainText(settings.value("scriptEditorText"))
         
     def closeEvent(self, event):
         mainWin = MainWindow.globalInstance()

@@ -239,8 +239,7 @@ class MainWindow(QtGui.QMainWindow):
         self.resize(geometry[2], geometry[3])
         
         self.restoreState(settings.value("mainWinState"))
-        
-    
+
     def settings(self):
         return QtCore.QSettings(self.windowTitle())
     

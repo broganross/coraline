@@ -495,13 +495,13 @@ def init():
     CoralAppData.rootNode = RootNode("root")
     
     _initCollapsedNodes()
-    
+     
     import builtinCommands
     loadPluginModule(builtinCommands)
-    
+     
     import builtinNodes
     loadPluginModule(builtinNodes)
-    
+     
     _coral.setCallback("node_created", _node_created)
     _coral.setCallback("node_addNode", _node_addNode)
     _coral.setCallback("node_removeNode", _node_removeNode)
@@ -517,7 +517,7 @@ def init():
     _coral.setCallback("nestedObject_setName", _nestedobject_setName)
     _coral.setCallback("attribute_specialization", _attribute_specialization)
 
-
+ 
     if os.environ.has_key("CORAL_PLUGINS_PATH"):
         path = os.environ["CORAL_PLUGINS_PATH"]
         paths = path.split(os.pathsep)
@@ -627,16 +627,20 @@ def finalize():
     _coral.setCallback("node_created", None)
     _coral.setCallback("node_addNode", None)
     _coral.setCallback("node_removeNode", None)
-    _coral.setCallback("attribute_created", None)
-    _coral.setCallback("attribute_connectTo", None)
-    _coral.setCallback("attribute_disconnectInput", None)
     _coral.setCallback("node_addInputAttribute", None)
     _coral.setCallback("node_addOutputAttribute", None)
     _coral.setCallback("node_deleteIt", None)
+    _coral.setCallback("node_removeAttribute", None)
+    _coral.setCallback("node_connectionChanged", None)
+
+    _coral.setCallback("attribute_created", None)
+    _coral.setCallback("attribute_connectTo", None)
+    _coral.setCallback("attribute_disconnectInput", None)
     _coral.setCallback("attribute_deleteIt", None)
-    _coral.setCallback("nestedObject_setName", None)
     _coral.setCallback("attribute_specialization", None)
     _coral.setCallback("attribute_valueChanged", None)
+    
+    _coral.setCallback("nestedObject_setName", None)
     
     CoralAppData.rootNode.deleteIt()
     CoralAppData.rootNode = None
