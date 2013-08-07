@@ -33,7 +33,8 @@ import timeNode
 
 def loadPlugin():
     plugin = Plugin("builtinNodes")
-    
+
+    plugin.registerAttribute("PolyAttribute", _coral.PolyAttribute)    
     plugin.registerAttribute("NumericAttribute", _coral.NumericAttribute)
     
     plugin.registerNode("Int", _coral.IntNode, tags = ["numeric"], description = "Generate an int.")

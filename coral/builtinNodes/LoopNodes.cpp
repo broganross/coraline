@@ -231,7 +231,7 @@ Node(name, parent){
 	setIsSlicer(true);
 	setUpdateEnabled(false);
 
-	_globalArray = new NumericAttribute("globalArray", this);
+	_globalArray = new PolyAttribute("globalArray", this);
 	
 	addInputAttribute(_globalArray);
 	

@@ -3,6 +3,7 @@
 
 #include "../src/Node.h"
 #include "../src/NumericAttribute.h"
+#include "../src/PolyAttribute.h"
 #include "../src/PassThroughAttribute.h"
 
 namespace coral{
@@ -54,9 +55,8 @@ protected:
 	unsigned int computeSlices();
 
 private:
-	NumericAttribute *_globalArray;
+	PolyAttribute *_globalArray;
 };
-
 }
 
 #endif

@@ -1,0 +1,20 @@
+# coral save script
+version = 0.1
+
+def runScript(topNode = 'root'):
+    executeCommand('CreateNode', className = 'FilePath', name = 'FilePath', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('SetAttributeValue', attribute = topNode + '.FilePath.filepath', value = '/media/fattie/home/broganross/Pictures/render\ | /3')
+    
+    executeCommand('CreateNode', className = 'CustomPython', name = 'CustomPython', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('CreateAttribute', name = 'inDir', className = 'StringAttribute', parentNode = topNode + '.CustomPython', input = True)
+    executeCommand('CreateAttribute', name = 'out', className = 'StringAttribute', parentNode = topNode + '.CustomPython', output = True)
+    executeCommand('SetupDynamicAttribute', attribute = topNode + '.CustomPython.inDir', affect = [topNode + '.CustomPython.out'], affectedBy = [], allowedSpecialization = ['Path'], specializationLinkedTo = [], specializationLinkedBy = [])
+    executeCommand('SetupDynamicAttribute', attribute = topNode + '.CustomPython.out', affect = [], affectedBy = [topNode + '.CustomPython.inDir',topNode + '.CustomPython.filter'], allowedSpecialization = ['PathArray'], specializationLinkedTo = [], specializationLinkedBy = [])
+    executeCommand('SetAttributeValue', attribute = topNode + '.CustomPython.filter', value = 'import os\nindir = inputs["inDir"][0]\nout = []\nfor i in os.listdir(indir):\n  out.append(os.path.join(indir, i))\noutputs["out"].setStringValues(out)\nprint "done"\ | /0')
+    
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.FilePath.filepath', destinationAttribute = topNode + '.CustomPython.inDir')
+    # nodeEditor save data
+    executeCommand('SetNodeUiData', node = topNode, data = {})
+    executeCommand('SetNodeUiData', node = topNode + '.FilePath', data = {'pos': [-51.0, -168.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.CustomPython', data = {'pos': [136.0, -63.0]})
+    
