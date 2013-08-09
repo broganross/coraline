@@ -1205,31 +1205,23 @@ void BuildArray::updateMatrix44(const std::vector<Attribute*> &inAttrs, int arra
 }
 
 void BuildArray::updateString(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice){
-	std::cout << "BuildArray.updateString" <<std::endl;
-	std::cout << "arraySize " << arraySize << std::endl;
 	std::vector<std::string> arrayValues(arraySize);
 	for (int i=0; i < arraySize; ++i){
 		if (typeid(inAttrs[i]) == typeid(String)){
-			std::cout << "string attr" << std::endl;
 			String *inVal = (String*)inAttrs[i]->value();
 			arrayValues[i] = inVal->stringValueAtSlice(slice, 0);
 		} else {
-			std::cout << "poly attr " << inAttrs[i]->name() << std::endl;
-
-			if (typeid(inAttrs[i]->value()) == typeid(PolyValue)){
-				std::cout << "poly value" << std::endl;
+			Value *v = inAttrs[i]->value();
+			if (typeid(*v) == typeid(PolyValue)){
 				PolyValue *inVal = (PolyValue*)inAttrs[i]->value();
 				arrayValues[i] = inVal->stringValueAtSlice(slice, 0);
-			} else {
-				std::cout << "string value" << std::endl;
+			} else if (typeid(*v) == typeid(String)){
 				String *inVal = (String*)inAttrs[i]->value();
 				arrayValues[i] = inVal->stringValueAtSlice(slice, 0);
 			}
 		}
 	}
-	std::cout << "about to set" << std::endl;
 	array->setStringValuesSlice(slice, arrayValues);
-	std::cout << "BuildArray.updateString: Done" <<std::endl;
 }
 
 void BuildArray::updatePath(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice){

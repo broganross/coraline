@@ -1200,11 +1200,6 @@ std::string PolyValue::stringValueAtSlice(unsigned int slice, unsigned int id){
 		slice = _stringValuesSliced.size() - 1;
 	}
 	std::vector<std::string> &slicevec = _stringValuesSliced[slice];
-	std::cout << "before" << std::endl;
-	for (int i=0; i < slicevec.size(); ++i){
-		std::cout << slicevec[i];
-	}
-	std::cout << "after" << std::endl;
 	int size = slicevec.size();
 	if(id < size){
 		return slicevec[id];
