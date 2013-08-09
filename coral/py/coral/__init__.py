@@ -30,3 +30,9 @@
 import Imath
 
 from _coral import *
+
+import logging
+
+logger = logging.Logger("coral")
+logger.setLevel(logging.DEBUG)
+handler = logging.Handler()

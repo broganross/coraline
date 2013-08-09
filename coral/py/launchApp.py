@@ -42,6 +42,7 @@ from coral.coralUi import coralUi
 import coralStandaloneConfig
 
 coralUi.init(configModule = coralStandaloneConfig)
+coralApp.setVerboseLevel(coralApp.VerboseLevel.logDebugs)
 coralApp.scanAutoLoadPaths()
 coralUi.scanAutoLoadPaths()
 coralUi.startApp()

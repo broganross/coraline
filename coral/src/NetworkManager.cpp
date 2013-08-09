@@ -326,6 +326,7 @@ bool NetworkManager::allowConnection(Attribute *sourceAttribute, Attribute *dest
 }
 
 bool NetworkManager::connect(Attribute *sourceAttribute, Attribute *destinationAttribute, ErrorObject *errorObject){
+	std::cout << "NetworkManager.connect" << std::endl;
 	bool success = false;
 		
 	if(!errorObject){
@@ -339,7 +340,7 @@ bool NetworkManager::connect(Attribute *sourceAttribute, Attribute *destinationA
 	}
 
 	errorObject->removeReference();
-	
+	std::cout << "NetworkManager.connect: Done" << std::endl;
 	return success;
 }
 

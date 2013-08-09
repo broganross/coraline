@@ -71,6 +71,7 @@ PolyValue *PolyAttribute::value(){
 }
 
 PolyValue *PolyAttribute::outValue(){
+	std::cout << "PolyAttribute.outValue" << std::endl;
 	return (PolyValue*)Attribute::outValue();
 }
 
@@ -140,17 +141,10 @@ PolyValue::ValueType PolyAttribute::typeFromString(const std::string &typeStr){
 }
 
 void PolyAttribute::onSettingSpecialization(const std::vector<std::string> &specialization){
-	std::cout << "on set spec" << std::endl;
 	PolyValue::ValueType type = PolyValue::typeAny;
-	std::cout << "here" << std::endl;
 	if (specialization.size() == 1){
-		std::cout << "just one" << std::endl;
 		std::string typeStr = specialization[0];
 		type = typeFromString(typeStr);
 	}
-	std::cout << "settype" << std::endl;
-	std::cout << outValue() << std::endl;
 	outValue()->setType(type);
-	std::cout << "setType done" << std::endl;
-	std::cout << "on set spec done" << std::endl;
 }

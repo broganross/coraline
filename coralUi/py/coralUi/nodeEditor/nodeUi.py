@@ -375,12 +375,14 @@ class NodeUi(QtGui.QGraphicsWidget):
         self.update()
         
     def paint(self, painter, option, widget):
+#         coralApp.logDebug("NodeUi.paint")
         shape = QtGui.QPainterPath()
         shape.addRoundedRect(self.rect(), 2, 2)
         
         painter.setPen(self._shapePen)
         painter.setBrush(self._brush)
         painter.drawPath(shape)
+#         coralApp.logDebug("NodeUi.paint: Done")
     
     def deleteIt(self):
         if self.isSelected():
@@ -405,6 +407,7 @@ class NodeUi(QtGui.QGraphicsWidget):
             del nodeEditor.NodeEditor._nodeUis[self._coralNodeId]
 
     def _openThis(self):
+        coralApp.logDebug("nodeUi.NodeUi._openThis")
         if self._canOpenThis:
             focusedNodeEditor = nodeEditor.NodeEditor.focusedInstance()
             nodeView = focusedNodeEditor.nodeView()
@@ -413,6 +416,7 @@ class NodeUi(QtGui.QGraphicsWidget):
                 self._nodeViewWatching = weakref.ref(nodeView)
                 
     def mousePressEvent(self, event):
+        coralApp.logDebug("nodeUi.NodeUi.MousePressEvent.")
         if event.button() == QtCore.Qt.RightButton:
             pass
         else:

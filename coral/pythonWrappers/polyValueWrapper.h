@@ -237,6 +237,16 @@ void polyValueWrapper(){
 		.def("matrix44ValueAt", &PolyValue::matrix44ValueAt)
 		.def("quatValueAt", &PolyValue::quatValueAt)
 
+		.def("stringValueAtSlice", &PolyValue::stringValueAtSlice)
+		.def("pathValueAtSlice", &PolyValue::pathValueAtSlice)
+		.def("boolValueAtSlice", &PolyValue::boolValueAtSlice)
+		.def("intValueAtSlice", &PolyValue::intValueAtSlice)
+		.def("floatValueAtSlice", &PolyValue::floatValueAtSlice)
+		.def("vec3ValueAtSlice", &PolyValue::vec3ValueAtSlice)
+		.def("col4ValueAtSlice", &PolyValue::col4ValueAtSlice)
+		.def("matrix44ValueAtSlice", &PolyValue::matrix44ValueAtSlice)
+		.def("quatValueAtSlice", &PolyValue::quatValueAtSlice)
+
 		.def("setStringValueAt", &PolyValue::setStringValueAt)
 		.def("setPathValueAt", &PolyValue::setPathValueAt)
 		.def("setBoolValueAt", &PolyValue::setBoolValueAt)

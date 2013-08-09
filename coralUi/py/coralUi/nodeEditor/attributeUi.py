@@ -125,6 +125,7 @@ class AttributeUi(QtGui.QGraphicsWidget):
             self._proxy().onChangedScene(scene)
     
     def connectTo(self, attributeUi):
+        coralApp.logDebug("nodeEditor.attributeUi.AttributeUi.connectTo")
         startHook = self._outputHook
         endHook = attributeUi.inputHook()
         
@@ -138,6 +139,7 @@ class AttributeUi(QtGui.QGraphicsWidget):
                 startHook = self._proxy().outputHook()
         
         Connection(startHook, endHook)
+        coralApp.logDebug("nodeEditor.attributeUi.AttributeUi.connectTo: Done")
     
     def _enableProxy(self):
         attr = self._coralAttribute()

@@ -150,6 +150,7 @@ class ConnectionHook(QtGui.QGraphicsItem):
         return self._color
         
     def mousePressEvent(self, event):
+        coralApp.logDebug("ConnectionHook.mousePressEvent")
         if self._isOutput:
             self._draggingConnection = connection.Connection(self)
             self._draggingConnection._pen.setWidth(2)
@@ -167,8 +168,10 @@ class ConnectionHook(QtGui.QGraphicsItem):
             mousePos = self._draggingConnection.mapFromScene(event.scenePos())
             self._draggingConnection.endHook().setPos(mousePos)
             self._draggingConnection.updateEndPos()
+        coralApp.logDebug("ConnectionHook.mousePressEvent")
     
     def _handleHover(self, item):
+#         coralApp.logDebug("ConnectionHook._handleHover")
         nodeHovered = None
         
         collidingItems = item.collidingItems(QtCore.Qt.IntersectsItemBoundingRect)
@@ -179,8 +182,10 @@ class ConnectionHook(QtGui.QGraphicsItem):
             nodeHovered.hoverEnterEvent(None)
         elif nodeView.NodeView._lastHoveredItem:
             nodeView.NodeView._lastHoveredItem.hoverLeaveEvent(None)
+#         coralApp.logDebug("ConnectionHook._handleHover")
     
     def mouseMoveEvent(self, event):
+#         coralApp.logDebug("ConnectionHook.mouseMoveEvent")
         if self._draggingConnection:
             connectionStartHook = self._draggingConnection.startHook()
             self._draggingConnectionEndHook = None
@@ -218,14 +223,15 @@ class ConnectionHook(QtGui.QGraphicsItem):
                     QtGui.QToolTip.hideText()
                 
             self._draggingConnection.updateEndPos()
+#         coralApp.logDebug("ConnectionHook.mouseMoveEvent: Done")
     
     def mouseReleaseEvent(self, event):
+#         coralApp.logDebug("ConnectionHook.mouseReleaseEvent")
         if self._draggingConnection:
             startHook = self._draggingConnection.startHook()
             self._draggingConnection.deleteIt()
             self._draggingConnection = None
             ConnectionHook._outstandingDraggingConnection = None
-            
             if self._draggingConnectionEndHook:
                 sourceAttribute = startHook.parentAttributeUi().coralAttribute()
                 destinationAttribute = self._draggingConnectionEndHook.parentAttributeUi().coralAttribute()
@@ -234,6 +240,7 @@ class ConnectionHook(QtGui.QGraphicsItem):
                 success = coralApp.executeCommand("ConnectAttributes", sourceAttribute = sourceAttribute.fullName(), destinationAttribute = destinationAttribute.fullName())
                 
                 self.parentAttributeUi().parentNodeUi().update()
+#         coralApp.logDebug("ConnectionHook.mouseReleaseEvent: Done")
     
     def boundingRect(self):
         return self._rect

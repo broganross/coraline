@@ -33,6 +33,7 @@
 	#include <tbb/mutex.h>
 #endif
 
+#include <typeinfo>
 #include "NumericNodes.h"
 #include "../src/Numeric.h"
 #include "../src/containerUtils.h"
@@ -1074,24 +1075,26 @@ BuildArray::BuildArray(const std::string &name, Node *parent):
 
 	setAllowDynamicAttributes(true);
 	
-	_array = new NumericAttribute("array", this);
+	_array = new PolyAttribute("array", this);
 	addOutputAttribute(_array);
 }
 
-void BuildArray::addNumericAttribute(){
+void BuildArray::addAttribute(){
 	std::string numStr = stringUtils::intToString(inputAttributes().size());
-	NumericAttribute *attr = new NumericAttribute("in" + numStr, this);
+	PolyAttribute *attr = new PolyAttribute("in" + numStr, this);
 	addInputAttribute(attr);
 	setAttributeAffect(attr, _array);
 	
-	std::vector<std::string> specialization;
-	specialization.push_back("Int");
-	specialization.push_back("Float");
-	specialization.push_back("Vec3");
-	specialization.push_back("Col4");
-	specialization.push_back("Matrix44");
-	
-	setAttributeAllowedSpecializations(attr, specialization);
+	std::vector<std::string> spec;
+	spec.push_back("Int");
+	spec.push_back("Float");
+	spec.push_back("Vec3");
+	spec.push_back("Col4");
+	spec.push_back("Matrix44");
+	spec.push_back("String");
+	spec.push_back("Path");
+	spec.push_back("Bool");
+	setAttributeAllowedSpecializations(attr, spec);
 	
 	addAttributeSpecializationLink(attr, _array);
 	
@@ -1115,88 +1118,149 @@ void BuildArray::updateSpecializationLink(Attribute *attributeA, Attribute *attr
 }
 
 void BuildArray::attributeSpecializationChanged(Attribute *attribute){
+	std::cout << "BuildArray.attributeSpecializationChanged" <<std::endl;
 	if(attribute == _array){
 		_selectedOperation = 0;
-		
-		Numeric::Type type = _array->outValue()->type();
-		if(type != Numeric::numericTypeAny){
-			if(type == Numeric::numericTypeIntArray){
+		PolyValue::ValueType type = _array->outValue()->type();
+		if(type != PolyValue::numericTypeAny &&
+				type != PolyValue::typeAny &&
+				type != PolyValue::stringTypeAny &&
+				type != PolyValue::boolTypeAny){
+			if(type == PolyValue::numericTypeIntArray){
 				_selectedOperation = &BuildArray::updateInt;
 			}
-			else if(type == Numeric::numericTypeFloatArray){
+			else if(type == PolyValue::numericTypeFloatArray){
 				_selectedOperation = &BuildArray::updateFloat;
 			}
-			else if(type == Numeric::numericTypeVec3Array){
+			else if(type == PolyValue::numericTypeVec3Array){
 				_selectedOperation = &BuildArray::updateVec3;
 			}
-			else if(type == Numeric::numericTypeCol4Array){
+			else if(type == PolyValue::numericTypeCol4Array){
 				_selectedOperation = &BuildArray::updateCol4;
 			}
-			else if(type == Numeric::numericTypeMatrix44Array){
+			else if(type == PolyValue::numericTypeMatrix44Array){
 				_selectedOperation = &BuildArray::updateMatrix44;
+			}
+			else if (type == PolyValue::stringTypeArray) {
+				_selectedOperation = &BuildArray::updateString;
+			}
+			else if (type == PolyValue::pathTypeArray) {
+				_selectedOperation = &BuildArray::updatePath;
+			}
+			else if (type == PolyValue::boolTypeArray) {
+				_selectedOperation = &BuildArray::updateBool;
 			}
 		}
 	}
+	std::cout << "BuildArray.attributeSpecializationChanged: Done" <<std::endl;
 }
 
-void BuildArray::updateInt(const std::vector<Attribute*> &inAttrs, int arraySize, Numeric *array, unsigned int slice){
+void BuildArray::updateInt(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice){
 	std::vector<int> arrayValues(arraySize);
 	for(int i = 0; i < arraySize; ++i){
-		Numeric *inNum = (Numeric*)inAttrs[i]->value();
+		PolyValue *inNum = (PolyValue*)inAttrs[i]->value();
 		arrayValues[i] = inNum->intValueAtSlice(slice, 0);
 	}
-	
 	array->setIntValuesSlice(slice, arrayValues);
 }
 
-void BuildArray::updateFloat(const std::vector<Attribute*> &inAttrs, int arraySize, Numeric *array, unsigned int slice){
+void BuildArray::updateFloat(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice){
 	std::vector<float> arrayValues(arraySize);
 	for(int i = 0; i < arraySize; ++i){
-		Numeric *inNum = (Numeric*)inAttrs[i]->value();
+		PolyValue *inNum = (PolyValue*)inAttrs[i]->value();
 		arrayValues[i] = inNum->floatValueAtSlice(slice, 0);
 	}
 	
 	array->setFloatValuesSlice(slice, arrayValues);
 }
 
-void BuildArray::updateVec3(const std::vector<Attribute*> &inAttrs, int arraySize, Numeric *array, unsigned int slice){
+void BuildArray::updateVec3(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice){
 	std::vector<Imath::V3f> arrayValues(arraySize);
 	for(int i = 0; i < arraySize; ++i){
-		Numeric *inNum = (Numeric*)inAttrs[i]->value();
+		PolyValue *inNum = (PolyValue*)inAttrs[i]->value();
 		arrayValues[i] = inNum->vec3ValueAtSlice(slice, 0);
 	}
 	
 	array->setVec3ValuesSlice(slice, arrayValues);
 }
 
-void BuildArray::updateCol4(const std::vector<Attribute*> &inAttrs, int arraySize, Numeric *array, unsigned int slice){
+void BuildArray::updateCol4(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice){
 	std::vector<Imath::Color4f> arrayValues(arraySize);
 	for(int i = 0; i < arraySize; ++i){
-		Numeric *inNum = (Numeric*)inAttrs[i]->value();
+		PolyValue *inNum = (PolyValue*)inAttrs[i]->value();
 		arrayValues[i] = inNum->col4ValueAtSlice(slice, 0);
 	}
 
 	array->setCol4ValuesSlice(slice, arrayValues);
 }
 
-void BuildArray::updateMatrix44(const std::vector<Attribute*> &inAttrs, int arraySize, Numeric *array, unsigned int slice){
+void BuildArray::updateMatrix44(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice){
 	std::vector<Imath::M44f> arrayValues(arraySize);
 	for(int i = 0; i < arraySize; ++i){
-		Numeric *inNum = (Numeric*)inAttrs[i]->value();
+		PolyValue *inNum = (PolyValue*)inAttrs[i]->value();
 		arrayValues[i] = inNum->matrix44ValueAtSlice(slice, 0);
 	}
 	
 	array->setMatrix44ValuesSlice(slice, arrayValues);
 }
 
+void BuildArray::updateString(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice){
+	std::cout << "BuildArray.updateString" <<std::endl;
+	std::cout << "arraySize " << arraySize << std::endl;
+	std::vector<std::string> arrayValues(arraySize);
+	for (int i=0; i < arraySize; ++i){
+		if (typeid(inAttrs[i]) == typeid(String)){
+			std::cout << "string attr" << std::endl;
+			String *inVal = (String*)inAttrs[i]->value();
+			arrayValues[i] = inVal->stringValueAtSlice(slice, 0);
+		} else {
+			std::cout << "poly attr " << inAttrs[i]->name() << std::endl;
+
+			if (typeid(inAttrs[i]->value()) == typeid(PolyValue)){
+				std::cout << "poly value" << std::endl;
+				PolyValue *inVal = (PolyValue*)inAttrs[i]->value();
+				arrayValues[i] = inVal->stringValueAtSlice(slice, 0);
+			} else {
+				std::cout << "string value" << std::endl;
+				String *inVal = (String*)inAttrs[i]->value();
+				arrayValues[i] = inVal->stringValueAtSlice(slice, 0);
+			}
+		}
+	}
+	std::cout << "about to set" << std::endl;
+	array->setStringValuesSlice(slice, arrayValues);
+	std::cout << "BuildArray.updateString: Done" <<std::endl;
+}
+
+void BuildArray::updatePath(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice){
+	std::vector<std::string> arrayValues(arraySize);
+	for (int i=0; i < arraySize; ++i){
+		PolyValue *inVal = (PolyValue*)inAttrs[i]->value();
+		arrayValues[i] = inVal->pathValueAtSlice(slice, 0);
+	}
+	array->setPathValuesSlice(slice, arrayValues);
+}
+
+void BuildArray::updateBool(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice){
+	std::vector<bool> arrayValues(arraySize);
+	for (int i=0; i<arraySize; ++i){
+		PolyValue *inVal = (PolyValue*)inAttrs[i]->value();
+		arrayValues[i] = inVal->boolValueAtSlice(slice, 0);
+	}
+	array->setBoolValuesSlice(slice, arrayValues);
+}
+
 void BuildArray::updateSlice(Attribute *attribute, unsigned int slice){
+	std::cout << "BuildArray.updateSlice" <<std::endl;
 	if(_selectedOperation){
+		std::cout << "operation" << std::endl;
 		std::vector<Attribute*> inAttrs = inputAttributes();
 		int arraySize = inAttrs.size();
-		Numeric *array = _array->outValue();
+		PolyValue *array = _array->outValue();
 		
 		(this->*_selectedOperation)(inAttrs, arraySize, array, slice);
 	}
+	std::cout << "BuildArray.updateSlice: Done" <<std::endl;
 }
 
 

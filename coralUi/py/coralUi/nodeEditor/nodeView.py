@@ -127,6 +127,7 @@ class NodeView(QtGui.QGraphicsView):
         nodeEditor.NodeEditor._setFocusedInstance(self.parentWidget())
     
     def setCurrentNodeUi(self, nodeUi):
+        coralApp.logDebug("nodeView.NodeView.setCurrentNodeUi")
         if self._currentNodeUi:
             oldNodeUi = self._currentNodeUi()
             if oldNodeUi:
@@ -183,7 +184,6 @@ class NodeView(QtGui.QGraphicsView):
                 scenePos = self.mapToScene(event.pos())
                 sceneItem.setPos(scenePos)
                 self.setSelectedItems([sceneItem])
-
         
     def setSelectedItems(self, items):
         self.scene().clearSelection()
@@ -201,6 +201,7 @@ class NodeView(QtGui.QGraphicsView):
         self.centerOn(self._currentCenterPoint);
     
     def mousePressEvent(self, mouseEvent):
+        coralApp.logDebug("nodeView.NodeView.mousePressEvent")
         if mouseEvent.modifiers() == QtCore.Qt.AltModifier:
             self._lastPanPoint = mouseEvent.pos()
             self.setCursor(QtCore.Qt.ClosedHandCursor)

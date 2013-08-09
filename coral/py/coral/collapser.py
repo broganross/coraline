@@ -76,6 +76,7 @@ def _disconnectConnectedOutputs(node, nodes):
     return outputAttrs
 
 def collapseNodes(nodes, collapsedNode = None):
+    coralApp.logDebug("collapser.collapseNodes")
     parentNode = _checkNodesShareSameParent(nodes)
     
     if collapsedNode is None:
@@ -122,10 +123,12 @@ def collapseNodes(nodes, collapsedNode = None):
                 passAttr = outPassAttrs[passAttrName]
                 
             NetworkManager.connect(passAttr, destAttr)
-    
+
+    coralApp.logDebug("collapser.collapseNodes: Done")    
     return collapsedNode
 
 def explodeCollapsedNode(collapsedNode):
+    coralApp.logDebug("collapser.explodeCollapsedNode")
     parentNode = collapsedNode.parent()
     extractedNodes = collapsedNode.nodes()
     if parentNode:
@@ -155,6 +158,6 @@ def explodeCollapsedNode(collapsedNode):
                 NetworkManager.connect(source, dest)
     else:
         raise coralApp.logError("collapsedNode has no parent to explode onto.")
-    
+    coralApp.logDebug("collapser.explodeCollapsedNode: Done")
     return extractedNodes
 

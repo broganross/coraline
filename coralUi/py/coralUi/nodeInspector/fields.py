@@ -288,7 +288,6 @@ class StringValueField(AttributeField):
             self.setAttributeWidget(FilePathWidget(self), "completed()")
         else:    
             self.setAttributeWidget(CustomLineEdit(self), "editingFinished()")
-
    
     def setAttributeValue(self, attribute, value):
         attribute.outValue().setStringValueAt(0, value)
@@ -425,3 +424,8 @@ class ColorField(AttributeField):
         col = self._colorButton.palette().background().color()
         return [col.redF(), col.greenF(), col.blueF(), col.alphaF()]
 
+
+class PolyValueField(AttributeField):
+    def __init__(self, coralAttr, parentWidget):
+        super(PolyValueField, self).__init__(coralAttr, parentWidget)
+        

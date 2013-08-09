@@ -27,7 +27,8 @@
 # </license>
 
 
-import weakref
+import  weakref
+import  logging
 from PyQt4 import QtGui, QtCore
 
 from ... import coralApp
@@ -38,6 +39,8 @@ from nodeUi import NodeUi, AttributeUi, Connection
 from nodeView import NodeView
 from rootNodeUi import RootNodeUi
 from addressBar import AddressBar
+
+logger = logging.getLogger("coral")
 
 def _checkClassIsNodeUi(class_):
     if NodeUi in class_.__bases__:
@@ -375,6 +378,7 @@ class NodeEditor(QtGui.QWidget):
         
     @staticmethod
     def _coralConnectedAttributesCallback():
+        coralApp.logDebug("NodeEditor._coralConnectedAttributesCallback")
         sourceAttributeId = NodeEditor._connectedAttributesObserver.data("sourceAttributeId")
         destinationAttributeId = NodeEditor._connectedAttributesObserver.data("destinationAttributeId")
         
@@ -382,6 +386,7 @@ class NodeEditor(QtGui.QWidget):
         destinationAttributeUi = NodeEditor.findAttributeUi(destinationAttributeId)
         
         sourceAttributeUi.connectTo(destinationAttributeUi)
+        coralApp.logDebug("NodeEditor._coralConnectedAttributesCallback: Done")
         
     @staticmethod
     def _coralDeletingNodeCallback():
@@ -496,13 +501,14 @@ class NodeEditor(QtGui.QWidget):
             self._addressBar.setAddress(self._nodeView.currentNodeUi().coralNode().fullName())
     
     def _currentNodeUiChanged(self):
+        coralApp.logDebug("nodeEditor.NodeEditor._currentNodeUiChanged")
         coralNode = self._nodeView.currentNodeUi().coralNode()
         self._addressBar.setAddress(coralNode.fullName())
         
         self.setWindowTitle(coralNode.name())
         if type(self.parentWidget()) is QtGui.QDockWidget:
             self.parentWidget().setWindowTitle(coralNode.name())
-    
+
     def _upButtonClicked(self):
         parentNodeUi = self._nodeView.currentNodeUi().parentNodeUi()
         

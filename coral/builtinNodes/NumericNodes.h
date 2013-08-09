@@ -33,6 +33,8 @@
 #include "../src/Node.h"
 #include "../src/Attribute.h"
 #include "../src/NumericAttribute.h"
+#include "../src/PolyAttribute.h"
+#include "../src/PolyValue.h"
 #include "../src/PassThroughAttribute.h"
 #include "../src/StringAttribute.h"
 
@@ -196,16 +198,20 @@ public:
 	void updateSpecializationLink(Attribute *attributeA, Attribute *attributeB, std::vector<std::string> &specializationA, std::vector<std::string> &specializationB);
 	void attributeSpecializationChanged(Attribute *attribute);
 	void updateSlice(Attribute *attribute, unsigned int slice);
-	void addNumericAttribute();
+	void addAttribute();
 	
 private:
-	NumericAttribute *_array;
-	void(BuildArray::*_selectedOperation)(const std::vector<Attribute*>&, int, Numeric*, unsigned int);
-	void updateInt(const std::vector<Attribute*> &inAttrs, int arraySize, Numeric *array, unsigned int slice);
-	void updateFloat(const std::vector<Attribute*> &inAttrs, int arraySize, Numeric *array, unsigned int slice);
-	void updateVec3(const std::vector<Attribute*> &inAttrs, int arraySize, Numeric *array, unsigned int slice);
-	void updateCol4(const std::vector<Attribute*> &inAttrs, int arraySize, Numeric *array, unsigned int slice);
-	void updateMatrix44(const std::vector<Attribute*> &inAttrs, int arraySize, Numeric *array, unsigned int slice);
+	PolyAttribute *_array;
+	void(BuildArray::*_selectedOperation)(const std::vector<Attribute*>&, int, PolyValue*, unsigned int);
+	void updateInt(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice);
+	void updateFloat(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice);
+	void updateVec3(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice);
+	void updateCol4(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice);
+	void updateMatrix44(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice);
+	void updateString(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice);
+	void updatePath(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice);
+	void updateBool(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice);
+
 };
 
 class RangeArray: public Node{

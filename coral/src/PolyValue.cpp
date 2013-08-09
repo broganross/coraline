@@ -78,6 +78,7 @@ unsigned int PolyValue::size(){
 }
 
 unsigned int PolyValue::sizeSlice(unsigned int slice){
+	std::cout << "PolyValue.sizeSlice" << std::endl;
 	if (slice >= _slices){
 		slice = _slices -1;
 	}
@@ -111,6 +112,7 @@ unsigned int PolyValue::sizeSlice(unsigned int slice){
 		ret = _boolValuesSliced[slice].size();
 		break;
 	}
+	std::cout << "PolyValue.sizeSlice: Done" << std::endl;
 	return ret;
 }
 
@@ -119,10 +121,8 @@ PolyValue::ValueType PolyValue::type(){
 }
 
 void PolyValue::setType(PolyValue::ValueType type){
-	std::cout << "setType start" << std::endl;
 	_type = type;
 	_isArray = false;
-	std::cout << "type switch" << std::endl;
 	switch (_type){
 	case stringType:
 		_stringValuesSliced.resize(_slices);
@@ -215,7 +215,6 @@ void PolyValue::setType(PolyValue::ValueType type){
 		_boolValuesSliced.resize(_slices);
 		break;
 	}
-	std::cout << "setType done" << std::endl;
 }
 
 void PolyValue::copy(const Value *other){
@@ -661,6 +660,7 @@ std::string PolyValue::asString(){
 }
 
 void PolyValue::setFromString(const std::string &value){
+	std::cout << "PolyValue.setFromString" << std::endl;
 	//@TODO determine the type first
 	// numeric types
 	std::string tmp = stringUtils::replace(value, "\n", "");
@@ -720,6 +720,7 @@ void PolyValue::setFromString(const std::string &value){
 			break;
 		}
 	}
+	std::cout << "PolyValue.setFromString: Done" << std::endl;
 }
 
 void PolyValue::stringSetFromString(const std::string &value){
@@ -918,53 +919,6 @@ void PolyValue::col4SetFromString(const std::string &value){
 	}
 }
 
-/*
-template<typename valType> void PolyValue::setValueAtSlice(unsigned int slice, unsigned int id, valType value){
-	switch(_type){
-	case stringTypeAny:
-		setStringValueAtSlice(slice, id, value);
-	case stringType:
-		setStringValueAtSlice(slice, id, value);
-	case stringTypeArray:
-		setStringValueAtSlice(slice, id, value);
-	case pathType:
-		setStringValueAtSlice(slice, id, value);
-	case pathTypeArray:
-		setStringValueAtSlice(slice, id, value);
-	case boolTypeArray:
-		setBoolValueAtSlice(slice, id, value);
-	case boolType:
-		setBoolValueAtSlice(slice, id, value);
-	case boolTypeArray:
-		setBoolValueAtSlice(slice, id, value);
-	case numericTypeInt:
-		setIntValueAtSlice(slice, id, value);
-	case numericTypeIntArray:
-		setIntValueAtSlice(slice, id, value);
-	case numericTypeFloat:
-		setFloatValueAtSlice(slice, id, value);
-	case numericTypeFloatArray:
-		setFloatValueAtSlice(slice, id, value);
-	case numericTypeVec3:
-		setVec3ValueAtSlice(slice, id, value);
-	case numericTypeVec3Array:
-		setVec3ValueAtSlice(slice, id, value);
-	case numericTypeCol4:
-		setCol4ValueAtSlice(slice, id, value);
-	case numericTypeCol4Array:
-		setCol4ValueAtSlice(slice, id, value);
-	case numericTypeMatrix44:
-		setMatrix44ValueAtSlice(slice, id, value);
-	case numericTypeMatrix44Array:
-		setMatrix44ValueAtSlice(slice, id, value);
-	case numericTypeQuat:
-		setQuatValueAtSlice(slice, id, value);
-	case numericTypeQuatArray:
-		setQuatValueAtSlice(slice, id, value);
-	}
-}
-*/
-
 void PolyValue::setStringValueAtSlice(unsigned int slice, unsigned int id, std::string &value){
 	if (slice < _stringValuesSliced.size()){
 		std::vector<std::string> &slicevec = _stringValuesSliced[slice];
@@ -1041,73 +995,6 @@ void PolyValue::setQuatValueAtSlice(unsigned int slice, unsigned int id, const I
 	}
 }
 
-/*
-template<typename valType> void PolyValue::setValueAt(unsigned int id, valType value){
-	switch (_type){
-	case stringTypeAny:
-		setStringValueAt(id, value);
-		break;
-	case stringType:
-		setStringValueAt(id, value);
-		break;
-	case stringTypeArray:
-		setStringValueAt(id, value);
-		break;
-	case pathType:
-		setStringValueAt(id, value);
-		break;
-	case pathTypeArray:
-		setStringValueAt(id, value);
-		break;
-	case boolTypeAny:
-		setBoolValueAt(id, value);
-		break;
-	case boolType:
-		setBoolValueAt(id, value);
-		break;
-	case boolTypeArray:
-		setBoolValueAt(id, value);
-		break;
-	case numericTypeInt:
-		setIntValueAt(id, value);
-		break;
-	case numericTypeIntArray:
-		setIntValueAt(id, value);
-		break;
-	case numericTypeFloat:
-		setFloatValueAt(id, value);
-		break;
-	case numericTypeFloatArray:
-		setFloatValueAt(id, value);
-		break;
-	case numericTypeVec3:
-		setVec3ValueAt(id, value);
-		break;
-	case numericTypeVec3Array:
-		setVec3ValueAt(id, value);
-		break;
-	case numericTypeCol4:
-		setCol4ValueAt(id, value);
-		break;
-	case numericTypeCol4Array:
-		setCol4ValueAT(id, value);
-		break;
-	case numericTypeMatrix44:
-		setMatrix44ValueAt(id, value);
-		break;
-	case numericTypeMatrix44Array:
-		setMatrix44ValueAt(id, value);
-		break;
-	case numericTypeQuat:
-		setQuatValueAt(id, value);
-		break;
-	case numericTypeQuatArray:
-		setQuatValueAt(id, value);
-		break;
-	}
-}
-*/
-
 void PolyValue::setStringValueAt(unsigned int id, std::string value){
 	setStringValueAtSlice(0, id, value);
 }
@@ -1143,111 +1030,6 @@ void PolyValue::setQuatValueAt(unsigned int id, const Imath::Quatf &value){
 void PolyValue::setMatrix44ValueAt(unsigned int id, const Imath::M44f &value){
 	setMatrix44ValueAtSlice(0, id, value);
 }
-
-/*
-template<typename valType> void PolyValue::setValues(const std::vector<valType> &value){
-	switch(_type){
-	case stringType:
-		_stringValuesSliced = value;
-		break;
-	case stringTypeArray:
-		_stringValuesSliced = value;
-		break;
-	case pathType:
-		_stringValuesSliced = value;
-		break;
-	case pathTypeArray:
-		_stringValuesSliced = value;
-		break;
-	case boolTypeAny:
-		_boolValuesSliced = value;
-		break;
-	case boolType:
-		_boolValuesSliced = value;
-		break;
-	case boolTypeArray:
-		_boolValuesSliced = value;
-		break;
-	case numericTypeInt:
-		_intValuesSliced = value;
-		break;
-	case numericTypeIntArray:
-		_intValuesSliced = value;
-		break;
-	case numericTypeFloat:
-		_floatValuesSliced = value;
-		break;
-	case numericTypeFloatArray:
-		_floatValuesSliced = value;
-		break;
-	case numericTypeVec3:
-		_vec3ValuesSliced = value;
-		break;
-	case numericTypeVec3Array:
-		_vec3ValuesSliced = value;
-		break;
-	case numericTypeCol4:
-		_col4ValuesSliced = value;
-		break;
-	case numericTypeCol4Array:
-		_col4ValuesSliced = value;
-		break;
-	case numericTypeMatrix44:
-		_matrix44ValuesSliced = value;
-		break;
-	case numericTypeMatrix44Array:
-		_matrix44ValuesSliced = value;
-		break;
-	case numericTypeQuat:
-		_quatValuesSliced = value;
-		break;
-	case numericTypeQuatArray:
-		_quatValuesSliced = value;
-		break;
-	}
-}
-*/
-
-/*
-template<typename valType> valType PolyValue::valueAtSlice(unsigned int slice, unsigned int id){
-	switch (_type){
-	case stringType:
-		return stringValueAtSlice(slice, id);
-	case stringTypeArray:
-		return stringValueAtSlice(slice, id);
-	case pathType:
-		return stringValueAtSlice(slice, id);
-	case pathTypeArray:
-		return stringValueAtSlice(slice, id);
-	case boolTypeAny:
-		return boolValueAtSlice(slice, id);
-	case boolType:
-		return boolValueAtSlice(slice, id);
-	case boolTypeArray:
-		return boolValueAtSlice(slice, id);
-	case numericTypeInt:
-		return intValueAtSlice(slice, id);
-	case numericTypeIntArray:
-		return intValueAtSlice(slice, id);
-	case numericTypeFloat:
-		return floatValueAtSlice(slice, id);
-	case numericTypeFloatArray:
-		return floatValueAtSlice(slice, id);
-	case numericTypeVec3:
-		return vec3ValueAtSlice(slice, id);
-	case numericTypeVec3Array:
-		return vec3ValueAtSlice(slice, id);
-	case numericTypeCol4:
-		return col4ValueAtSlice(slice, id);
-	case numericTypeCol4Array:
-		return col4ValueAtSlice(slice, id);
-	case numericTypeMatrix44:
-		return matrix44ValueAtSlice(slice, id);
-	case numericTypeMatrix44Array:
-		return matrix44ValueAtSlice(slice, id);
-	}
-}
-*/
 
 const std::vector<std::string> &PolyValue::stringValues(){
 	return _stringValuesSliced[0];
@@ -1411,13 +1193,18 @@ const Imath::Quatf PolyValue::quatValueAt(unsigned int id){
 	return quatValueAtSlice(0, id);
 }
 
+
 std::string PolyValue::stringValueAtSlice(unsigned int slice, unsigned int id){
+	std::cout << "PolyValue.stringValueAtSlice" << std::endl;
 	if(slice >= _stringValuesSliced.size()){
 		slice = _stringValuesSliced.size() - 1;
 	}
-
 	std::vector<std::string> &slicevec = _stringValuesSliced[slice];
-
+	std::cout << "before" << std::endl;
+	for (int i=0; i < slicevec.size(); ++i){
+		std::cout << slicevec[i];
+	}
+	std::cout << "after" << std::endl;
 	int size = slicevec.size();
 	if(id < size){
 		return slicevec[id];

@@ -26,6 +26,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # </license>
 
+import  coralApp
 import utils
 
 class Observer(object):
@@ -46,8 +47,10 @@ class Observer(object):
         self._notificationCallback = utils.weakRef(callback)
     
     def notify(self):
+        coralApp.logDebug("Observer.notify")
         if self._notificationCallback():
             self._notificationCallback()()
+        coralApp.logDebug("Observer.notify: Done")
     
     def __del__(self):
         collector = self._collector()

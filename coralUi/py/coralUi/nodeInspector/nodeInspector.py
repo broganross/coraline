@@ -85,7 +85,7 @@ class SpecializationCombo(QtGui.QWidget):
 class NodeInspectorWidget(QtGui.QWidget):
     def __init__(self, coralNode, parent):
         QtGui.QWidget.__init__(self, parent)
-        
+        coralApp.logDebug("nodeInspector.NodeInspectorWidget.__init__")
         self._mainLayout = QtGui.QVBoxLayout(self)
         self._coralNode = weakref.ref(coralNode)
         self._nameField = None
@@ -93,10 +93,11 @@ class NodeInspectorWidget(QtGui.QWidget):
         self._attributeWidgets = {}
         self._presetCombo = None
         self._nodeInspector = weakref.ref(parent)
-        
+
         self.setLayout(self._mainLayout)
         self._mainLayout.setContentsMargins(0, 0, 0, 0)
         self._mainLayout.setSpacing(2)
+        coralApp.logDebug("nodeInspector.NodeInspector.__init__: complete")
     
     def nodeInspector(self):
         return self._nodeInspector()
@@ -175,6 +176,7 @@ class NodeInspectorWidget(QtGui.QWidget):
         combo.setCurrentIndex(presets.index(currentPreset))
         
     def _updatePresetCombo(self):
+        coralApp.logDebug("nodeInspector.NodeInspectorWidget._updatePresetCombo")
         coralNode = self._coralNode()
         
         presets = coralNode.specializationPresets()
@@ -192,6 +194,7 @@ class NodeInspectorWidget(QtGui.QWidget):
             
             #if self._nodeIsConnected(coralNode):
             #    self._presetCombo._combo.setDisabled(True)
+        coralApp.logDebug("nodeInspector.NodeInspectorWidget._updatePresetCombo: done")
     
     def _findFirstConnectedAtributeNonPassThrough(self, coralAttribute, processedAttributes):
         foundAttr = None
@@ -214,12 +217,12 @@ class NodeInspectorWidget(QtGui.QWidget):
         return foundAttr
     
     def build(self):
+        coralApp.logDebug("nodeInspector.NodeInspectorWidget.build")
         coralNode = self.coralNode()
         
         if self._nameEditable:
             self._nameField = fields.NameField(coralNode, self)
             self.layout().addWidget(self._nameField)
-        
         self._updatePresetCombo()
         
         nodeUi = nodeEditor.NodeEditor.findNodeUi(coralNode.id())
@@ -241,6 +244,7 @@ class NodeInspectorWidget(QtGui.QWidget):
                     self._attributeWidgets[attribute.name()] = weakref.ref(inspectorWidget)
                     self._mainLayout.addWidget(inspectorWidget)
                     inspectorWidget.build()
+        coralApp.logDebug("nodeInspector.NodeInspectorWidget.build: complete")
 
 class ProxyAttributeInspectorWidget(QtGui.QWidget):
     def __init__(self, coralAttribute, parent):
@@ -384,6 +388,7 @@ class NodeInspector(QtGui.QWidget):
         self._selectionChanged()
     
     def refresh(self):
+        coralApp.logDebug("nodeInspector.NodeInspector.refresh")
         self.clear()
         
         node = None
@@ -394,6 +399,7 @@ class NodeInspector(QtGui.QWidget):
             attribute = self._attribute()
         
         self._rebuild(node, attribute)
+        coralApp.logDebug("nodeInspector.NodeInspector.refresh: Done")
     
     def clear(self):
         self._header._classNameLabel.setText("")
@@ -402,6 +408,7 @@ class NodeInspector(QtGui.QWidget):
             self._inspectorWidget = None
     
     def _rebuild(self, node = None, attribute = None):
+        coralApp.logDebug("nodeInspector.NodeInspector._rebuild")
         if node:
             inspectorWidgetClass = NodeInspectorWidget
             
@@ -428,8 +435,10 @@ class NodeInspector(QtGui.QWidget):
             self._header._classNameLabel.setText(attribute.className())
             
             coralApp.addNodeConnectionChangedObserver(self._nodeConnectionChangedObserver, attribute.parent(), self.refresh)
-                
+        coralApp.logDebug("nodeInspector.NodeInspector._rebuild: Done")
+
     def _selectionChanged(self):
+        coralApp.logDebug("nodeInspector.NodeInspector._selectionChanged")
         if self._isLocked:
             return
         
@@ -451,6 +460,7 @@ class NodeInspector(QtGui.QWidget):
                 attr = attributes[0]
                 self._attribute = weakref.ref(attr)
                 self._rebuild(attribute = attr)
+        coralApp.logDebug("nodeInspector.NodeInspector._selectionChanged: Done")
         
     def lock(self, value):
         self._isLocked = value

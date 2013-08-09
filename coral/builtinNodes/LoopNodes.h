@@ -2,8 +2,10 @@
 #define CORAL_LOOPNODES_H
 
 #include "../src/Node.h"
-#include "../src/NumericAttribute.h"
 #include "../src/PolyAttribute.h"
+#include "../src/Value.h"
+#include "../src/PolyValue.h"
+#include "../src/NumericAttribute.h"
 #include "../src/PassThroughAttribute.h"
 
 namespace coral{
@@ -16,16 +18,19 @@ public:
 	void updateSlice(Attribute *attribute, unsigned int slice);
 
 private:
-	NumericAttribute *_globalArray;
+	PolyAttribute *_globalArray;
 	NumericAttribute *_localIndex;
-	NumericAttribute *_localElement;
-	void(LoopInputNode::*_selectedOperation)(unsigned int, Numeric *, Numeric *);
+	PolyAttribute *_localElement;
+	void(LoopInputNode::*_selectedOperation)(unsigned int, PolyValue *, PolyValue *);
 
-	void updateInt(unsigned int slice, Numeric *globalArray, Numeric *localElement);
-	void updateFloat(unsigned int slice, Numeric *globalArray, Numeric *localElement);
-	void updateVec3(unsigned int slice, Numeric *globalArray, Numeric *localElement);
-	void updateCol4(unsigned int slice, Numeric *globalArray, Numeric *localElement);
-	void updateMatrix44(unsigned int slice, Numeric *globalArray, Numeric *localElement);
+	void updateInt(unsigned int slice, PolyValue *globalArray, PolyValue *localElement);
+	void updateFloat(unsigned int slice, PolyValue *globalArray, PolyValue *localElement);
+	void updateVec3(unsigned int slice, PolyValue *globalArray, PolyValue *localElement);
+	void updateCol4(unsigned int slice, PolyValue *globalArray, PolyValue *localElement);
+	void updateMatrix44(unsigned int slice, PolyValue *globalArray, PolyValue *localElement);
+	void updateString(unsigned int slice, PolyValue *globaArray, PolyValue *localElement);
+	void updatePath(unsigned int slice, PolyValue *globalArray, PolyValue *localElement);
+	void updateBool(unsigned int slice, PolyValue *globalArray, PolyValue *localElement);
 };
 
 class LoopOutputNode: public Node{
@@ -36,15 +41,18 @@ public:
 	void update(Attribute *attribute);
 
 private:
-	NumericAttribute *_localElement;
-	NumericAttribute *_globalArray;
-	void(LoopOutputNode::*_selectedOperation)(unsigned int, Numeric *, Numeric *);
-	
-	void updateInt(unsigned int slices, Numeric *element, Numeric *array);
-	void updateFloat(unsigned int slices, Numeric *element, Numeric *array);
-	void updateVec3(unsigned int slices, Numeric *element, Numeric *array);
-	void updateCol4(unsigned int slices, Numeric *element, Numeric *array);
-	void updateMatrix44(unsigned int slices, Numeric *element, Numeric *array);
+	PolyAttribute *_localElement;
+	PolyAttribute *_globalArray;
+	void(LoopOutputNode::*_selectedOperation)(unsigned int, PolyValue *, PolyValue *);
+
+	void updateInt(unsigned int slices, PolyValue *element, PolyValue *array);
+	void updateFloat(unsigned int slices, PolyValue *element, PolyValue *array);
+	void updateVec3(unsigned int slices, PolyValue *element, PolyValue *array);
+	void updateCol4(unsigned int slices, PolyValue *element, PolyValue *array);
+	void updateMatrix44(unsigned int slices, PolyValue *element, PolyValue *array);
+	void updateString(unsigned int slice, PolyValue *globaArray, PolyValue *localElement);
+	void updatePath(unsigned int slice, PolyValue *globalArray, PolyValue *localElement);
+	void updateBool(unsigned int slice, PolyValue *globalArray, PolyValue *localElement);
 };
 
 class ForLoopNode: public Node{

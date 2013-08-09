@@ -182,6 +182,7 @@ class ConnectAttributes(Command):
         self.setArgString("destinationAttribute", "")
         
     def doIt(self):
+        coralApp.logDebug("ConnectAttributes.doIt")
         success = False
         error = None
         
@@ -205,6 +206,7 @@ class ConnectAttributes(Command):
                     errorMessage += "extended info: " + error.message()
                 
             coralApp.logDebug(errorMessage)
+        coralApp.logDebug("ConnectAttributes.doIt: Done")
             
 class DisconnectInput(Command):
     def __init__(self):
@@ -261,6 +263,7 @@ class SetAttributeValue(Command):
         self.setArgString("value", "")
     
     def doIt(self):
+        coralApp.logDebug("SetAttributeValue.doIt")
         attribute = self.argAsString("attribute")
         value = self.argAsString("value")
         
@@ -269,6 +272,7 @@ class SetAttributeValue(Command):
             if attribute.outValue():
                 attribute.outValue().setFromString(value);
                 attribute.valueChanged()
+        coralApp.logDebug("SetAttributeValue.doIt")
 
 def loadPlugin():
     plugin = Plugin("builtinCommands")

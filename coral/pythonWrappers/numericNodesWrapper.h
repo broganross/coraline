@@ -221,7 +221,7 @@ void numericNodesWrapper(){
 	pythonWrapperUtils::pythonWrapper<ConstantArray, Node>("ConstantArray");
 	pythonWrapperUtils::pythonWrapper<ArraySize, Node>("ArraySize");
 	pythonWrapperUtils::pythonWrapper<BuildArray, Node>("BuildArray")
-		.def("addNumericAttribute", &BuildArray::addNumericAttribute);
+		.def("addAttribute", &BuildArray::addAttribute);
 	pythonWrapperUtils::pythonWrapper<RangeArray, Node>("RangeArray");
 	pythonWrapperUtils::pythonWrapper<Matrix44Translation, Node>("Matrix44Translation");
 	pythonWrapperUtils::pythonWrapper<Matrix44RotationAxis, Node>("Matrix44RotationAxis");

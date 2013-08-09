@@ -305,7 +305,7 @@ class BuildArrayInspectorWidget(NodeInspectorWidget):
     
     def _addInputClicked(self):
         node = self.coralNode()
-        node.addNumericAttribute()
+        node.addAttribute()
         
         self.nodeInspector().refresh()
 
@@ -351,11 +351,32 @@ class PassThroughAttributeUi(AttributeUi):
         return color
 
 class StringAttributeUi(AttributeUi):
+    TypeColor = { "Any" : QtGui.QColor(204, 255, 102),
+                 "String" : QtGui.QColor(194, 255, 102),
+                 "Path" : QtGui.QColor(214, 255, 102)
+                }
     def __init__(self, coralAttribute, parentNodeUi):
         AttributeUi.__init__(self, coralAttribute, parentNodeUi)
         
     def hooksColor(self, specialization):
-        return QtGui.QColor(204, 255, 102)
+        color = self.TypeColor["Any"]
+        
+        if len(specialization) == 2:
+            prefix1 = specialization[0].replace("Array", "")
+            prefix2 = specialization[1].replace("Array", "")
+            
+            if(prefix1 == prefix2):
+                color = self.TypeColor[prefix1]
+                        
+        elif len(specialization) == 1:
+            prefix = specialization[0].replace("Array", "")
+            suffix = specialization[0].replace(prefix, "")
+            color = self.TypeColor[prefix]
+            
+            if suffix == "Array":
+                color = color.lighter(110)
+        
+        return color
 
 class BoolAttributeUi(AttributeUi):
     def __init__(self, coralAttribute, parentNodeUi):

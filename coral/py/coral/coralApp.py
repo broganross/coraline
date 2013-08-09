@@ -28,17 +28,20 @@
 
 ##@package coral.coralApp
 # Main module to perform the most basic operations.
-import traceback
-import os, sys
-import copy 
-import weakref
-import traceback
 
-import _coral
-import utils
-from observer import Observer, ObserverCollector
-from rootNode import RootNode
-from valueChangedObserverCollector import ValueChangedObserverCollector
+import  copy
+import  os
+import  sys
+import  traceback
+import  weakref
+
+import  _coral
+import  utils
+from    observer                        import  Observer
+from    observer                        import  ObserverCollector
+from    rootNode                        import  RootNode
+from    valueChangedObserverCollector   import  ValueChangedObserverCollector
+
 
 class VerboseLevel:
     logNothing = 0
@@ -90,6 +93,12 @@ class CoralAppData:
     networkLoadingObservers = ObserverCollector()
     messageLoggedObservers = ObserverCollector()
 
+def _notifyMessageLogged(message, verboseLevel):
+    for observer in CoralAppData.messageLoggedObservers.observers():
+        observer.setData("message", message)
+        observer.setData("verboseLevel", verboseLevel)
+        observer.notify()
+
 def registeredNodeDescription(className):
     description = ""
     if CoralAppData.registeredNodeDescriptions.has_key(className):
@@ -132,12 +141,6 @@ def scanAutoLoadPaths():
 
 def version():
     return str(CoralAppData.version)
-
-def _notifyMessageLogged(message, verboseLevel):
-    for observer in CoralAppData.messageLoggedObservers.observers():
-        observer.setData("message", message)
-        observer.setData("verboseLevel", verboseLevel)
-        observer.notify()
 
 def addMessageLoggedObserver(observer, callback):
     CoralAppData.messageLoggedObservers.add(observer)
@@ -187,12 +190,16 @@ def _notifyInitializingNewNetworkObservers():
         observer.notify()
 
 def addConnectedInputObserver(observer, attribute, callback):
+    logDebug("coralApp.addConnectedInputObserver")
     CoralAppData.connectedInputObservers.add(observer, subject = attribute.id())
     observer.setNotificationCallback(callback)
+    logDebug("coralApp.addConnectedInputObserver: Done")
 
 def _notifyConnectedInputObservers(attribute):
+    logDebug("coralApp._notifyConnectedInputObservers")
     for observer in CoralAppData.connectedInputObservers.observers(attribute.id()):
         observer.notify()
+    logDebug("coralApp._notifyConnectedInputObservers: Done")
 
 def addNameChangedObserver(observer, nestedObject, callback):
     CoralAppData.nameChangedObservers.add(observer, subject = nestedObject.id())
@@ -240,8 +247,10 @@ def _notifyNodeConnectionChanged(node, attribute):
         observer.notify()
 
 def addNodeConnectionChangedObserver(observer, node, callback):
+    logDebug("coralApp.addNodeConnectionChangedObserver")
     CoralAppData.nodeConnectionChangedObservers.add(observer, subject = node.id())
     observer.setNotificationCallback(callback)
+    logDebug("coralApp.addNodeConnectionChangedObserver: Done")
 
 def addAddedNodeObserver(observer, callback):
     CoralAppData.addedNodeObservers.add(observer)
@@ -289,8 +298,10 @@ def _notifyDisconnectedInputObservers(attribute):
         observer.notify()
 
 def addConnectedAttributesObserver(observer, callback):
+    logDebug("coralApp.addConnectedAttributesObserver")
     CoralAppData.connectedAttributesObservers.add(observer)
     observer.setNotificationCallback(callback)
+    logDebug("coralApp.addConnectedAttributesObserver: Done")
 
 def _notifyConnectedAttributesObservers(sourceAttribute, destinationAttribute):
     for observer in CoralAppData.connectedAttributesObservers.observers():
@@ -736,6 +747,7 @@ def _getCommandResult(command):
     return result
 
 def _executeCommand(cmdName, redo, **args):
+    logDebug("coralApp._executeCommand")
     result = None
     
     if CoralAppData.commandClasses.has_key(cmdName):
@@ -763,6 +775,7 @@ def _executeCommand(cmdName, redo, **args):
     else:
         raise Exception("could not find any commad named " + str(cmdName))
 
+    logDebug("coralApp._executeCommand: Done")
     return result
 
 def setUndoLimit(limit):
@@ -976,4 +989,6 @@ def importCollapsedNodeFile(filename, topNode):
             logInfo("loaded netowrk file: " + filename)
 
 def connectAttributes(sourceAttribute, destinationAttribute):
+    logDebug("coralApp.connectAttributes")
     _coral.NetworkManager.connect(sourceAttribute, destinationAttribute)
+    logDebug("coralApp.connectAttributes: Done")

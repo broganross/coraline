@@ -148,6 +148,16 @@ public:
 	void setCol4ValueAtSlice(unsigned int slice, unsigned int id, const Imath::Color4f &value);
 	void setQuatValueAtSlice(unsigned int slice, unsigned int id, const Imath::Quatf &value);
 
+	void setStringValuesSlice(unsigned int slice, const std::vector<std::string> &values);
+	void setPathValuesSlice(unsigned int slice, const std::vector<std::string> &values);
+	void setBoolValuesSlice(unsigned int slice, const std::vector<bool> &values);
+	void setIntValuesSlice(unsigned int slice, const std::vector<int> &values);
+	void setFloatValuesSlice(unsigned int slice, const std::vector<float> &values);
+	void setVec3ValuesSlice(unsigned int slice, const std::vector<Imath::V3f> &values);
+	void setCol4ValuesSlice(unsigned int slice, const std::vector<Imath::Color4f> &values);
+	void setMatrix44ValuesSlice(unsigned int slice, const std::vector<Imath::M44f> &values);
+	void setQuatValuesSlice(unsigned int slice, const std::vector<Imath::Quatf> &values);
+
 	std::string stringValueAtSlice(unsigned int slice, unsigned int id);
 	std::string pathValueAtSlice(unsigned int slice, unsigned int id);
 	bool boolValueAtSlice(unsigned int slice, unsigned int id);
@@ -188,16 +198,6 @@ private:
 	void col4SetFromString(const std::string &value);
 	void matrix44SetFromString(const std::string &value);
 	void quatSetFromString(const std::string &value);
-
-	void setStringValuesSlice(unsigned int slice, const std::vector<std::string> &values);
-	void setPathValuesSlice(unsigned int slice, const std::vector<std::string> &values);
-	void setBoolValuesSlice(unsigned int slice, const std::vector<bool> &values);
-	void setIntValuesSlice(unsigned int slice, const std::vector<int> &values);
-	void setFloatValuesSlice(unsigned int slice, const std::vector<float> &values);
-	void setVec3ValuesSlice(unsigned int slice, const std::vector<Imath::V3f> &values);
-	void setCol4ValuesSlice(unsigned int slice, const std::vector<Imath::Color4f> &values);
-	void setMatrix44ValuesSlice(unsigned int slice, const std::vector<Imath::M44f> &values);
-	void setQuatValuesSlice(unsigned int slice, const std::vector<Imath::Quatf> &values);
 };
 
 }
