@@ -78,7 +78,7 @@ unsigned int PolyValue::size(){
 }
 
 unsigned int PolyValue::sizeSlice(unsigned int slice){
-	std::cout << "PolyValue.sizeSlice" << std::endl;
+//	std::cout << "PolyValue.sizeSlice" << std::endl;
 	if (slice >= _slices){
 		slice = _slices -1;
 	}
@@ -112,7 +112,7 @@ unsigned int PolyValue::sizeSlice(unsigned int slice){
 		ret = _boolValuesSliced[slice].size();
 		break;
 	}
-	std::cout << "PolyValue.sizeSlice: Done" << std::endl;
+//	std::cout << "PolyValue.sizeSlice: Done" << std::endl;
 	return ret;
 }
 
@@ -304,7 +304,7 @@ PolyValue::ValueType PolyValue::typeConvert(Numeric::Type type){
 }
 
 void PolyValue::copy(const Value *other){
-	std::cout << "PolyValue.copy" << std::endl;
+//	std::cout << "PolyValue.copy" << std::endl;
 	const PolyValue *otherVal = dynamic_cast<const PolyValue*>(other);
 
 	if(otherVal){
@@ -321,7 +321,7 @@ void PolyValue::copy(const Value *other){
 		_stringValuesSliced = otherVal->_stringValuesSliced;
 
 	}
-	std::cout << "PolyValue.copy: Done" << std::endl;
+//	std::cout << "PolyValue.copy: Done" << std::endl;
 }
 
 void PolyValue::resize(unsigned int newSize){
@@ -748,8 +748,7 @@ std::string PolyValue::asString(){
 }
 
 void PolyValue::setFromString(const std::string &value){
-	std::cout << "PolyValue.setFromString" << std::endl;
-	//@TODO determine the type first
+//	std::cout << "PolyValue.setFromString" << std::endl;
 	// numeric types
 	std::string tmp = stringUtils::replace(value, "\n", "");
 	std::vector<std::string> fields;
@@ -808,7 +807,7 @@ void PolyValue::setFromString(const std::string &value){
 			break;
 		}
 	}
-	std::cout << "PolyValue.setFromString: Done" << std::endl;
+//	std::cout << "PolyValue.setFromString: Done" << std::endl;
 }
 
 void PolyValue::stringSetFromString(const std::string &value){
@@ -1283,7 +1282,7 @@ const Imath::Quatf PolyValue::quatValueAt(unsigned int id){
 
 
 std::string PolyValue::stringValueAtSlice(unsigned int slice, unsigned int id){
-	std::cout << "PolyValue.stringValueAtSlice" << std::endl;
+//	std::cout << "PolyValue.stringValueAtSlice" << std::endl;
 	if(slice >= _stringValuesSliced.size()){
 		slice = _stringValuesSliced.size() - 1;
 	}
@@ -1419,3 +1418,72 @@ Imath::Quatf PolyValue::quatValueAtSlice(unsigned int slice, unsigned int id){
 	return Imath::Quatf(0.0, 0.0, 0.0, 1.0);
 }
 
+
+const std::vector<int> &PolyValue::intValuesSlice(unsigned int slice){
+	if(slice >= _intValuesSliced.size()){
+		slice = _intValuesSliced.size() - 1;
+	}
+
+	return _intValuesSliced[slice];
+}
+
+const std::vector<float> &PolyValue::floatValuesSlice(unsigned int slice){
+	if(slice >= _floatValuesSliced.size()){
+		slice = _floatValuesSliced.size() - 1;
+	}
+
+	return _floatValuesSliced[slice];
+}
+
+const std::vector<Imath::V3f> &PolyValue::vec3ValuesSlice(unsigned int slice){
+	if(slice >= _vec3ValuesSliced.size()){
+		slice = _vec3ValuesSliced.size() - 1;
+	}
+
+	return _vec3ValuesSliced[slice];
+}
+
+const std::vector<Imath::Color4f> &PolyValue::col4ValuesSlice(unsigned int slice){
+	if(slice >= _col4ValuesSliced.size()){
+		slice = _col4ValuesSliced.size() - 1;
+	}
+
+	return _col4ValuesSliced[slice];
+}
+
+const std::vector<Imath::Quatf> &PolyValue::quatValuesSlice(unsigned int slice){
+	if(slice >= _quatValuesSliced.size()){
+		slice = _quatValuesSliced.size() - 1;
+	}
+
+	return _quatValuesSliced[slice];
+}
+
+const std::vector<Imath::M44f> &PolyValue::matrix44ValuesSlice(unsigned int slice){
+	if(slice >= _matrix44ValuesSliced.size()){
+		slice = _matrix44ValuesSliced.size() - 1;
+	}
+
+	return _matrix44ValuesSliced[slice];
+}
+
+const std::vector<std::string> &PolyValue::stringValuesSlice(unsigned int slice){
+	if(slice >= _stringValuesSliced.size()){
+		slice = _stringValuesSliced.size() - 1;
+	}
+	return _stringValuesSliced[slice];
+}
+
+const std::vector<std::string> &PolyValue::pathValuesSlice(unsigned int slice){
+	if (slice >= _stringValuesSliced.size()){
+		slice = _stringValuesSliced.size() -1;
+	}
+	return _stringValuesSliced[slice];
+}
+
+const std::vector<bool> &PolyValue::boolValuesSlice(unsigned int slice){
+	if (slice >= _boolValuesSliced.size()){
+		slice = _boolValuesSliced.size() - 1;
+	}
+	return _boolValuesSliced[slice];
+}

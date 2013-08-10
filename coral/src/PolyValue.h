@@ -128,6 +128,16 @@ public:
 	const Imath::M44f matrix44ValueAt(unsigned int id);
 	const Imath::Quatf quatValueAt(unsigned int id);
 
+	const std::vector<int> &intValuesSlice(unsigned int slice);
+	const std::vector<float> &floatValuesSlice(unsigned int slice);
+	const std::vector<Imath::V3f> &vec3ValuesSlice(unsigned int slice);
+	const std::vector<Imath::M44f> &matrix44ValuesSlice(unsigned int slice);
+	const std::vector<Imath::Quatf> &quatValuesSlice(unsigned int slice);
+	const std::vector<Imath::Color4f> &col4ValuesSlice(unsigned int slice);
+	const std::vector<std::string> &stringValuesSlice(unsigned int slice);
+	const std::vector<std::string> &pathValuesSlice(unsigned int slice);
+	const std::vector<bool> &boolValuesSlice(unsigned int slice);
+
 	void setStringValues(const std::vector<std::string> &values);
 	void setPathValues(const std::vector<std::string> &values);
 	void setBoolValues(const std::vector<bool> &values);
