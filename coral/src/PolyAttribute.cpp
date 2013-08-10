@@ -69,7 +69,6 @@ PolyAttribute::PolyAttribute(const std::string &name, Node *parent)
 
 PolyValue *PolyAttribute::value(){
 	Value *v = Attribute::value();
-	std::cout << typeid(*v).name() << std::endl;
 	if (typeid(*v) == typeid(String)){
 		PolyValue *np = new PolyValue();
 		np->copyFromString((String*)v);
@@ -83,13 +82,11 @@ PolyValue *PolyAttribute::value(){
 		np->copyFromNumeric((Numeric*)v);
 		return np;
 	} else {
-		std::cout << "is poly" << std::endl;
 		return (PolyValue*)v;
 	}
 }
 
 PolyValue *PolyAttribute::outValue(){
-	std::cout << "PolyAttribute.outValue" << std::endl;
 	return (PolyValue*)Attribute::outValue();
 }
 

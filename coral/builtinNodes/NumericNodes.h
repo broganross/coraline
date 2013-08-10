@@ -170,18 +170,6 @@ private:
 	NumericAttribute *_matrix;
 };
 
-class ConstantArray: public Node{
-public:
-	ConstantArray(const std::string &name, Node *parent);
-	void updateSlice(Attribute *attribute, unsigned int slice);
-	void updateSpecializationLink(Attribute *attributeA, Attribute *attributeB, std::vector<std::string> &specializationA, std::vector<std::string> &specializationB);
-	
-private:
-	NumericAttribute *_size;
-	PolyAttribute *_constant;
-	PolyAttribute *_array;
-};
-
 class ArraySize: public Node{
 public:
 	ArraySize(const std::string &name, Node *parent);
@@ -190,28 +178,6 @@ public:
 private:
 	NumericAttribute *_array;
 	NumericAttribute *_size;
-};
-
-class BuildArray: public Node{
-public:
-	BuildArray(const std::string &name, Node *parent);
-	void updateSpecializationLink(Attribute *attributeA, Attribute *attributeB, std::vector<std::string> &specializationA, std::vector<std::string> &specializationB);
-	void attributeSpecializationChanged(Attribute *attribute);
-	void updateSlice(Attribute *attribute, unsigned int slice);
-	void addAttribute();
-	
-private:
-	PolyAttribute *_array;
-	void(BuildArray::*_selectedOperation)(const std::vector<Attribute*>&, int, PolyValue*, unsigned int);
-	void updateInt(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice);
-	void updateFloat(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice);
-	void updateVec3(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice);
-	void updateCol4(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice);
-	void updateMatrix44(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice);
-	void updateString(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice);
-	void updatePath(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice);
-	void updateBool(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice);
-
 };
 
 class RangeArray: public Node{
@@ -327,47 +293,6 @@ public:
 private:
 	NumericAttribute *_array;
 	NumericAttribute *_indices;
-};
-
-class GetArrayElement: public Node{
-public:
-	GetArrayElement(const std::string &name, Node *parent);
-	void updateSpecializationLink(Attribute *attributeA, Attribute *attributeB, std::vector<std::string> &specializationA, std::vector<std::string> &specializationB);
-	void attributeSpecializationChanged(Attribute *attribute);
-	void updateSlice(Attribute *attribute, unsigned int slice);	
-
-private:
-	NumericAttribute *_array;
-	NumericAttribute *_index;
-	NumericAttribute *_element;
-	void(GetArrayElement::*_selectedOperation)(Numeric *, const std::vector<int> &, Numeric *, unsigned int);
-	
-	void updateInt(Numeric *array, const std::vector<int> &index, Numeric *element, unsigned int slice);
-	void updateFloat(Numeric *array, const std::vector<int> &index, Numeric *element, unsigned int slice);
-	void updateVec3(Numeric *array, const std::vector<int> &index, Numeric *element, unsigned int slice);
-	void updateCol4(Numeric *array, const std::vector<int> &index, Numeric *element, unsigned int slice);
-	void updateMatrix44(Numeric *array, const std::vector<int> &index, Numeric *element, unsigned int slice);
-};
-
-class SetArrayElement: public Node{
-public:
-	SetArrayElement(const std::string &name, Node *parent);
-	void updateSpecializationLink(Attribute *attributeA, Attribute *attributeB, std::vector<std::string> &specializationA, std::vector<std::string> &specializationB);
-	void attributeSpecializationChanged(Attribute *attribute);
-	void updateSlice(Attribute *attribute, unsigned int slice);	
-	
-private:
-	NumericAttribute *_array;
-	NumericAttribute *_index;
-	NumericAttribute *_element;
-	NumericAttribute *_outArray;
-	void(SetArrayElement::*_selectedOperation)(Numeric *, const std::vector<int> &, Numeric *, Numeric *, unsigned int);
-
-	void updateInt(Numeric *array, const std::vector<int> &index, Numeric *element, Numeric *outArray, unsigned int slice);
-	void updateFloat(Numeric *array, const std::vector<int> &index, Numeric *element, Numeric *outArray, unsigned int slice);
-	void updateVec3(Numeric *array, const std::vector<int> &index, Numeric *element, Numeric *outArray, unsigned int slice);
-	void updateCol4(Numeric *array, const std::vector<int> &index, Numeric *element, Numeric *outArray, unsigned int slice);
-	void updateMatrix44(Numeric *array, const std::vector<int> &index, Numeric *element, Numeric *outArray, unsigned int slice);
 };
 
 class SetSimulationStep: public Node{

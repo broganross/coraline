@@ -218,10 +218,7 @@ void numericNodesWrapper(){
 	pythonWrapperUtils::pythonWrapper<QuatToEulerRotation, Node>("QuatToEulerRotation");
 	pythonWrapperUtils::pythonWrapper<QuatToMatrix44, Node>("QuatToMatrix44");
 	pythonWrapperUtils::pythonWrapper<Matrix44Node, Node>("Matrix44Node");
-	pythonWrapperUtils::pythonWrapper<ConstantArray, Node>("ConstantArray");
 	pythonWrapperUtils::pythonWrapper<ArraySize, Node>("ArraySize");
-	pythonWrapperUtils::pythonWrapper<BuildArray, Node>("BuildArray")
-		.def("addAttribute", &BuildArray::addAttribute);
 	pythonWrapperUtils::pythonWrapper<RangeArray, Node>("RangeArray");
 	pythonWrapperUtils::pythonWrapper<Matrix44Translation, Node>("Matrix44Translation");
 	pythonWrapperUtils::pythonWrapper<Matrix44RotationAxis, Node>("Matrix44RotationAxis");
@@ -231,8 +228,6 @@ void numericNodesWrapper(){
 	pythonWrapperUtils::pythonWrapper<RangeLoop, Node>("RangeLoop");
 	pythonWrapperUtils::pythonWrapper<RandomNumber, Node>("RandomNumber");
 	pythonWrapperUtils::pythonWrapper<ArrayIndices, Node>("ArrayIndices");
-	pythonWrapperUtils::pythonWrapper<GetArrayElement, Node>("GetArrayElement");
-	pythonWrapperUtils::pythonWrapper<SetArrayElement, Node>("SetArrayElement");
 	pythonWrapperUtils::pythonWrapper<GetSimulationStep, Node>("GetSimulationStep");
 	pythonWrapperUtils::pythonWrapper<SetSimulationStep, Node>("SetSimulationStep");
 }

@@ -31,40 +31,41 @@
 #include <map>
 #include <vector>
 
+#include "../builtinNodes/KdNodes.h"
 #include "../src/Node.h"
 #include "../src/NetworkManager.h"
 #include "../src/pythonWrapperUtils.h"
 #include "../src/PythonDataCollector.h"
 #include "../tests/coralTests.h"
 
-#include "networkManagerWrapper.h"
-#include "nodeWrapper.h"
-#include "objectWrapper.h"
-#include "nestedObjectWrapper.h"
 #include "attributeWrapper.h"
-#include "numericNodesWrapper.h"
-#include "passThroughAttributeWrapper.h"
-#include "valueWrapper.h"
-#include "imageNodeWrapper.h"
-#include "geoWrapper.h"
+#include "boolWrapper.h"
 #include "commandWrapper.h"
-#include "objImporterNodeWrapper.h"
-#include "stringWrapper.h"
+#include "conditionalNodesWrapper.h"
+#include "coralIOWrapper.h"
+#include "deformerNodesWrapper.h"
+#include "enumWrapper.h"
+#include "errorObjectWrapper.h"
+#include "geoCubeNodeWrapper.h"
 #include "geoGridNodeWrapper.h"
 #include "geoSphereNodeWrapper.h"
-#include "geoCubeNodeWrapper.h"
-#include "errorObjectWrapper.h"
-#include "boolWrapper.h"
-#include "conditionalNodesWrapper.h"
-#include "mathNodesWrapper.h"
-#include "splineNodesWrapper.h"
-#include "coralIOWrapper.h"
+#include "geoWrapper.h"
+#include "imageNodeWrapper.h"
 #include "loopNodesWrapper.h"
-#include "enumWrapper.h"
-#include "processSimulationNodeWrapper.h"
-#include "deformerNodesWrapper.h"
+#include "mathNodesWrapper.h"
+#include "nestedObjectWrapper.h"
+#include "networkManagerWrapper.h"
+#include "nodeWrapper.h"
+#include "numericNodesWrapper.h"
+#include "objectWrapper.h"
+#include "objImporterNodeWrapper.h"
+#include "passThroughAttributeWrapper.h"
+#include "polyNodesWrapper.h"
 #include "polyValueWrapper.h"
-#include "../builtinNodes/KdNodes.h"
+#include "processSimulationNodeWrapper.h"
+#include "splineNodesWrapper.h"
+#include "stringWrapper.h"
+#include "valueWrapper.h"
 
 using namespace coral;
 
@@ -123,6 +124,7 @@ BOOST_PYTHON_MODULE(_coral)
 	processSimulationNodeWrapper();
 	deformerNodesWrapper();
 	polyValueWrapper();
+	polyNodesWrapper();
 	pythonWrapperUtils::pythonWrapper<FindPointsInRange, Node>("FindPointsInRange");
 	
 	boost::python::to_python_converter<std::vector<std::string>, pythonWrapperUtils::stdVectorToPythonList<std::string> >();
