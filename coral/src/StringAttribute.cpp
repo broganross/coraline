@@ -92,9 +92,7 @@ bool String::isArrayType(String::Type type){
 
 void String::setStringValueAt(unsigned int id, std::string& value)
 {
-	std::cout << "setStringValueAt" << std::endl;
 	setStringValueAtSlice(0, id, value);
-	std::cout << "setStringValueAt" << std::endl;
 }
 
 const std::string String::stringValueAt(unsigned int id){

@@ -217,7 +217,94 @@ void PolyValue::setType(PolyValue::ValueType type){
 	}
 }
 
+void PolyValue::copyFromNumeric(Numeric *other){
+//	std::cout << "PolyValue.copyFromNumeric" << std::endl;
+	_type = typeConvert(other->type());
+	_isArray = other->isArray();
+	setIntValues(other->intValues());
+	setFloatValues(other->floatValues());
+	setCol4Values(other->col4Values());
+	setVec3Values(other->vec3Values());
+	setMatrix44Values(other->matrix44Values());
+	setQuatValues(other->quatValues());
+//	std::cout << "PolyValue.copyFromNumeric: Done" << std::endl;
+}
+
+void PolyValue::copyFromBool(Bool *other){
+//	std::cout << "PolyValue.copyFromBool" << std::endl;
+	_type = typeConvert(other->type());
+	_isArray = other->isArray();
+	setBoolValues(other->boolValues());
+//	std::cout << "PolyValue.copyFromBool: Done" << std::endl;
+}
+
+void PolyValue::copyFromString(String *other){
+//	std::cout << "PolyValue.copyFromString" << std::endl;
+	_type = typeConvert(other->type());
+	_isArray = other->isArray();
+	setStringValues(other->stringValues());
+//	std::cout << "PolyValue.copyFromString: Done" << std::endl;
+}
+
+PolyValue::ValueType PolyValue::typeConvert(String::Type type){
+	switch (type){
+	case String::stringTypeAny:
+		return PolyValue::stringTypeAny;
+	case String::stringType:
+		return PolyValue::stringType;
+	case String::stringTypeArray:
+		return PolyValue::stringTypeArray;
+	case String::pathType:
+		return PolyValue::pathType;
+	case String::pathTypeArray:
+		return PolyValue::pathTypeArray;
+	}
+}
+
+PolyValue::ValueType PolyValue::typeConvert(Bool::Type type){
+	switch(type){
+	case Bool::boolTypeAny:
+		return PolyValue::boolTypeAny;
+	case Bool::boolType:
+		return PolyValue::boolType;
+	case Bool::boolTypeArray:
+		return PolyValue::boolTypeArray;
+	}
+}
+
+PolyValue::ValueType PolyValue::typeConvert(Numeric::Type type){
+	switch(type){
+	case Numeric::numericTypeAny:
+		return PolyValue::numericTypeAny;
+	case Numeric::numericTypeInt:
+		return PolyValue::numericTypeInt;
+	case Numeric::numericTypeIntArray:
+		return PolyValue::numericTypeIntArray;
+	case Numeric::numericTypeFloat:
+		return PolyValue::numericTypeFloat;
+	case Numeric::numericTypeFloatArray:
+		return PolyValue::numericTypeFloatArray;
+	case Numeric::numericTypeVec3:
+		return PolyValue::numericTypeVec3;
+	case Numeric::numericTypeVec3Array:
+		return PolyValue::numericTypeVec3Array;
+	case Numeric::numericTypeCol4:
+		return PolyValue::numericTypeCol4;
+	case Numeric::numericTypeCol4Array:
+		return PolyValue::numericTypeCol4Array;
+	case Numeric::numericTypeMatrix44:
+		return PolyValue::numericTypeMatrix44;
+	case Numeric::numericTypeMatrix44Array:
+		return PolyValue::numericTypeMatrix44Array;
+	case Numeric::numericTypeQuat:
+		return PolyValue::numericTypeQuat;
+	case Numeric::numericTypeQuatArray:
+		return PolyValue::numericTypeQuatArray;
+	}
+}
+
 void PolyValue::copy(const Value *other){
+	std::cout << "PolyValue.copy" << std::endl;
 	const PolyValue *otherVal = dynamic_cast<const PolyValue*>(other);
 
 	if(otherVal){
@@ -234,6 +321,7 @@ void PolyValue::copy(const Value *other){
 		_stringValuesSliced = otherVal->_stringValuesSliced;
 
 	}
+	std::cout << "PolyValue.copy: Done" << std::endl;
 }
 
 void PolyValue::resize(unsigned int newSize){

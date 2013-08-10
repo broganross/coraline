@@ -33,6 +33,9 @@
 #include <string>
 #include "Value.h"
 #include "stringUtils.h"
+#include "StringAttribute.h"
+#include "Numeric.h"
+#include "BoolAttribute.h"
 
 #include <ImathVec.h>
 #include <ImathMatrix.h>
@@ -80,7 +83,14 @@ public:
 
 	PolyValue();
 	PolyValue::ValueType type();
+
 	void copy(const Value *other);
+	//! Copy the proper values from a String value
+	void copyFromString(String *other);
+	//! Copy the proper values from a Bool value
+	void copyFromBool(Bool *other);
+	//! Copy the proper values from a Numeric value
+	void copyFromNumeric(Numeric *other);
 	void setType(ValueType type);
 	virtual std::string asString();
 	std::string sliceAsString(unsigned int slice);
@@ -172,6 +182,11 @@ private:
 	bool _isArray;
 	ValueType _type;
 	unsigned int _slices;
+	//! use to convert other value types to their corresponding PolyValue type
+	PolyValue::ValueType typeConvert(String::Type type);
+	PolyValue::ValueType typeConvert(Numeric::Type type);
+	PolyValue::ValueType typeConvert(Bool::Type type);
+
 	std::vector<std::vector<int> > _intValuesSliced;
 	std::vector<std::vector<float> > _floatValuesSliced;
 	std::vector<std::vector<Imath::V3f> > _vec3ValuesSliced;
