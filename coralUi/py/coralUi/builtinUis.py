@@ -43,6 +43,7 @@ from nodeInspector.fields import IntValueField, FloatValueField, BoolValueField,
 from nodeInspector.nodeInspector import NodeInspector, NodeInspectorWidget, AttributeInspectorWidget
 import mainWindow
 import viewport
+import  settings
 
 class GeoInstanceArrayAttributeUi(AttributeUi):
     def __init__(self, coralAttribute, parentNodeUi):
@@ -57,6 +58,23 @@ class GeoAttributeUi(AttributeUi):
         
     def hooksColor(self, specialization):
         return QtGui.QColor(200, 200, 250)
+
+
+class PolyAttributeUi(AttributeUi):
+    def hooksColor(self, spec):
+        color = settings.ATTRIBUTE_COLORS["Any"]
+        if len(spec) ==2:
+            pre1 = spec[0].replace("Array", "")
+            pre2 = spec[1].replace("Array", "")
+            if pre1 == pre2:
+                color = settings.ATTRIBUTE_COLORS[pre1]
+        elif len(spec) == 1:
+            pre = spec[0].replace("Array", "")
+            suf = spec[0].replace(pre, "")
+            color = settings.ATTRIBUTE_COLORS[pre]
+            if suf == "Array":
+                color = color.lighter(110)
+        return color
 
 class NumericAttributeUi(AttributeUi):
     typeColor = {
@@ -73,23 +91,23 @@ class NumericAttributeUi(AttributeUi):
         AttributeUi.__init__(self, coralAttribute, parentNodeUi)
     
     def hooksColor(self, specialization):
-        color = NumericAttributeUi.typeColor["Any"]
-        
+        color = settings.ATTRIBUTE_COLORS["NumericAny"]
+
         if len(specialization) == 2:
             prefix1 = specialization[0].replace("Array", "")
             prefix2 = specialization[1].replace("Array", "")
             
             if(prefix1 == prefix2):
-                color = NumericAttributeUi.typeColor[prefix1]
-                        
+                color = settings.ATTRIBUTE_COLORS[prefix1]
+
         elif len(specialization) == 1:
             prefix = specialization[0].replace("Array", "")
             suffix = specialization[0].replace(prefix, "")
-            color = NumericAttributeUi.typeColor[prefix]
+            color = settings.ATTRIBUTE_COLORS[prefix]
             
             if suffix == "Array":
-                color = color.lighter(110)
-        
+                color = color.lighter(160)
+
         return color
 
 class NumericAttributeInspectorWidget(AttributeInspectorWidget):
@@ -203,7 +221,21 @@ class EnumAttributeInspectorWidget(AttributeInspectorWidget):
     def _comboChanged(self, index):
         self.coralAttribute().outValue().setCurrentIndex(index)
         self.coralAttribute().valueChanged()
-    
+
+
+class BoolAttributeUi(AttributeUi):
+    def __init__(self, coralAttribute, parentNodeUi):
+        AttributeUi.__init__(self, coralAttribute, parentNodeUi)
+        
+    def hooksColor(self, specialization):
+        color = settings.ATTRIBUTE_COLORS["Bool"]
+        if len(specialization) == 1:
+            if specialization[0].endswith("Array"):
+                color.lighter(140)
+        
+        return color
+
+
 class BoolAttributeInspectorWidget(AttributeInspectorWidget):
     def __init__(self, coralAttribute, parentWidget):
         AttributeInspectorWidget.__init__(self, coralAttribute, parentWidget)
@@ -222,6 +254,7 @@ class StringAttributeInspectorWidget(AttributeInspectorWidget):
         valueField = StringValueField(coralAttribute, self)
         self.layout().addWidget(valueField)
 
+
 class ProcessSimulationNodeInspectorWidget(NodeInspectorWidget):
     def __init__(self, coralNode, parentWidget):
         NodeInspectorWidget.__init__(self, coralNode, parentWidget)
@@ -238,6 +271,7 @@ class ProcessSimulationNodeInspectorWidget(NodeInspectorWidget):
         node.addInputData()
         
         self.nodeInspector().refresh()
+
 
 class AttributeSpecializationComboBox(QtGui.QComboBox):
     def __init__(self, coralAttribute, parent):
@@ -274,6 +308,7 @@ class AttributeSpecializationComboBox(QtGui.QComboBox):
         
         self._currentItemChangedCallbackEnabled = True
 
+
 class GeoInstanceGeneratorInspectorWidget(NodeInspectorWidget):
     def __init__(self, coralNode, parentWidget):
         NodeInspectorWidget.__init__(self, coralNode, parentWidget)
@@ -292,6 +327,7 @@ class GeoInstanceGeneratorInspectorWidget(NodeInspectorWidget):
 
         self.nodeInspector().refresh()
 
+
 class BuildArrayInspectorWidget(NodeInspectorWidget):
     def __init__(self, coralNode, parentWidget):
         NodeInspectorWidget.__init__(self, coralNode, parentWidget)
@@ -308,6 +344,7 @@ class BuildArrayInspectorWidget(NodeInspectorWidget):
         node.addAttribute()
         
         self.nodeInspector().refresh()
+
 
 class TimeNodeInspectorWidget(NodeInspectorWidget):
     def __init__(self, coralNode, parentWidget):
@@ -333,6 +370,7 @@ class TimeNodeInspectorWidget(NodeInspectorWidget):
         else:
             self.coralNode().play(False)
             viewport.ViewportWidget._activateImmediateRefresh()
+
             
 class PassThroughAttributeUi(AttributeUi):
     def __init__(self, coralAttribute, parentNodeUi):
@@ -349,6 +387,7 @@ class PassThroughAttributeUi(AttributeUi):
                 color = connectedAttributeUi.hooksColor(self.coralAttribute().specialization())
         
         return color
+
 
 class StringAttributeUi(AttributeUi):
     TypeColor = { "Any" : QtGui.QColor(204, 255, 102),
@@ -374,21 +413,10 @@ class StringAttributeUi(AttributeUi):
             color = self.TypeColor[prefix]
             
             if suffix == "Array":
-                color = color.lighter(110)
+                color = color.lighter(160)
         
         return color
 
-class BoolAttributeUi(AttributeUi):
-    def __init__(self, coralAttribute, parentNodeUi):
-        AttributeUi.__init__(self, coralAttribute, parentNodeUi)
-        
-    def hooksColor(self, specialization):
-        color = QtGui.QColor(255, 160, 130)
-        if len(specialization) == 1:
-            if specialization[0].endswith("Array"):
-                color.lighter(140)
-        
-        return color
 
 class ForLoopNodeUi(NodeUi):
     def __init__(self, coralNode):
@@ -399,6 +427,7 @@ class ForLoopNodeUi(NodeUi):
     
     def color(self):
         return QtGui.QColor(245, 181, 118)
+
         
 class CollapsedNodeUi(NodeUi):
     def __init__(self, coralNode):
@@ -472,6 +501,7 @@ class CollapsedNodeUi(NodeUi):
                         finalPos = hookPos - (proxyAttr.inputHook().scenePos() - proxyAttr.scenePos())
                         proxyAttr.setPos(finalPos)
 
+
 class ShaderNodeInspectorWidget(NodeInspectorWidget):
     def __init__(self, coralNode, parentWidget):
         NodeInspectorWidget.__init__(self, coralNode, parentWidget)
@@ -526,6 +556,7 @@ def loadPluginUi():
     plugin.registerAttributeUi("StringAttribute", StringAttributeUi)
     plugin.registerAttributeUi("BoolAttribute", BoolAttributeUi)
     plugin.registerAttributeUi("EnumAttribute", EnumAttributeUi)
+    plugin.registerAttributeUi("PolyAttribute", PolyAttributeUi)
     
     plugin.registerNodeUi("CollapsedNode", CollapsedNodeUi)
     plugin.registerNodeUi("ForLoop", ForLoopNodeUi)

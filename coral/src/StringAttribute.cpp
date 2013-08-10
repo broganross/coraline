@@ -155,35 +155,29 @@ void String::setFromString(const std::string &value)
 }
 
 void String::setStringValueAtSlice(unsigned int slice, unsigned int id, std::string& value){
-	std::cout << "String.setStringValueAtSlice" << std::endl;
+//	std::cout << "String.setStringValueAtSlice" << std::endl;
 	if (slice < _valuesSliced.size()){
 		std::vector<std::string> &slicevec = _valuesSliced[slice];
 		if (id < slicevec.size()){
 			slicevec[id] = value;
 		}
-		for (int i=0; i < slicevec.size(); ++i){
-			std::cout << slicevec[i];
-		}
 	}
-	std::cout << "String.setStringValueAtSlice: Done" << std::endl;
+//	std::cout << "String.setStringValueAtSlice: Done" << std::endl;
 }
 
 std::string String::stringValueAtSlice(unsigned int slice, unsigned int id){
-	std::cout << "String.stringValueAtSlice" <<std::endl;
+//	std::cout << "String.stringValueAtSlice" <<std::endl;
 	if (slice >= _valuesSliced.size()){
 		slice = _valuesSliced.size() - 1;
 	}
 	std::vector<std::string> &slicevec = _valuesSliced[slice];
 	int size = slicevec.size();
 	if (id < size){
-		std::cout << "String.stringValueAtSlice: id < size" <<std::endl;
-		std::cout << slicevec[id] << std::endl;
 		return slicevec[id];
 	} else if (size){
-		std::cout << "String.stringValueAtSlice: size" <<std::endl;
 		return slicevec[size-1];
 	}
-	std::cout << "String.stringValueAtSlice: None" <<std::endl;
+//	std::cout << "String.stringValueAtSlice: None" <<std::endl;
 	return "";
 }
 
