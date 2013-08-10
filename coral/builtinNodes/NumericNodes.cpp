@@ -85,6 +85,7 @@ IntNode::IntNode(const std::string &name, Node* parent): Node(name, parent){
 	_out->outValue()->setFloatValueAtSlice(0, 0, 0.0);
 }
 
+
 FloatNode::FloatNode(const std::string &name, Node* parent): Node(name, parent){
 	setSliceable(true);
 
@@ -96,6 +97,7 @@ FloatNode::FloatNode(const std::string &name, Node* parent): Node(name, parent){
 	_out->outValue()->resize(1);
 	_out->outValue()->setIntValueAtSlice(0, 0, 0.0);
 }
+
 
 Vec3Node::Vec3Node(const std::string &name, Node* parent): Node(name, parent){
 	setSliceable(true);
@@ -196,6 +198,7 @@ void Vec3Node::updateSlice(Attribute *attribute, unsigned int slice){
 	_vector->outValue()->setVec3ValuesSlice(slice, outArray);
 }
 
+
 Vec3ToFloats::Vec3ToFloats(const std::string &name, Node* parent): Node(name, parent){
 	setSliceable(true);
 
@@ -280,6 +283,7 @@ void Vec3ToFloats::updateSlice(Attribute *attribute, unsigned int slice){
 	setAttributeIsClean(_y, true);
 	setAttributeIsClean(_z, true);
 }
+
 
 Col4Node::Col4Node(const std::string &name, Node* parent): Node(name, parent){
 	setSliceable(true);
@@ -393,6 +397,7 @@ void Col4Node::updateSlice(Attribute *attribute, unsigned int slice){
 	_color->outValue()->setCol4ValuesSlice(slice, outArray);
 }
 
+
 Col4ToFloats::Col4ToFloats(const std::string &name, Node* parent): Node(name, parent){
 	setSliceable(true);
 
@@ -492,6 +497,7 @@ void Col4ToFloats::updateSlice(Attribute *attribute, unsigned int slice){
 	setAttributeIsClean(_a, true);
 }
 
+
 Col4Reverse::Col4Reverse(const std::string &name, Node* parent): Node(name, parent){
 	setSliceable(true);
 
@@ -563,6 +569,7 @@ void Col4Reverse::updateSlice(Attribute *attribute, unsigned int slice){
 
 	setAttributeIsClean(_outColor, true);
 }
+
 
 QuatNode::QuatNode(const std::string &name, Node* parent): Node(name, parent){
 	setSliceable(true);
@@ -659,6 +666,7 @@ void QuatNode::updateSlice(Attribute *attribute, unsigned int slice){
 
 	_quat->outValue()->setQuatValuesSlice(slice, outArray);
 }
+
 
 QuatToFloats::QuatToFloats(const std::string &name, Node* parent): Node(name, parent){
 	setSliceable(true);
@@ -923,12 +931,13 @@ void Matrix44Node::updateSlice(Attribute *attribute, unsigned int slice){
 	_matrix->outValue()->setMatrix44ValuesSlice(slice, newMatrixValues);
 }
 
+
 ConstantArray::ConstantArray(const std::string &name, Node *parent): Node(name, parent){
 	setSliceable(true);
 
 	_size = new NumericAttribute("size", this);
-	_constant = new NumericAttribute("constant", this);
-	_array = new NumericAttribute("array", this);
+	_constant = new PolyAttribute("constant", this);
+	_array = new PolyAttribute("array", this);
 	
 	addInputAttribute(_size);
 	addInputAttribute(_constant);
@@ -943,13 +952,18 @@ ConstantArray::ConstantArray(const std::string &name, Node *parent): Node(name, 
 	constantSpecializations.push_back("Vec3");
 	constantSpecializations.push_back("Col4");
 	constantSpecializations.push_back("Matrix44");
-	
+	constantSpecializations.push_back("String");
+	constantSpecializations.push_back("Bool");
+	constantSpecializations.push_back("Path");
 	std::vector<std::string> arraySpecializations;
 	arraySpecializations.push_back("IntArray");
 	arraySpecializations.push_back("FloatArray");
 	arraySpecializations.push_back("Vec3Array");
 	arraySpecializations.push_back("Col4Array");
 	arraySpecializations.push_back("Matrix44Array");
+	arraySpecializations.push_back("StringArray");
+	arraySpecializations.push_back("PathArray");
+	arraySpecializations.push_back("BoolArray");
 	
 	setAttributeAllowedSpecialization(_size, "Int");
 	setAttributeAllowedSpecializations(_constant, constantSpecializations);
@@ -980,16 +994,19 @@ void ConstantArray::updateSpecializationLink(Attribute *attributeA, Attribute *a
 }
 
 void ConstantArray::updateSlice(Attribute *attribute, unsigned int slice){
-	Numeric *constant = _constant->value();
-	if(constant->type() != Numeric::numericTypeAny){
+	PolyValue *constant = _constant->value();
+	if(constant->type() != PolyValue::numericTypeAny &&
+			constant->type() != PolyValue::typeAny &&
+			constant->type() != PolyValue::stringTypeAny &&
+			constant->type() != PolyValue::boolTypeAny){
 		int size = _size->value()->intValueAtSlice(slice, 0);
 		if(size < 0){
 			size = 0;
 			_size->outValue()->setIntValueAtSlice(slice, 0, 0);
 		}
 		
-		Numeric *array = _array->outValue();
-		if(constant->type() == Numeric::numericTypeInt){
+		PolyValue *array = _array->outValue();
+		if(constant->type() == PolyValue::numericTypeInt){
 			int constantValue = constant->intValueAtSlice(slice, 0);
 			std::vector<int> values(size);
 			for(int i = 0; i < size; ++i){
@@ -997,7 +1014,7 @@ void ConstantArray::updateSlice(Attribute *attribute, unsigned int slice){
 			}
 			array->setIntValuesSlice(slice, values);
 		}
-		else if(constant->type() == Numeric::numericTypeFloat){
+		else if(constant->type() == PolyValue::numericTypeFloat){
 			float constantValue = constant->floatValueAtSlice(slice, 0);
 			std::vector<float> values(size);
 			for(int i = 0; i < size; ++i){
@@ -1005,7 +1022,7 @@ void ConstantArray::updateSlice(Attribute *attribute, unsigned int slice){
 			}
 			array->setFloatValuesSlice(slice, values);
 		}
-		else if(constant->type() == Numeric::numericTypeVec3){
+		else if(constant->type() == PolyValue::numericTypeVec3){
 			Imath::V3f constantValue = constant->vec3ValueAtSlice(slice, 0);
 			std::vector<Imath::V3f> values(size);
 			for(int i = 0; i < size; ++i){
@@ -1013,7 +1030,7 @@ void ConstantArray::updateSlice(Attribute *attribute, unsigned int slice){
 			}
 			array->setVec3ValuesSlice(slice, values);
 		}
-		else if(constant->type() == Numeric::numericTypeCol4){
+		else if(constant->type() == PolyValue::numericTypeCol4){
 			Imath::Color4f constantValue = constant->col4ValueAtSlice(slice, 0);
 			std::vector<Imath::Color4f> values(size);
 			for(int i = 0; i < size; ++i){
@@ -1021,7 +1038,7 @@ void ConstantArray::updateSlice(Attribute *attribute, unsigned int slice){
 			}
 			array->setCol4ValuesSlice(slice, values);
 		}
-		else if(constant->type() == Numeric::numericTypeMatrix44){
+		else if(constant->type() == PolyValue::numericTypeMatrix44){
 			Imath::M44f constantValue = constant->matrix44ValueAtSlice(slice, 0);
 			std::vector<Imath::M44f> values(size);
 			for(int i = 0; i < size; ++i){
@@ -1029,11 +1046,37 @@ void ConstantArray::updateSlice(Attribute *attribute, unsigned int slice){
 			}
 			array->setMatrix44ValuesSlice(slice, values);
 		}
+		else if (constant->type() == PolyValue::stringType){
+			std::string constantValue = constant->stringValueAtSlice(slice, 0);
+			std::vector<std::string> values(size);
+			for (int i=i; i<size; ++i){
+				values[i] = constantValue;
+			}
+			array->setStringValuesSlice(slice, values);
+		}
+		else if (constant->type() == PolyValue::pathType){
+			std::string constantValue = constant->stringValueAtSlice(slice, 0);
+			std::vector<std::string> values(size);
+			for (int i=0; i<size; ++i){
+				values[i] = constantValue;
+			}
+			array->setStringValuesSlice(slice, values);
+		}
+		else if (constant->type() == PolyValue::boolType){
+			bool constantValue = constant->boolValueAtSlice(slice, 0);
+			std::vector<bool> values(size);
+			for (int i=0; i<size; ++i){
+				values[i] = constantValue;
+			}
+			array->setBoolValuesSlice(slice, values);
+		}
 	}
 	else{
 		setAttributeIsClean(_array, false);
 	}
 }
+
+
 
 ArraySize::ArraySize(const std::string &name, Node *parent): Node(name, parent){
 	setSliceable(true);
@@ -1158,7 +1201,8 @@ void BuildArray::attributeSpecializationChanged(Attribute *attribute){
 void BuildArray::updateInt(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice){
 	std::vector<int> arrayValues(arraySize);
 	for(int i = 0; i < arraySize; ++i){
-		PolyValue *inNum = (PolyValue*)inAttrs[i]->value();
+		PolyAttribute *attr = (PolyAttribute*)inAttrs[i];
+		PolyValue *inNum = attr->value();
 		arrayValues[i] = inNum->intValueAtSlice(slice, 0);
 	}
 	array->setIntValuesSlice(slice, arrayValues);
@@ -1167,7 +1211,8 @@ void BuildArray::updateInt(const std::vector<Attribute*> &inAttrs, int arraySize
 void BuildArray::updateFloat(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice){
 	std::vector<float> arrayValues(arraySize);
 	for(int i = 0; i < arraySize; ++i){
-		PolyValue *inNum = (PolyValue*)inAttrs[i]->value();
+		PolyAttribute *attr = (PolyAttribute*)inAttrs[i];
+		PolyValue *inNum = attr->value();
 		arrayValues[i] = inNum->floatValueAtSlice(slice, 0);
 	}
 	
@@ -1177,57 +1222,50 @@ void BuildArray::updateFloat(const std::vector<Attribute*> &inAttrs, int arraySi
 void BuildArray::updateVec3(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice){
 	std::vector<Imath::V3f> arrayValues(arraySize);
 	for(int i = 0; i < arraySize; ++i){
-		PolyValue *inNum = (PolyValue*)inAttrs[i]->value();
+		PolyAttribute *attr = (PolyAttribute*)inAttrs[i];
+		PolyValue *inNum = attr->value();
 		arrayValues[i] = inNum->vec3ValueAtSlice(slice, 0);
 	}
-	
 	array->setVec3ValuesSlice(slice, arrayValues);
 }
 
 void BuildArray::updateCol4(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice){
 	std::vector<Imath::Color4f> arrayValues(arraySize);
 	for(int i = 0; i < arraySize; ++i){
-		PolyValue *inNum = (PolyValue*)inAttrs[i]->value();
+		PolyAttribute *attr = (PolyAttribute*)inAttrs[i];
+		PolyValue *inNum = attr->value();
 		arrayValues[i] = inNum->col4ValueAtSlice(slice, 0);
 	}
-
 	array->setCol4ValuesSlice(slice, arrayValues);
 }
 
 void BuildArray::updateMatrix44(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice){
 	std::vector<Imath::M44f> arrayValues(arraySize);
 	for(int i = 0; i < arraySize; ++i){
-		PolyValue *inNum = (PolyValue*)inAttrs[i]->value();
+		PolyAttribute *attr = (PolyAttribute*)inAttrs[i];
+		PolyValue *inNum = attr->value();
 		arrayValues[i] = inNum->matrix44ValueAtSlice(slice, 0);
 	}
-	
 	array->setMatrix44ValuesSlice(slice, arrayValues);
 }
 
 void BuildArray::updateString(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice){
+//	std::cout << "BuildArray.updateString" << std::endl;
 	std::vector<std::string> arrayValues(arraySize);
 	for (int i=0; i < arraySize; ++i){
-		if (typeid(inAttrs[i]) == typeid(String)){
-			String *inVal = (String*)inAttrs[i]->value();
-			arrayValues[i] = inVal->stringValueAtSlice(slice, 0);
-		} else {
-			Value *v = inAttrs[i]->value();
-			if (typeid(*v) == typeid(PolyValue)){
-				PolyValue *inVal = (PolyValue*)inAttrs[i]->value();
-				arrayValues[i] = inVal->stringValueAtSlice(slice, 0);
-			} else if (typeid(*v) == typeid(String)){
-				String *inVal = (String*)inAttrs[i]->value();
-				arrayValues[i] = inVal->stringValueAtSlice(slice, 0);
-			}
-		}
+		PolyAttribute *attr = (PolyAttribute*)inAttrs[i];
+		PolyValue *inVal = attr->value();
+		arrayValues[i] = inVal->stringValueAtSlice(slice, 0);
 	}
 	array->setStringValuesSlice(slice, arrayValues);
+//	std::cout << "BuildArray.updateString: Done" << std::endl;
 }
 
 void BuildArray::updatePath(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice){
 	std::vector<std::string> arrayValues(arraySize);
 	for (int i=0; i < arraySize; ++i){
-		PolyValue *inVal = (PolyValue*)inAttrs[i]->value();
+		PolyAttribute *attr = (PolyAttribute*)inAttrs[i];
+		PolyValue *inVal = attr->value();
 		arrayValues[i] = inVal->pathValueAtSlice(slice, 0);
 	}
 	array->setPathValuesSlice(slice, arrayValues);
@@ -1236,23 +1274,23 @@ void BuildArray::updatePath(const std::vector<Attribute*> &inAttrs, int arraySiz
 void BuildArray::updateBool(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice){
 	std::vector<bool> arrayValues(arraySize);
 	for (int i=0; i<arraySize; ++i){
-		PolyValue *inVal = (PolyValue*)inAttrs[i]->value();
+		PolyAttribute *attr = (PolyAttribute*)inAttrs[i];
+		PolyValue *inVal = attr->value();
 		arrayValues[i] = inVal->boolValueAtSlice(slice, 0);
 	}
 	array->setBoolValuesSlice(slice, arrayValues);
 }
 
 void BuildArray::updateSlice(Attribute *attribute, unsigned int slice){
-	std::cout << "BuildArray.updateSlice" <<std::endl;
+//	std::cout << "BuildArray.updateSlice" <<std::endl;
 	if(_selectedOperation){
-		std::cout << "operation" << std::endl;
 		std::vector<Attribute*> inAttrs = inputAttributes();
 		int arraySize = inAttrs.size();
 		PolyValue *array = _array->outValue();
 		
 		(this->*_selectedOperation)(inAttrs, arraySize, array, slice);
 	}
-	std::cout << "BuildArray.updateSlice: Done" <<std::endl;
+//	std::cout << "BuildArray.updateSlice: Done" <<std::endl;
 }
 
 

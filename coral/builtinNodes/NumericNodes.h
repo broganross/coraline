@@ -178,8 +178,8 @@ public:
 	
 private:
 	NumericAttribute *_size;
-	NumericAttribute *_constant;
-	NumericAttribute *_array;
+	PolyAttribute *_constant;
+	PolyAttribute *_array;
 };
 
 class ArraySize: public Node{
