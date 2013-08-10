@@ -41,13 +41,14 @@
 
 namespace coral{
 
-//! The base class for customized attributes.
-//
-//! Internally it stores a pointer to a Value, 
-//! the scope of this class is to expose any kind of data as interface of a node to then manipulate the data.
+//! A PolyMorphic attribute capable of holding and handling any values.
 class CORAL_EXPORT PolyAttribute : public Attribute{
 	public:
 		PolyAttribute(const std::string &name, Node *parent);
+
+		/*! Convert the clean input attribute into a PolyValue with the same
+		 * values.  Be sure to cast any Attribute pointers to be a PolyAttribute
+		 * otherwise you might get crashes*/
 		PolyValue *value();
 		PolyValue *outValue();
 		void onSettingSpecialization(const std::vector<std::string> &specialization);

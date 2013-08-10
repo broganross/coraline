@@ -29,6 +29,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <typeinfo>
 
 #include "PolyAttribute.h"
 
@@ -67,7 +68,24 @@ PolyAttribute::PolyAttribute(const std::string &name, Node *parent)
 }
 
 PolyValue *PolyAttribute::value(){
-	return (PolyValue*)Attribute::value();
+	Value *v = Attribute::value();
+	std::cout << typeid(*v).name() << std::endl;
+	if (typeid(*v) == typeid(String)){
+		PolyValue *np = new PolyValue();
+		np->copyFromString((String*)v);
+		return np;
+	} else if (typeid(v) == typeid(Bool)) {
+		PolyValue *np = new PolyValue();
+		np->copyFromBool((Bool*)v);
+		return np;
+	} else if (typeid(v) == typeid(Numeric)) {
+		PolyValue *np = new PolyValue();
+		np->copyFromNumeric((Numeric*)v);
+		return np;
+	} else {
+		std::cout << "is poly" << std::endl;
+		return (PolyValue*)v;
+	}
 }
 
 PolyValue *PolyAttribute::outValue(){
