@@ -39,8 +39,15 @@ namespace coral{
 //! Wrapper to bool and array of bool, used by BoolAttribute.
 class CORAL_EXPORT Bool : public Value{
 public:
+	enum Type{
+			boolTypeAny = 0,
+			boolType,
+			boolTypeArray,
+		};
 	Bool();
 	unsigned int size();
+	Type type();
+	void setType(Bool::Type type);
 	void setBoolValueAt(unsigned int id, bool value);
 	bool boolValueAt(unsigned int id);
 	const std::vector<bool> &boolValues();
@@ -63,6 +70,7 @@ public:
 private:
 	std::vector<std::vector<bool> > _boolValuesSliced;
 	bool _isArray;
+	Bool::Type _type;
 	unsigned int _slices;
 };
 

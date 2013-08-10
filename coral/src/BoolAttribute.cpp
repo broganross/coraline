@@ -31,11 +31,20 @@
 using namespace coral;
 
 Bool::Bool():
+_type(boolTypeAny),
 _isArray(false),
 _slices(1){
 	_boolValuesSliced.resize(1);
 	_boolValuesSliced[0].resize(1);
 	_boolValuesSliced[0][0] = false;
+}
+
+Bool::Type Bool::type(){
+	return _type;
+}
+
+void Bool::setType(Bool::Type type){
+	_type = type;
 }
 
 unsigned int Bool::slices(){
