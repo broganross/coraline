@@ -41,8 +41,9 @@ from coral import coralApp
 from coral.coralUi import coralUi
 import coralStandaloneConfig
 
+if len(sys.argv) > 1 and "debug" in sys.argv:
+    coralApp.setVerboseLevel(coralApp.VerboseLevel.logDebugs)
 coralUi.init(configModule = coralStandaloneConfig)
-coralApp.setVerboseLevel(coralApp.VerboseLevel.logDebugs)
 coralApp.scanAutoLoadPaths()
 coralUi.scanAutoLoadPaths()
 coralUi.startApp()

@@ -67,7 +67,7 @@ class CoralAppData:
     appendToLastCreatedNodes = False
     lastCreatedNodes = []
     currentNetworkDir = ""
-    verboseLevel = VerboseLevel.logDebugs
+    verboseLevel = VerboseLevel.logInfos
     
     #observer lists
     registeredNodeClassesObservers = ObserverCollector()

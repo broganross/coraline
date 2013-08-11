@@ -59,7 +59,7 @@ void BuildArray::updateSpecializationLink(Attribute *attributeA, Attribute *attr
 }
 
 void BuildArray::attributeSpecializationChanged(Attribute *attribute){
-	std::cout << "BuildArray.attributeSpecializationChanged" <<std::endl;
+//	std::cout << "BuildArray.attributeSpecializationChanged" <<std::endl;
 	if(attribute == _array){
 		_selectedOperation = 0;
 		PolyValue::ValueType type = _array->outValue()->type();
@@ -93,7 +93,7 @@ void BuildArray::attributeSpecializationChanged(Attribute *attribute){
 			}
 		}
 	}
-	std::cout << "BuildArray.attributeSpecializationChanged: Done" <<std::endl;
+//	std::cout << "BuildArray.attributeSpecializationChanged: Done" <<std::endl;
 }
 
 void BuildArray::updateInt(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice){
