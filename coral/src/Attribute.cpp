@@ -139,6 +139,7 @@ bool Attribute::isConnectedTo(Attribute *attribute){
 }
 
 void Attribute::resetInputValuesInChain(){
+//	std::cout << "Attribute.resetInputValuesInChain " << name() << std::endl;
 	_inputValue = _value;
 	
 	if(_input){
@@ -150,7 +151,7 @@ void Attribute::resetInputValuesInChain(){
 	for(int i = 0; i < _outputs.size(); ++i){
 		_outputs[i]->resetInputValuesInChain();
 	}
-	
+//	std::cout << "Attribute.resetInputValuesInChain: Done" << std::endl;
 }
 
 void Attribute::disconnectInput(){
@@ -278,7 +279,7 @@ void Attribute::setValuePtr(Value *value){
 	if(_value){
 		_value->removeReference();
 	}
-	
+
 	_value = value;
 	_value->addReference();
 	_inputValue = _value;
@@ -289,8 +290,9 @@ void Attribute::valueChanged(){
 }
 
 Value *Attribute::value(){
+//	std::cout << "Attribute.value " << name() << std::endl;
 	clean();
-	
+//	std::cout << "Attribute.value: Done" << std::endl;
 	return _inputValue;
 }
 
@@ -299,6 +301,7 @@ Value *Attribute::outValue(){
 }
 
 void Attribute::clean(){
+//	std::cout << "Attribute.clean " << name() << std::endl;
 	if(!_cleaningLocked){
 		if(_isClean == false){
 			if(_isInput && _input == 0){
@@ -328,9 +331,11 @@ void Attribute::clean(){
 			_cleaningLocked = false;
 		}
 	}
+//	std::cout << "Attribute.clean: Done" << std::endl;
 }
 
 void Attribute::cleanSelf(){
+	std::cout << "Attribute.cleanSelf " << name() << std::endl;
 	if(_isClean == false){
 		_isClean = true;
 
@@ -346,6 +351,7 @@ void Attribute::cleanSelf(){
 			}
 		}
 	}
+	std::cout << "Attribute.cleanSelf: Done" << std::endl;
 }
 
 void Attribute::setNotifyParentNodeOnDirty(bool value){
@@ -430,12 +436,12 @@ void Attribute::initValueFromPassThroughFirstOutput(Attribute *attribute){
 }
 
 void Attribute::setInput(Attribute *attribute){
+//	std::cout << "Attribute.setInput " << name() << std::endl;
 	if(attribute){
 		if(_input != attribute){
 			if(_input){
 				disconnectInput();
 			}
-			
 			_input = attribute;
 			_inputValue = _value;
 
@@ -448,6 +454,7 @@ void Attribute::setInput(Attribute *attribute){
 			}
 		}
 	}
+//	std::cout << "Attribute.setInput: Done" << std::endl;
 }
 
 bool Attribute::connectTo(Attribute *attribute, ErrorObject *errorObject){

@@ -211,6 +211,7 @@ void Node::resizedSlices(unsigned int slices){
 }
 
 void Node::doUpdate(Attribute *attribute){
+//	std::cout << "Node.doUpdate " << name() << std::endl;
 	boost::posix_time::ptime startTime = boost::posix_time::microsec_clock::universal_time();
 	
 	update(attribute);
@@ -221,6 +222,7 @@ void Node::doUpdate(Attribute *attribute){
 	_computeTimeSeconds = enlapsed.length().total_seconds();
 	_computeTimeMilliseconds = enlapsed.length().total_milliseconds() % 1000;
 	_computeTimeTicks = enlapsed.length().ticks();
+//	std::cout << "Node.doUpdate: Done" << std::endl;
 }
 
 void Node::updateSlice(Attribute *attribute, unsigned int slice){
