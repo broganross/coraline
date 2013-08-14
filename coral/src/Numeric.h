@@ -70,6 +70,8 @@ public:
 	Numeric::Type type();
 	void setType(Numeric::Type type);
 	bool isArray();
+	void setIsArray(bool array);
+	void setSlices(int slices);
 	unsigned int size();
 	void resize(unsigned int newSize);
 	void setIntValueAt(unsigned int id, int value);

@@ -35,9 +35,10 @@ using namespace coral;
 
 Numeric::Numeric():
 	_type(numericTypeAny),
-	_isArray(false),
-	_slices(1){
-	
+	_isArray(false)
+//	_slices(1)
+{
+	_slices = 1;
 	_intValuesSliced.resize(1);
 	_intValuesSliced[0].resize(1);
 	_intValuesSliced[0][0] = 0;
@@ -81,6 +82,14 @@ void Numeric::copy(const Value *other){
 
 bool Numeric::isArray(){
 	return _isArray;
+}
+
+void Numeric::setIsArray(bool array){
+	_isArray = array;
+}
+
+void Numeric::setSlices(int slices){
+	_slices = slices;
 }
 
 unsigned int Numeric::size(){
@@ -649,6 +658,7 @@ void Numeric::setQuatValueAtSlice(unsigned int slice, unsigned int id, const Ima
 	}
 }
 
+
 int Numeric::intValueAtSlice(unsigned int slice, unsigned int id){
 	if(slice >= _intValuesSliced.size()){
 		slice = _intValuesSliced.size() - 1;
@@ -757,6 +767,7 @@ Imath::M44f Numeric::matrix44ValueAtSlice(unsigned int slice, unsigned int id){
 	return Imath::identity44f;
 }
 
+
 void Numeric::setIntValuesSlice(unsigned int slice, const std::vector<int> &values){
 	if(slice < _intValuesSliced.size()){
 		_intValuesSliced[slice] = values;
@@ -792,6 +803,7 @@ void Numeric::setMatrix44ValuesSlice(unsigned int slice, const std::vector<Imath
 		_matrix44ValuesSliced[slice] = values;
 	}
 }
+
 
 const std::vector<int> &Numeric::intValuesSlice(unsigned int slice){
 	if(slice >= _intValuesSliced.size()){
@@ -840,6 +852,7 @@ const std::vector<Imath::M44f> &Numeric::matrix44ValuesSlice(unsigned int slice)
 
 	return _matrix44ValuesSliced[slice];
 }
+
 
 void Numeric::resizeSlices(unsigned int slices){
 	if(slices == 0){
