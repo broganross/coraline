@@ -95,7 +95,7 @@ FloatNode::FloatNode(const std::string &name, Node* parent): Node(name, parent){
 	setAttributeAllowedSpecialization(_out, "Float");
 	
 	_out->outValue()->resize(1);
-	_out->outValue()->setIntValueAtSlice(0, 0, 0.0);
+	_out->outValue()->setFloatValueAtSlice(0, 0, 0.0);
 }
 
 
@@ -132,7 +132,7 @@ Vec3Node::Vec3Node(const std::string &name, Node* parent): Node(name, parent){
 	addAttributeSpecializationLink(_x, _vector);
 	addAttributeSpecializationLink(_x, _y);
 	addAttributeSpecializationLink(_y, _z);
-	
+
 	setSpecializationPreset("single", _x, "Float");
 	setSpecializationPreset("single", _y, "Float");
 	setSpecializationPreset("single", _z, "Float");
@@ -177,10 +177,11 @@ void Vec3Node::updateSpecializationLink(Attribute *attributeA, Attribute *attrib
 }
 
 void Vec3Node::updateSlice(Attribute *attribute, unsigned int slice){
+//	std::cout << "Vec3Node.updateSlice" << std::endl;
 	Numeric *x = _x->value();
 	Numeric *y = _y->value();
 	Numeric *z = _z->value();
-	
+
 	NumericAttribute *attrs[] = {_x, _y, _z};
 	int minorSize = findMinorNumericSize(attrs, 3, slice);
 	if(minorSize < 1)
@@ -196,6 +197,7 @@ void Vec3Node::updateSlice(Attribute *attribute, unsigned int slice){
 	}
 	
 	_vector->outValue()->setVec3ValuesSlice(slice, outArray);
+//	std::cout << "Vec3Node.updateSlice: Done" << std::endl;
 }
 
 
