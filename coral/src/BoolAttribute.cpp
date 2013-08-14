@@ -63,6 +63,10 @@ unsigned int Bool::slices(){
 	return _slices;
 }
 
+void Bool::setSlices(unsigned int slices){
+	_slices = slices;
+}
+
 unsigned int Bool::sizeSlice(unsigned int slice){
 	if(slice >= _slices){
 		slice = _slices - 1;

@@ -49,6 +49,7 @@ public:
 	Type type();
 	void setType(Bool::Type type);
 	unsigned int slices();
+	void setSlices(unsigned int slices);
 	void setIsArray(bool value);
 	bool isArray();
 	void resize(unsigned int size);
