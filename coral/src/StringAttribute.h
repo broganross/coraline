@@ -55,27 +55,37 @@ namespace coral{
 		void setType(String::Type type);
 		String::Type type();
 		bool isArray();
+		void setIsArray(bool array);
 		unsigned int size();
 		unsigned int sizeSlice(unsigned int slice);
 		unsigned int slices(){return _slices;}
+		void setSlices(unsigned int slices);
 		void resize(unsigned int newSize);
 		void resizeSlice(unsigned int slice, unsigned int newSize);
 		void resizeSlices(unsigned int slices);
 		bool isArrayType(String::Type type);
 		void setStringValueAt(unsigned int id, std::string& value);
+		void setPathValueAt(unsigned int id, std::string& value);
 		void setStringValues(const std::vector<std::string> &values);
+		void setPathValues(const std::vector<std::string> &values);
 		void setStringValueAtSlice(unsigned int slice, unsigned int id, std::string& value);
+		void setPathValueAtSlice(unsigned int slice, unsigned int id, std::string& value);
 		void setStringValuesSlice(unsigned int slice, const std::vector<std::string> &values);
+		void setPathValuesSlice(unsigned int slice, const std::vector<std::string> &values);
+
 		const std::string stringValueAt(unsigned int id);
+		const std::string pathValueAt(unsigned int id);
 		const std::vector<std::string> &stringValues();
 		const std::vector<std::string> &pathValues();
 		std::string stringValueAtSlice(unsigned int slice, unsigned int id);
+		std::string pathValueAtSlice(unsigned int slice, unsigned int id);
 		const std::vector<std::string> &valuesSlice(unsigned int slice);
 
 	private:
 		std::string _value;
-		std::vector<std::vector<std::string> > _valuesSliced;
+		std::vector<std::vector<std::string> > _stringValuesSliced;
 		Type _type;
+		bool _isArray;
 		unsigned int _slices;
 	};
 

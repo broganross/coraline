@@ -31,19 +31,24 @@
 using namespace coral;
 String::String():
 	_type(stringTypeAny),
+	_isArray(false),
 	_slices(1){
 
-	_valuesSliced.resize(1);
-	_valuesSliced[0].resize(1);
-	_valuesSliced[0][0] = "";
+	_stringValuesSliced.resize(1);
+	_stringValuesSliced[0].resize(1);
+	_stringValuesSliced[0][0] = "";
 }
 
 bool String::isArray(){
-	if (_type == stringTypeArray || _type == pathTypeArray){
-		return true;
-	} else {
-		return false;
-	}
+	return _isArray;
+}
+
+void String::setIsArray(bool array){
+	_isArray = array;
+}
+
+void String::setSlices(unsigned int slices){
+	_slices = slices;
 }
 
 unsigned int String::size(){
@@ -58,7 +63,7 @@ unsigned int String::sizeSlice(unsigned int slice){
 	if (_type == stringTypeAny){
 		return 0;
 	} else if (_type == stringType || _type == pathType || _type == stringTypeArray || _type == pathTypeArray) {
-		return _valuesSliced[slice].size();
+		return _stringValuesSliced[slice].size();
 	}
 	return 0;
 }
@@ -69,18 +74,23 @@ String::Type String::type(){
 
 void String::setType(String::Type type){
 	_type = type;
+	_isArray = false;
+
+	if(type == stringType || type == pathType){
+		_stringValuesSliced.resize(_slices);
+		for (int i=0; i < _slices; ++i){
+			_stringValuesSliced[i].resize(1);
+		}
+	}
+	else if (type == stringTypeArray || type == pathTypeArray){
+		_stringValuesSliced.resize(_slices);
+		_isArray = true;
+	}
+
 }
 
 void String::resize(unsigned int newSize){
 	resizeSlice(0, newSize);
-}
-
-void String::resizeSlice(unsigned int slice, unsigned int newSize){
-	if (_type != stringTypeAny){
-		for(int i=0; i < _valuesSliced.size(); i++){
-			_valuesSliced[i].resize(newSize);
-		}
-	}
 }
 
 bool String::isArrayType(String::Type type){
@@ -88,6 +98,7 @@ bool String::isArrayType(String::Type type){
 	if( type == stringTypeArray || type == pathTypeArray){
 		arrayType = true;
 	}
+	return arrayType;
 }
 
 void String::setStringValueAt(unsigned int id, std::string& value)
@@ -95,36 +106,48 @@ void String::setStringValueAt(unsigned int id, std::string& value)
 	setStringValueAtSlice(0, id, value);
 }
 
+void String::setPathValueAt(unsigned int id, std::string& value){
+	setStringValueAt(id, value);
+}
+
 const std::string String::stringValueAt(unsigned int id){
 	return stringValueAtSlice(0, id);
 }
 
+const std::string String::pathValueAt(unsigned int id){
+	return stringValueAt(id);
+}
+
 const std::vector<std::string> &String::stringValues()
 {
-	return _valuesSliced[0];
+	return _stringValuesSliced[0];
 }
 
 const std::vector<std::string> &String::pathValues(){
-	return _valuesSliced[0];
+	return _stringValuesSliced[0];
 }
 
 std::string String::sliceAsString(unsigned int slice){
+//	std::cout << "PolyValue.stringSliceAsString" << std::endl;
 	std::string script;
-	if (_type != stringTypeAny || (_type == stringTypeAny && !_valuesSliced.empty())){
-		std::ostringstream stream;
-		if (slice >= _slices){
-			slice = _slices - 1;
-		}
-		for (int i=0; i<_valuesSliced[slice].size(); ++i){
-			stream << stringUtils::replace(_valuesSliced[slice][i], "\n", "\\n");
-			if (i < _valuesSliced[slice].size() - 1){
-				stream << " ~ ";
-			}
-		}
-		std::ostringstream type;
-		type << _type;
-		script = stream.str() + "\\ | /" + type.str();
+	std::ostringstream stream;
+	if (slice >= _slices){
+		slice = _slices - 1;
 	}
+	for (int i=0; i < _stringValuesSliced[slice].size(); ++i){
+		std::string val = stringUtils::replace(_stringValuesSliced[slice][i], "\n", "\\n");
+		stream << stringUtils::replace(val, " ", "___");
+		if (i < _stringValuesSliced[slice].size() - 1){
+			stream << ",,";
+		}
+	}
+	script = stream.str();
+	std::ostringstream type;
+	type << _type;
+	script = "[" + stream.str() + "] " + type.str();
+
+	//	std::cout << "PolyValue.stringSliceAsString: Done" << std::endl;
+
 	return script;
 }
 
@@ -139,25 +162,29 @@ std::string String::asString(){
 void String::setFromString(const std::string &value)
 {
 	std::string tmp = stringUtils::replace(value, "\\n", "\n");
+	tmp = stringUtils::replace(tmp, "\\t", "\t");
 	std::vector<std::string> fields;
-	stringUtils::split(tmp, fields, "\\ | /");
+	stringUtils::split(tmp, fields, " ");
 	if (fields.size() == 2){
 		std::string valuesStr = fields[0];
+		valuesStr = stringUtils::replace(valuesStr, "___", " ");
+		valuesStr = valuesStr.substr(0, valuesStr.length() -1);
+		valuesStr = valuesStr.substr(1, valuesStr.length() - 1);
 		String::Type type = String::Type(stringUtils::parseInt(fields[1]));
-		_valuesSliced.resize(1);
-		_valuesSliced[0].clear();
+		_stringValuesSliced.resize(1);
+		_stringValuesSliced[0].clear();
 		std::vector<std::string> values;
-		stringUtils::split(valuesStr, values, " ~ ");
+		stringUtils::split(valuesStr, values, ",,");
 		for (int i=0; i<values.size(); ++i){
-			_valuesSliced[0].push_back(values[i]);
+			_stringValuesSliced[0].push_back(values[i]);
 		}
 	}
 }
 
 void String::setStringValueAtSlice(unsigned int slice, unsigned int id, std::string& value){
 //	std::cout << "String.setStringValueAtSlice" << std::endl;
-	if (slice < _valuesSliced.size()){
-		std::vector<std::string> &slicevec = _valuesSliced[slice];
+	if (slice < _stringValuesSliced.size()){
+		std::vector<std::string> &slicevec = _stringValuesSliced[slice];
 		if (id < slicevec.size()){
 			slicevec[id] = value;
 		}
@@ -165,12 +192,16 @@ void String::setStringValueAtSlice(unsigned int slice, unsigned int id, std::str
 //	std::cout << "String.setStringValueAtSlice: Done" << std::endl;
 }
 
+void String::setPathValueAtSlice(unsigned int slice, unsigned int id, std::string& value){
+	setStringValueAtSlice(slice, id, value);
+}
+
 std::string String::stringValueAtSlice(unsigned int slice, unsigned int id){
 //	std::cout << "String.stringValueAtSlice" <<std::endl;
-	if (slice >= _valuesSliced.size()){
-		slice = _valuesSliced.size() - 1;
+	if (slice >= _stringValuesSliced.size()){
+		slice = _stringValuesSliced.size() - 1;
 	}
-	std::vector<std::string> &slicevec = _valuesSliced[slice];
+	std::vector<std::string> &slicevec = _stringValuesSliced[slice];
 	int size = slicevec.size();
 	if (id < size){
 		return slicevec[id];
@@ -181,21 +212,41 @@ std::string String::stringValueAtSlice(unsigned int slice, unsigned int id){
 	return "";
 }
 
+std::string String::pathValueAtSlice(unsigned int slice, unsigned int id){
+	return stringValueAtSlice(slice, id);
+}
+
 void String::setStringValues(const std::vector<std::string> &values){
 	setStringValuesSlice(0, values);
 }
 
+void String::setPathValues(const std::vector<std::string> &values){
+	setStringValues(values);
+}
+
 void String::setStringValuesSlice(unsigned int slice, const std::vector<std::string> &values){
-	if (slice < _valuesSliced.size()){
-		_valuesSliced[slice] = values;
+	if (slice < _stringValuesSliced.size()){
+		_stringValuesSliced[slice] = values;
 	}
 }
 
+void String::setPathValuesSlice(unsigned int slice, const std::vector<std::string> &values){
+	setStringValuesSlice(slice, values);
+}
+
 const std::vector<std::string> &String::valuesSlice(unsigned int slice){
-	if(slice >= _valuesSliced.size()){
-		slice = _valuesSliced.size() - 1;
+	if(slice >= _stringValuesSliced.size()){
+		slice = _stringValuesSliced.size() - 1;
 	}
-	return _valuesSliced[slice];
+	return _stringValuesSliced[slice];
+}
+
+void String::resizeSlice(unsigned int slice, unsigned int newSize){
+	if (_type != stringTypeAny){
+		for(int i=0; i < _stringValuesSliced.size(); i++){
+			_stringValuesSliced[i].resize(newSize);
+		}
+	}
 }
 
 void String::resizeSlices(unsigned int slices){
@@ -204,20 +255,19 @@ void String::resizeSlices(unsigned int slices){
 	}
 	if (slices != _slices && _type != stringTypeAny){
 		if (_type == stringType){
-			_valuesSliced.resize(slices);
+			_stringValuesSliced.resize(slices);
 			for (int i=0; i < slices; ++i){
-				std::vector<std::string> &slicevec = _valuesSliced[i];
+				std::vector<std::string> &slicevec = _stringValuesSliced[i];
 				if (!slicevec.size()){
 					slicevec.resize(1);
 				}
 			}
 		} else if (_type == stringTypeArray) {
-			_valuesSliced.resize(slices);
+			_stringValuesSliced.resize(slices);
 		}
-		_slices - slices;
+		_slices = slices;
 	}
 }
-
 
 
 StringAttribute::StringAttribute(const std::string &name, Node *parent)
