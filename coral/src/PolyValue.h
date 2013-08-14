@@ -83,7 +83,13 @@ public:
 
 	PolyValue();
 	PolyValue::ValueType type();
+	operator Numeric();
+	operator Numeric*();
 
+
+	Numeric *copyToNumeric();
+	String *copyToString();
+	Bool *copyToBool();
 	void copy(const Value *other);
 	//! Copy the proper values from a String value
 	void copyFromString(String *other);
@@ -192,7 +198,6 @@ private:
 	bool _isArray;
 	ValueType _type;
 	unsigned int _slices;
-	//! use to convert other value types to their corresponding PolyValue type
 	PolyValue::ValueType typeConvert(String::Type type);
 	PolyValue::ValueType typeConvert(Numeric::Type type);
 	PolyValue::ValueType typeConvert(Bool::Type type);

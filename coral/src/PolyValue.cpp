@@ -32,9 +32,10 @@ using namespace coral;
 
 PolyValue::PolyValue():
 	_type(typeAny),
-	_isArray(false),
-	_slices(1){
-
+	_isArray(false)
+//	_slices(1)
+{
+	_slices = 1;
 	_intValuesSliced.resize(1);
 	_intValuesSliced[0].resize(1);
 	_intValuesSliced[0][0] = 0;
@@ -82,38 +83,46 @@ unsigned int PolyValue::sizeSlice(unsigned int slice){
 	if (slice >= _slices){
 		slice = _slices -1;
 	}
-	int ret = 0;
 	switch (_type){
+	case stringType:
+		return _stringValuesSliced[slice].size();
 	case stringTypeArray:
-		ret = _stringValuesSliced[slice].size();
-		break;
-	case numericTypeIntArray:
-		ret = _intValuesSliced[slice].size();
-		break;
-	case numericTypeFloatArray:
-		ret = _floatValuesSliced[slice].size();
-		break;
-	case numericTypeVec3Array:
-		ret = _vec3ValuesSliced[slice].size();
-		break;
-	case numericTypeCol4Array:
-		ret = _col4ValuesSliced[slice].size();
-		break;
-	case numericTypeQuatArray:
-		ret = _quatValuesSliced[slice].size();
-		break;
-	case numericTypeMatrix44Array:
-		ret = _matrix44ValuesSliced[slice].size();
-		break;
+		return _stringValuesSliced[slice].size();
+	case pathType:
+		return _stringValuesSliced[slice].size();
 	case pathTypeArray:
-		ret = _stringValuesSliced[slice].size();
-		break;
+		return _stringValuesSliced[slice].size();
+	case numericTypeInt:
+		return _intValuesSliced[slice].size();
+	case numericTypeIntArray:
+		return _intValuesSliced[slice].size();
+	case numericTypeFloat:
+		return _floatValuesSliced[slice].size();
+	case numericTypeFloatArray:
+		return _floatValuesSliced[slice].size();
+	case numericTypeVec3:
+		return _vec3ValuesSliced[slice].size();
+	case numericTypeVec3Array:
+		return _vec3ValuesSliced[slice].size();
+	case numericTypeCol4:
+		return _col4ValuesSliced[slice].size();
+	case numericTypeCol4Array:
+		return _col4ValuesSliced[slice].size();
+	case numericTypeQuat:
+		return _quatValuesSliced[slice].size();
+	case numericTypeQuatArray:
+		return _quatValuesSliced[slice].size();
+	case numericTypeMatrix44:
+		return _matrix44ValuesSliced[slice].size();
+	case numericTypeMatrix44Array:
+		return _matrix44ValuesSliced[slice].size();
+	case boolType:
+		return _boolValuesSliced[slice].size();
 	case boolTypeArray:
-		ret = _boolValuesSliced[slice].size();
-		break;
+		return _boolValuesSliced[slice].size();
 	}
 //	std::cout << "PolyValue.sizeSlice: Done" << std::endl;
-	return ret;
+	return 0;
 }
 
 PolyValue::ValueType PolyValue::type(){
@@ -121,9 +130,10 @@ PolyValue::ValueType PolyValue::type(){
 }
 
 void PolyValue::setType(PolyValue::ValueType type){
+//	std::cout << "PolyValue.setType" << std::endl;
 	_type = type;
 	_isArray = false;
-	switch (_type){
+	switch (type){
 	case stringType:
 		_stringValuesSliced.resize(_slices);
 		for(int i=0; i<_slices; ++i){
@@ -215,12 +225,65 @@ void PolyValue::setType(PolyValue::ValueType type){
 		_boolValuesSliced.resize(_slices);
 		break;
 	}
+//	std::cout << "PolyValue.setType: Done" << std::endl;
+}
+
+void PolyValue::copy(const Value *other){
+//	std::cout << "PolyValue.copy" << std::endl;
+	const PolyValue *otherVal = dynamic_cast<const PolyValue*>(other);
+
+	if(otherVal){
+		_type = otherVal->_type;
+		_isArray = otherVal->_isArray;
+
+		_intValuesSliced = otherVal->_intValuesSliced;
+		_floatValuesSliced = otherVal->_floatValuesSliced;
+		_vec3ValuesSliced = otherVal->_vec3ValuesSliced;
+		_quatValuesSliced = otherVal->_quatValuesSliced;
+		_matrix44ValuesSliced = otherVal->_matrix44ValuesSliced;
+		_col4ValuesSliced = otherVal->_col4ValuesSliced;
+		_boolValuesSliced = otherVal-> _boolValuesSliced;
+		_stringValuesSliced = otherVal->_stringValuesSliced;
+	}
+//	std::cout << "PolyValue.copy: Done" << std::endl;
+}
+
+PolyValue::operator Numeric(){
+//	std::cout << "PolyValue.Numeric" << std::endl;
+	Numeric n;
+//	n.setType(n.typeConvert(_type));
+	n.setIsArray(_isArray);
+	n.setSlices(_slices);
+	n.setIntValues(intValues());
+	n.setFloatValues(floatValues());
+	n.setCol4Values(col4Values());
+	n.setVec3Values(vec3Values());
+	n.setMatrix44Values(matrix44Values());
+	n.setQuatValues(quatValues());
+	return n;
+}
+
+PolyValue::operator Numeric*(){
+//	std::cout << "PolyValueNumeric*" << std::endl;
+	Numeric *n = new Numeric();
+//	n->setType(n.typeConvert(_type));
+	n->setIsArray(_isArray);
+	n->setSlices(_slices);
+	n->setIntValues(intValues());
+	n->setFloatValues(floatValues());
+	n->setCol4Values(col4Values());
+	n->setVec3Values(vec3Values());
+	n->setMatrix44Values(matrix44Values());
+	n->setQuatValues(quatValues());
+	return n;
 }
 
 void PolyValue::copyFromNumeric(Numeric *other){
 //	std::cout << "PolyValue.copyFromNumeric" << std::endl;
-	_type = typeConvert(other->type());
+	setType(typeConvert(other->type()));
 	_isArray = other->isArray();
+	_slices = other->slices();
+//	resize(other->size());
 	setIntValues(other->intValues());
 	setFloatValues(other->floatValues());
 	setCol4Values(other->col4Values());
@@ -230,20 +293,64 @@ void PolyValue::copyFromNumeric(Numeric *other){
 //	std::cout << "PolyValue.copyFromNumeric: Done" << std::endl;
 }
 
+Numeric *PolyValue::copyToNumeric(){
+//	std::cout << "PolyValue.copyToNumeric" << std::endl;
+	Numeric *n = new Numeric();
+//	setType(typeConvert(other->type()));
+	n->setIsArray(_isArray);
+	n->setSlices(_slices);
+	n->setIntValues(intValues());
+	n->setFloatValues(floatValues());
+	n->setCol4Values(col4Values());
+	n->setVec3Values(vec3Values());
+	n->setMatrix44Values(matrix44Values());
+	n->setQuatValues(quatValues());
+	n->resize(size());
+//	std::cout << "PolyValue.copyToNumeric: Done" << std::endl;
+	return n;
+}
+
 void PolyValue::copyFromBool(Bool *other){
 //	std::cout << "PolyValue.copyFromBool" << std::endl;
-	_type = typeConvert(other->type());
+	setType(typeConvert(other->type()));
 	_isArray = other->isArray();
+	_slices = other->slices();
+	std::vector<bool> vals = other->boolValues();
 	setBoolValues(other->boolValues());
 //	std::cout << "PolyValue.copyFromBool: Done" << std::endl;
 }
 
+Bool *PolyValue::copyToBool(){
+	Bool *b = new Bool();
+//	b->setType(convertType(_type));
+	b->setIsArray(_isArray);
+	b->setSlices(_slices);
+	std::vector<bool> vals = boolValues();
+	b->setBoolValues(vals);
+	b->resize(size());
+	return b;
+}
+
 void PolyValue::copyFromString(String *other){
 //	std::cout << "PolyValue.copyFromString" << std::endl;
-	_type = typeConvert(other->type());
+//	_type = typeConvert(other->type());
 	_isArray = other->isArray();
+	_slices = other->slices();
 	setStringValues(other->stringValues());
 //	std::cout << "PolyValue.copyFromString: Done" << std::endl;
+}
+
+String *PolyValue::copyToString(){
+	String *s = new String();
+//	s->setType(typeConvert(_type));
+	s->setIsArray(_isArray);
+	s->setSlices(_slices);
+	std::vector<std::string> vals = stringValues();
+	s->setStringValues(vals);
+	vals = pathValues();
+	s->setPathValues(vals);
+	s->resize(size());
+	return s;
 }
 
 PolyValue::ValueType PolyValue::typeConvert(String::Type type){
@@ -262,6 +369,7 @@ PolyValue::ValueType PolyValue::typeConvert(String::Type type){
 }
 
 PolyValue::ValueType PolyValue::typeConvert(Bool::Type type){
+//	std::cout << "PolyValue.typeConvert (Bool)" << std::endl;
 	switch(type){
 	case Bool::boolTypeAny:
 		return PolyValue::boolTypeAny;
@@ -303,32 +411,12 @@ PolyValue::ValueType PolyValue::typeConvert(Numeric::Type type){
 	}
 }
 
-void PolyValue::copy(const Value *other){
-//	std::cout << "PolyValue.copy" << std::endl;
-	const PolyValue *otherVal = dynamic_cast<const PolyValue*>(other);
-
-	if(otherVal){
-		_type = otherVal->_type;
-		_isArray = otherVal->_isArray;
-
-		_intValuesSliced = otherVal->_intValuesSliced;
-		_floatValuesSliced = otherVal->_floatValuesSliced;
-		_vec3ValuesSliced = otherVal->_vec3ValuesSliced;
-		_quatValuesSliced = otherVal->_quatValuesSliced;
-		_matrix44ValuesSliced = otherVal->_matrix44ValuesSliced;
-		_col4ValuesSliced = otherVal->_col4ValuesSliced;
-		_boolValuesSliced = otherVal-> _boolValuesSliced;
-		_stringValuesSliced = otherVal->_stringValuesSliced;
-
-	}
-//	std::cout << "PolyValue.copy: Done" << std::endl;
-}
-
 void PolyValue::resize(unsigned int newSize){
 	resizeSlice(0, newSize);
 }
 
 void PolyValue::resizeSlice(unsigned int slice, unsigned int newSize){
+//	std::cout << "PolyValue.resizeSlice" << std::endl;
 	switch (_type){
 	case stringType:
 		for(int i = 0; i < _stringValuesSliced.size(); ++i){
@@ -411,133 +499,142 @@ void PolyValue::resizeSlice(unsigned int slice, unsigned int newSize){
 		}
 		break;
 	}
+//	std::cout << "PolyValue.resizeSlice: Done" << std::endl;
 }
 
 void PolyValue::resizeSlices(unsigned int slices){
+//	std::cout << "PolyValue.resizeSlices" << std::endl;
 	if (slices == 0){
 		slices = 1;
 	};
 
 	if (slices != _slices){
-		switch (_type){
-		case stringType:
-			_stringValuesSliced.resize(slices);
-			for(int i = 0; i < slices; ++i){
-				std::vector<std::string> &slicevec = _stringValuesSliced[i];
-				if(!slicevec.size()){
-					slicevec.resize(1);
+		if (_type != typeAny &&
+				_type != stringTypeAny &&
+				_type != boolTypeAny &&
+				_type != numericTypeAny){
+			switch (_type){
+			case stringType:
+				_stringValuesSliced.resize(slices);
+				for(int i = 0; i < slices; ++i){
+					std::vector<std::string> &slicevec = _stringValuesSliced[i];
+					if(!slicevec.size()){
+						slicevec.resize(1);
+					}
 				}
-			}
-			break;
-		case stringTypeArray:
-			_stringValuesSliced.resize(slices);
-			break;
-		case pathType:
-			_stringValuesSliced.resize(slices);
-			for(int i = 0; i < slices; ++i){
-				std::vector<std::string> &slicevec = _stringValuesSliced[i];
-				if(!slicevec.size()){
-					slicevec.resize(1);
+				break;
+			case stringTypeArray:
+				_stringValuesSliced.resize(slices);
+				break;
+			case pathType:
+				_stringValuesSliced.resize(slices);
+				for(int i = 0; i < slices; ++i){
+					std::vector<std::string> &slicevec = _stringValuesSliced[i];
+					if(!slicevec.size()){
+						slicevec.resize(1);
+					}
 				}
-			}
-		case pathTypeArray:
-			_stringValuesSliced.resize(slices);
-			break;
-		case boolType:
-			_boolValuesSliced.resize(slices);
-			for(int i = 0; i < slices; ++i){
-				std::vector<bool> &slicevec = _boolValuesSliced[i];
-				if(!slicevec.size()){
-					slicevec.resize(1);
+			case pathTypeArray:
+				_stringValuesSliced.resize(slices);
+				break;
+			case boolType:
+				_boolValuesSliced.resize(slices);
+				for(int i = 0; i < slices; ++i){
+					std::vector<bool> &slicevec = _boolValuesSliced[i];
+					if(!slicevec.size()){
+						slicevec.resize(1);
+					}
 				}
-			}
-			break;
-		case boolTypeArray:
-			_boolValuesSliced.resize(slices);
-			break;
-		case numericTypeInt:
-			_intValuesSliced.resize(slices);
-			for(int i = 0; i < slices; ++i){
-				std::vector<int> &slicevec = _intValuesSliced[i];
-				if(!slicevec.size()){
-					slicevec.resize(1);
+				break;
+			case boolTypeArray:
+				_boolValuesSliced.resize(slices);
+				break;
+			case numericTypeInt:
+				_intValuesSliced.resize(slices);
+				for(int i = 0; i < slices; ++i){
+					std::vector<int> &slicevec = _intValuesSliced[i];
+					if(!slicevec.size()){
+						slicevec.resize(1);
+					}
 				}
-			}
-		case numericTypeIntArray:
-			_intValuesSliced.resize(slices);
-			break;
-		case numericTypeFloat:
-			_floatValuesSliced.resize(slices);
-			for(int i = 0; i < slices; ++i){
-				std::vector<float> &slicevec = _floatValuesSliced[i];
-				if(!slicevec.size()){
-					slicevec.resize(1);
+			case numericTypeIntArray:
+				_intValuesSliced.resize(slices);
+				break;
+			case numericTypeFloat:
+				_floatValuesSliced.resize(slices);
+				for(int i = 0; i < slices; ++i){
+					std::vector<float> &slicevec = _floatValuesSliced[i];
+					if(!slicevec.size()){
+						slicevec.resize(1);
+					}
 				}
-			}
-			break;
-		case numericTypeFloatArray:
-			_floatValuesSliced.resize(slices);
-			break;
-		case numericTypeVec3:
-			_vec3ValuesSliced.resize(slices);
-			for(int i = 0; i < slices; ++i){
-				std::vector<Imath::V3f> &slicevec = _vec3ValuesSliced[i];
-				if(!slicevec.size()){
-					slicevec.resize(1);
+				break;
+			case numericTypeFloatArray:
+				_floatValuesSliced.resize(slices);
+				break;
+			case numericTypeVec3:
+				_vec3ValuesSliced.resize(slices);
+				for(int i = 0; i < slices; ++i){
+					std::vector<Imath::V3f> &slicevec = _vec3ValuesSliced[i];
+					if(!slicevec.size()){
+						slicevec.resize(1);
+					}
 				}
-			}
-			break;
-		case numericTypeVec3Array:
-			_vec3ValuesSliced.resize(slices);
-			break;
-		case numericTypeMatrix44:
-			_matrix44ValuesSliced.resize(slices);
-			for(int i = 0; i < slices; ++i){
-				std::vector<Imath::M44f> &slicevec = _matrix44ValuesSliced[i];
-				if(!slicevec.size()){
-					slicevec.resize(1);
+				break;
+			case numericTypeVec3Array:
+				_vec3ValuesSliced.resize(slices);
+				break;
+			case numericTypeMatrix44:
+				_matrix44ValuesSliced.resize(slices);
+				for(int i = 0; i < slices; ++i){
+					std::vector<Imath::M44f> &slicevec = _matrix44ValuesSliced[i];
+					if(!slicevec.size()){
+						slicevec.resize(1);
+					}
 				}
-			}
-			break;
-		case numericTypeMatrix44Array:
-			_matrix44ValuesSliced.resize(slices);
-			break;
-		case numericTypeQuat:
-			_quatValuesSliced.resize(slices);
-			for(int i = 0; i < slices; ++i){
-				std::vector<Imath::Quatf> &slicevec = _quatValuesSliced[i];
-				if(!slicevec.size()){
-					slicevec.resize(1);
+				break;
+			case numericTypeMatrix44Array:
+				_matrix44ValuesSliced.resize(slices);
+				break;
+			case numericTypeQuat:
+				_quatValuesSliced.resize(slices);
+				for(int i = 0; i < slices; ++i){
+					std::vector<Imath::Quatf> &slicevec = _quatValuesSliced[i];
+					if(!slicevec.size()){
+						slicevec.resize(1);
+					}
 				}
-			}
-			break;
-		case numericTypeQuatArray:
-			_quatValuesSliced.resize(slices);
-			break;
-		case numericTypeCol4:
-			_col4ValuesSliced.resize(slices);
-			for (int i=0; i<slices; ++i){
-				std::vector<Imath::Color4f> &slicevec = _col4ValuesSliced[i];
-				if (!slicevec.size()){
-					slicevec.resize(1);
+				break;
+			case numericTypeQuatArray:
+				_quatValuesSliced.resize(slices);
+				break;
+			case numericTypeCol4:
+				_col4ValuesSliced.resize(slices);
+				for (int i=0; i<slices; ++i){
+					std::vector<Imath::Color4f> &slicevec = _col4ValuesSliced[i];
+					if (!slicevec.size()){
+						slicevec.resize(1);
+					}
 				}
-			}
-			break;
-		case numericTypeCol4Array:
-			_col4ValuesSliced.resize(slices);
+				break;
+			case numericTypeCol4Array:
+				_col4ValuesSliced.resize(slices);
+		}
 	}
 	_slices = slices;
 	}
+//	std::cout << "PolyValue.resizeSlices: Done" << std::endl;
 }
 
 std::string PolyValue::boolSliceAsString(unsigned int slice){
+//	std::cout << "PolyValue.boolSliceAsString" << std::endl;
 	if(slice >= _slices){
 		slice = _slices - 1;
 	}
 
 	std::string script;
 	if(_isArray){
-		script = "[";
+		script = "";
 		for(int i = 0; i < _boolValuesSliced[slice].size(); ++i){
 			std::string value = "False";
 			if(_boolValuesSliced[slice][i]){
@@ -549,7 +646,7 @@ std::string PolyValue::boolSliceAsString(unsigned int slice){
 			if(i % 20 == 19)
 				value += "\n";
 		}
-		script += "]";
+		script += "";
 	}
 	else{
 		bool value = _boolValuesSliced[slice][0];
@@ -564,20 +661,21 @@ std::string PolyValue::boolSliceAsString(unsigned int slice){
 }
 
 std::string PolyValue::stringSliceAsString(unsigned int slice){
+//	std::cout << "PolyValue.stringSliceAsString" << std::endl;
 	std::string script;
 	std::ostringstream stream;
 	if (slice >= _slices){
 		slice = _slices - 1;
 	}
-	for (int i=0; i<_stringValuesSliced[slice].size(); ++i){
-		stream << stringUtils::replace(_stringValuesSliced[slice][i], "\n", "\\n");
+	for (int i=0; i < _stringValuesSliced[slice].size(); ++i){
+		std::string val = stringUtils::replace(_stringValuesSliced[slice][i], "\n", "\\n");
+		stream << stringUtils::replace(val, " ", "___");
 		if (i < _stringValuesSliced[slice].size() - 1){
-			stream << " ~ ";
+			stream << ",,";
 		}
 	}
-	std::ostringstream type;
-	type << _type;
-	script = stream.str() + "\\ | /" + type.str();
+	script = stream.str();
+//	std::cout << "PolyValue.stringSliceAsString: Done" << std::endl;
 	return script;
 }
 
@@ -592,10 +690,12 @@ std::string PolyValue::intSliceAsString(unsigned int slice){
 		if(i % 20 == 19)
 			stream << "\n";
 	}
+	script = stream.str();
 	return script;
 }
 
 std::string PolyValue::floatSliceAsString(unsigned int slice){
+//	std::cout << "PolyValue.floatSliceAsString" << std::endl;
 	std::string script;
 	std::ostringstream stream;
 	for(int i = 0; i < _floatValuesSliced[slice].size(); ++i){
@@ -606,6 +706,8 @@ std::string PolyValue::floatSliceAsString(unsigned int slice){
 		if(i % 20 == 19)
 			stream << "\n";
 	}
+	script = stream.str();
+//	std::cout << "PolyValue.floatSliceAsString: Done" << std::endl;
 	return script;
 }
 
@@ -627,6 +729,7 @@ std::string PolyValue::vec3SliceAsString(unsigned int slice){
 		if(i % 20 == 19)
 			stream << "\n";
 	}
+	script = stream.str();
 	return script;
 }
 
@@ -649,6 +752,7 @@ std::string PolyValue::col4SliceAsString(unsigned int slice){
 		if(i % 20 == 19)
 			stream << "\n";
 	}
+	script = stream.str();
 	return script;
 }
 
@@ -671,6 +775,7 @@ std::string PolyValue::quatSliceAsString(unsigned int slice){
 		if(i % 20 == 19)
 			stream << "\n";
 	}
+	script = stream.str();
 	return script;
 }
 
@@ -705,11 +810,14 @@ std::string PolyValue::matrix44SliceAsString(unsigned int slice){
 		if(i % 20 == 19)
 			stream << "\n";
 	}
+	script = stream.str();
 	return script;
 }
 
 std::string PolyValue::sliceAsString(unsigned int slice){
+//	std::cout << "PolyValue.sliceAsString" << std::endl;
 	std::string script;
+
 	if (_type != typeAny &&
 		_type != stringTypeAny &&
 		_type != numericTypeAny &&
@@ -718,6 +826,7 @@ std::string PolyValue::sliceAsString(unsigned int slice){
 		if (slice >= _slices){
 			slice = _slices - 1;
 		}
+
 		if (_type == stringType || _type == stringTypeArray ||
 			_type == pathType || _type == pathTypeArray){
 			stream << stringSliceAsString(slice);
@@ -740,6 +849,7 @@ std::string PolyValue::sliceAsString(unsigned int slice){
 		type << _type;
 		script = "[" + stream.str() + "] " + type.str();
 	}
+//	std::cout << "PolyValue.sliceAsString: Done" << std::endl;
 	return script;
 }
 
@@ -812,15 +922,19 @@ void PolyValue::setFromString(const std::string &value){
 
 void PolyValue::stringSetFromString(const std::string &value){
 	std::string tmp = stringUtils::replace(value, "\\n", "\n");
+	tmp = stringUtils::replace(tmp, "\\t", "\t");
 	std::vector<std::string> fields;
-	stringUtils::split(tmp, fields, "\\ | /");
+	stringUtils::split(tmp, fields, " ");
 	if (fields.size() == 2){
 		std::string valuesStr = fields[0];
+		valuesStr = stringUtils::replace(valuesStr, "___", " ");
+		valuesStr = valuesStr.substr(0, valuesStr.length() -1);
+		valuesStr = valuesStr.substr(1, valuesStr.length() - 1);
 		PolyValue::ValueType type = PolyValue::ValueType(stringUtils::parseInt(fields[1]));
 		_stringValuesSliced.resize(1);
 		_stringValuesSliced[0].clear();
 		std::vector<std::string> values;
-		stringUtils::split(valuesStr, values, " ~ ");
+		stringUtils::split(valuesStr, values, ",,");
 		for (int i=0; i<values.size(); ++i){
 			_stringValuesSliced[0].push_back(values[i]);
 		}
@@ -1005,6 +1119,7 @@ void PolyValue::col4SetFromString(const std::string &value){
 		}
 	}
 }
+
 
 void PolyValue::setStringValueAtSlice(unsigned int slice, unsigned int id, std::string &value){
 	if (slice < _stringValuesSliced.size()){
@@ -1191,9 +1306,11 @@ void PolyValue::setCol4Values(const std::vector<Imath::Color4f> &values){
 }
 
 void PolyValue::setStringValuesSlice(unsigned int slice, const std::vector<std::string> &values){
+//	std::cout << "PolyValue.setStringValuesSlice" << std::endl;
 	if (slice < _stringValuesSliced.size()){
 		_stringValuesSliced[slice] = values;
 	}
+//	std::cout << "PolyValue.setStringValuesSlice: Done" << std::endl;
 }
 
 void PolyValue::setPathValuesSlice(unsigned int slice, const std::vector<std::string> &values){
@@ -1314,17 +1431,21 @@ std::string PolyValue::pathValueAtSlice(unsigned int slice, unsigned int id){
 }
 
 bool PolyValue::boolValueAtSlice(unsigned int slice, unsigned int id){
+//	std::cout << "PolyValue.boolValueAtSlice" << std::endl;
 	if(slice >= _boolValuesSliced.size()){
 		slice = _boolValuesSliced.size() - 1;
 	}
 	std::vector<bool> &slicevec = _boolValuesSliced[slice];
 	int size = slicevec.size();
 	if(id < size){
+//		std::cout << "PolyValue.boolValueAtSlice: Done" << std::endl;
 		return slicevec[id];
 	}
 	else if(size){
+//		std::cout << "PolyValue.boolValueAtSlice: Done" << std::endl;
 		return slicevec[size - 1];
 	}
+//	std::cout << "PolyValue.boolValueAtSlice: End" << std::endl;
 	return 0;
 }
 
