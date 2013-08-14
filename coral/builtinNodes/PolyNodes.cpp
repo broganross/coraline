@@ -3,11 +3,13 @@
 	#include <tbb/mutex.h>
 #endif
 
+#include <typeinfo>
 #include "PolyNodes.h"
 #include "../src/containerUtils.h"
 
 
 using namespace coral;
+
 
 BuildArray::BuildArray(const std::string &name, Node *parent):
 	Node(name, parent),
@@ -17,6 +19,17 @@ BuildArray::BuildArray(const std::string &name, Node *parent):
 	setAllowDynamicAttributes(true);
 
 	_array = new PolyAttribute("array", this);
+	std::vector<std::string> spec;
+	spec.push_back("StringArray");
+	spec.push_back("PathArray");
+	spec.push_back("BoolArray");
+	spec.push_back("IntArray");
+	spec.push_back("FloatArray");
+	spec.push_back("Vec3Array");
+	spec.push_back("Col4Array");
+	spec.push_back("Matrix44Array");
+	setAttributeAllowedSpecializations(_array, spec);
+
 	addOutputAttribute(_array);
 }
 
@@ -107,14 +120,15 @@ void BuildArray::updateInt(const std::vector<Attribute*> &inAttrs, int arraySize
 }
 
 void BuildArray::updateFloat(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice){
+//	std::cout << "BuildArray.updateFloat" << std::endl;
 	std::vector<float> arrayValues(arraySize);
 	for(int i = 0; i < arraySize; ++i){
 		PolyAttribute *attr = (PolyAttribute*)inAttrs[i];
 		PolyValue *inNum = attr->value();
 		arrayValues[i] = inNum->floatValueAtSlice(slice, 0);
 	}
-
 	array->setFloatValuesSlice(slice, arrayValues);
+//	std::cout << "BuildArray.updateFloat: Done" << std::endl;
 }
 
 void BuildArray::updateVec3(const std::vector<Attribute*> &inAttrs, int arraySize, PolyValue *array, unsigned int slice){
@@ -255,8 +269,9 @@ void ConstantArray::updateSpecializationLink(Attribute *attributeA, Attribute *a
 }
 
 void ConstantArray::updateSlice(Attribute *attribute, unsigned int slice){
+//	std::cout << "ConstantArray.updateSlice " << name() << std::endl;
 	PolyValue *constant = _constant->value();
-	if(constant->type() != PolyValue::numericTypeAny &&
+	if (constant->type() != PolyValue::numericTypeAny &&
 			constant->type() != PolyValue::typeAny &&
 			constant->type() != PolyValue::stringTypeAny &&
 			constant->type() != PolyValue::boolTypeAny){
@@ -310,7 +325,7 @@ void ConstantArray::updateSlice(Attribute *attribute, unsigned int slice){
 		else if (constant->type() == PolyValue::stringType){
 			std::string constantValue = constant->stringValueAtSlice(slice, 0);
 			std::vector<std::string> values(size);
-			for (int i=i; i<size; ++i){
+			for (int i=0; i<size; ++i){
 				values[i] = constantValue;
 			}
 			array->setStringValuesSlice(slice, values);
@@ -335,6 +350,8 @@ void ConstantArray::updateSlice(Attribute *attribute, unsigned int slice){
 	else{
 		setAttributeIsClean(_array, false);
 	}
+
+//	std::cout << "ConstantArray.updateSlice: Done" << std::endl;
 }
 
 
