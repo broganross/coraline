@@ -53,6 +53,7 @@ class CORAL_EXPORT PolyAttribute : public Attribute{
 		PolyValue *outValue();
 		void onSettingSpecialization(const std::vector<std::string> &specialization);
 		PolyValue::ValueType typeFromString(const std::string &typeStr);
+		std::string shortDebugInfo();
 	};
 }
 #endif

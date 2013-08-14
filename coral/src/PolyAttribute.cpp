@@ -39,8 +39,9 @@ using namespace coral;
 PolyAttribute::PolyAttribute(const std::string &name, Node *parent)
 	: Attribute(name, parent){
 	setClassName("PolyAttribute");
-	PolyValue *ptr=new PolyValue();
-	setValuePtr(ptr);
+	setValuePtr(new PolyValue());
+//	std::cout << "PolyAttr Const: " << (PolyValue*)_inputValue->slices() << std::endl;
+
 	std::vector<std::string> spec;
 	spec.push_back("Any");
 	spec.push_back("StringAny");
@@ -68,25 +69,33 @@ PolyAttribute::PolyAttribute(const std::string &name, Node *parent)
 }
 
 PolyValue *PolyAttribute::value(){
+//	std::cout << "PolyAttribute.value " << name() << std::endl;
+//	return (PolyValue*)Attribute::value();
+
 	Value *v = Attribute::value();
 	if (typeid(*v) == typeid(String)){
 		PolyValue *np = new PolyValue();
 		np->copyFromString((String*)v);
+//		std::cout << "PolyAttribute.value: Done" << std::endl;
 		return np;
-	} else if (typeid(v) == typeid(Bool)) {
+	} else if (typeid(*v) == typeid(Bool)) {
 		PolyValue *np = new PolyValue();
 		np->copyFromBool((Bool*)v);
+//		std::cout << "PolyAttribute.value: Done" << std::endl;
 		return np;
-	} else if (typeid(v) == typeid(Numeric)) {
+	} else if (typeid(*v) == typeid(Numeric)) {
 		PolyValue *np = new PolyValue();
 		np->copyFromNumeric((Numeric*)v);
+//		std::cout << "PolyAttribute.value: Done" << std::endl;
 		return np;
 	} else {
+//		std::cout << "PolyAttribute.value: Done" << std::endl;
 		return (PolyValue*)v;
 	}
 }
 
 PolyValue *PolyAttribute::outValue(){
+//	std::cout << "PolyAttribute.outValue " << name() << std::endl;
 	return (PolyValue*)Attribute::outValue();
 }
 
@@ -107,13 +116,13 @@ PolyValue::ValueType PolyAttribute::typeFromString(const std::string &typeStr){
 	else if (typeStr == "PathArray"){
 		type = PolyValue::pathTypeArray;
 	}
-	else if (typeStr == "BoolTypeAny"){
+	else if (typeStr == "BoolAny"){
 		type = PolyValue::boolTypeAny;
 	}
-	else if (typeStr == "BoolType"){
+	else if (typeStr == "Bool"){
 		type = PolyValue::boolType;
 	}
-	else if (typeStr == "BoolTypeArray"){
+	else if (typeStr == "BoolArray"){
 		type = PolyValue::boolTypeArray;
 	}
 	else if (typeStr == "Int"){
@@ -156,10 +165,64 @@ PolyValue::ValueType PolyAttribute::typeFromString(const std::string &typeStr){
 }
 
 void PolyAttribute::onSettingSpecialization(const std::vector<std::string> &specialization){
-	PolyValue::ValueType type = PolyValue::typeAny;
 	if (specialization.size() == 1){
 		std::string typeStr = specialization[0];
-		type = typeFromString(typeStr);
+		outValue()->setType(typeFromString(typeStr));
+	} else {
+		outValue()->setType(PolyValue::typeAny);
 	}
-	outValue()->setType(type);
+}
+
+std::string PolyAttribute::shortDebugInfo(){
+//	std::cout << "PolyAttribute.shortDebugInfo " << name() << std::endl;
+	std::string info = Attribute::shortDebugInfo() + "\n";
+
+	PolyValue *val = value();
+	int slices = val->slices();
+
+	bool isArray = val->isArray();
+
+	info += "slices: " + stringUtils::intToString(slices) + "\n";
+	for (int i=0; i<val->slices(); ++i){
+		info += "slice: " + stringUtils::intToString(i) + ", ";
+		if(isArray){
+			info += "size: " + stringUtils::intToString(val->sizeSlice(i)) + ", ";
+		}
+		std::string valStr = val->sliceAsString(i);
+		std::vector<std::string> split;
+		if (val->type() == PolyValue::stringType ||
+				val->type() == PolyValue::pathType ||
+				val->type() == PolyValue::stringTypeArray ||
+				val->type() == PolyValue::pathTypeArray){
+			stringUtils::split(valStr, split, " ");
+		} else {
+			stringUtils::split(valStr, split, " ");
+		}
+		valStr = split[0];
+		if (val->type() == PolyValue::stringType ||
+				val->type() == PolyValue::pathType ||
+				val->type() == PolyValue::stringTypeArray ||
+				val->type() == PolyValue::pathTypeArray){
+			valStr = stringUtils::replace(valStr, "___", " ");
+		}
+
+		std::string trimmedValStr;
+		if(valStr.size() < 100){
+			trimmedValStr = valStr;
+		}
+		else {
+			for (int i=0; i<100; ++i){
+				trimmedValStr += valStr[i];
+			}
+			trimmedValStr += "...]";
+		}
+		info += trimmedValStr + "\n";
+
+		if (i > 3){
+			info += "(trimming remaing slices)\n";
+			break;
+		}
+	}
+//	std::cout << "PolyAttribute.shortDebugInfo: Done" << std::endl;
+	return info;
 }
