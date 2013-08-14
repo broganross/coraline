@@ -48,24 +48,26 @@ public:
 	unsigned int size();
 	Type type();
 	void setType(Bool::Type type);
-	void setBoolValueAt(unsigned int id, bool value);
-	bool boolValueAt(unsigned int id);
-	const std::vector<bool> &boolValues();
-	void setBoolValues(const std::vector<bool> &values);
+	unsigned int slices();
 	void setIsArray(bool value);
 	bool isArray();
 	void resize(unsigned int size);
-	std::string asString();
-	void setFromString(const std::string &value);
-	unsigned int slices();
-
-	unsigned int sizeSlice(unsigned int slice);
+	void resizeSlice(unsigned int slice, unsigned int newSize);
 	void resizeSlices(unsigned int slices);
-	void setBoolValueAtSlice(unsigned int slice, unsigned int id, bool value);
-	bool boolValueAtSlice(unsigned int slice, unsigned int id);
-	void setBoolValuesSlice(unsigned int slice, const std::vector<bool> &values);
-	const std::vector<bool> &boolValuesSlice(unsigned int slice);
+	unsigned int sizeSlice(unsigned int slice);
+
+	std::string asString();
 	std::string sliceAsString(unsigned int slice);
+	void setFromString(const std::string &value);
+
+	void setBoolValueAt(unsigned int id, bool value);
+	void setBoolValues(const std::vector<bool> &values);
+	void setBoolValueAtSlice(unsigned int slice, unsigned int id, bool value);
+	void setBoolValuesSlice(unsigned int slice, const std::vector<bool> &values);
+	bool boolValueAt(unsigned int id);
+	const std::vector<bool> &boolValues();
+	bool boolValueAtSlice(unsigned int slice, unsigned int id);
+	const std::vector<bool> &boolValuesSlice(unsigned int slice);
 
 private:
 	std::vector<std::vector<bool> > _boolValuesSliced;
@@ -82,6 +84,7 @@ public:
 	Bool *outValue();
 	void onSettingSpecialization(const std::vector<std::string> &specialization);
 	std::string shortDebugInfo();
+	Bool::Type boolTypeFromString(const std::string &typeStr);
 };
 
 }

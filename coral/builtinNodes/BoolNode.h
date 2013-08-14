@@ -38,8 +38,9 @@ class BoolNode : public Node{
 public:
 	BoolNode(const std::string &name, Node *parent) : Node(name, parent){
 		setSliceable(true);
-		
+
 		_bool = new BoolAttribute("bool", this);
+		setAttributeAllowedSpecialization(_bool, "Bool");
 		addOutputAttribute(_bool);
 }
 

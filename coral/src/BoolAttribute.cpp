@@ -44,7 +44,19 @@ Bool::Type Bool::type(){
 }
 
 void Bool::setType(Bool::Type type){
+//	std::cout << "Bool.setType" << std::endl;
 	_type = type;
+	_isArray = false;
+	if (type == boolType){
+		_boolValuesSliced.resize(_slices);
+		for (int i=0; i<_slices; ++i){
+			_boolValuesSliced.resize(1);
+		}
+	} else if (type == boolTypeArray){
+		_boolValuesSliced.resize(_slices);
+		_isArray = true;
+	}
+//	std::cout << "Bool.setType: Done" << std::endl;
 }
 
 unsigned int Bool::slices(){
@@ -55,12 +67,28 @@ unsigned int Bool::sizeSlice(unsigned int slice){
 	if(slice >= _slices){
 		slice = _slices - 1;
 	}
-
-	return _boolValuesSliced[slice].size();
+	if (_type == boolTypeAny){
+		return 0;
+	} else {
+		return _boolValuesSliced[slice].size();
+	}
+	return 0;
 }
 
 unsigned int Bool::size(){
-	return _boolValuesSliced[0].size();
+	return sizeSlice(0);
+}
+
+void Bool::resize(unsigned int newSize){
+	resizeSlice(0, newSize);
+}
+
+void Bool::resizeSlice(unsigned int slice, unsigned int newSize){
+	if (_type != boolTypeAny){
+		for (int i=0; i<_boolValuesSliced.size(); ++i){
+			_boolValuesSliced[i].resize(newSize);
+		}
+	}
 }
 
 void Bool::resizeSlices(unsigned int slices){
@@ -153,10 +181,6 @@ bool Bool::isArray(){
 	return _isArray;
 }
 
-void Bool::resize(unsigned int size){
-	_boolValuesSliced[0].resize(size);
-}
-
 std::string Bool::sliceAsString(unsigned int slice){
 	if(slice >= _slices){
 		slice = _slices - 1;
@@ -240,24 +264,28 @@ BoolAttribute::BoolAttribute(const std::string &name, Node *parent) : Attribute(
 Bool *BoolAttribute::value(){
 	return (Bool*)Attribute::value();
 }
+
 Bool *BoolAttribute::outValue(){
 	return (Bool*)Attribute::outValue();
 }
 
 void BoolAttribute::onSettingSpecialization(const std::vector<std::string> &specialization){
-	Bool *boolVal = outValue();
-
-	boolVal->setIsArray(false);
-	if(boolVal->size() == 0){
-		boolVal->resize(1);
-		boolVal->setBoolValueAt(0, false);
+	if (specialization.size() == 1){
+		std::string typeStr = specialization[0];
+		outValue()->setType(boolTypeFromString(typeStr));
+	} else {
+		outValue()->setType(Bool::boolTypeAny);
 	}
+}
 
-	if(specialization.size() == 1){
-		if(specialization[0] == "BoolArray"){
-			boolVal->setIsArray(true);
-		}
+Bool::Type BoolAttribute::boolTypeFromString(const std::string &typeStr){
+	Bool::Type type = Bool::boolTypeAny;
+	if(typeStr == "Bool"){
+		type = Bool::boolType;
+	} else if (typeStr == "BoolArray"){
+		type = Bool::boolTypeArray;
 	}
+	return type;
 }
 
 std::string BoolAttribute::shortDebugInfo(){
