@@ -108,11 +108,6 @@ public:
 	void resizeSlice(unsigned int slice, unsigned int newSize);
 	void resizeSlices(unsigned int slices);
 	unsigned int slices(){return _slices;}
-//	template<typename valType> void setValueAtSlice(unsigned int slice, unsigned int id, valType value);
-//	template<typename valType> void setValueAt(unsigned int id, valType value);
-//	template<typename valType> void setValues(const std::vector<valType> &values);
-//	template<typename valType> valType valueAtSlice(unsigned int slice, unsigned int id);
-//	template<typename valType> valType valueAt(unsigned int id);
 
 	const std::vector<std::string> &stringValues();
 	const std::vector<std::string> &pathValues();
@@ -198,9 +193,6 @@ private:
 	bool _isArray;
 	ValueType _type;
 	unsigned int _slices;
-	PolyValue::ValueType typeConvert(String::Type type);
-	PolyValue::ValueType typeConvert(Numeric::Type type);
-	PolyValue::ValueType typeConvert(Bool::Type type);
 
 	std::vector<std::vector<int> > _intValuesSliced;
 	std::vector<std::vector<float> > _floatValuesSliced;

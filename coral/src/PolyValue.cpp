@@ -28,6 +28,8 @@
 #include "PolyValue.h"
 #include <ImathMatrixAlgo.h>
 
+#include "Utils.h"
+
 using namespace coral;
 
 PolyValue::PolyValue():
@@ -251,7 +253,7 @@ void PolyValue::copy(const Value *other){
 PolyValue::operator Numeric(){
 //	std::cout << "PolyValue.Numeric" << std::endl;
 	Numeric n;
-//	n.setType(n.typeConvert(_type));
+	n.setType(Util::polyTypeToNumeric(_type));
 	n.setIsArray(_isArray);
 	n.setSlices(_slices);
 	n.setIntValues(intValues());
@@ -266,7 +268,7 @@ PolyValue::operator Numeric(){
 PolyValue::operator Numeric*(){
 //	std::cout << "PolyValueNumeric*" << std::endl;
 	Numeric *n = new Numeric();
-//	n->setType(n.typeConvert(_type));
+	n->setType(Util::polyTypeToNumeric(_type));
 	n->setIsArray(_isArray);
 	n->setSlices(_slices);
 	n->setIntValues(intValues());
@@ -280,10 +282,9 @@ PolyValue::operator Numeric*(){
 
 void PolyValue::copyFromNumeric(Numeric *other){
 //	std::cout << "PolyValue.copyFromNumeric" << std::endl;
-	setType(typeConvert(other->type()));
+	setType(Util::numericTypeToPoly(other->type()));
 	_isArray = other->isArray();
 	_slices = other->slices();
-//	resize(other->size());
 	setIntValues(other->intValues());
 	setFloatValues(other->floatValues());
 	setCol4Values(other->col4Values());
@@ -296,7 +297,7 @@ void PolyValue::copyFromNumeric(Numeric *other){
 Numeric *PolyValue::copyToNumeric(){
 //	std::cout << "PolyValue.copyToNumeric" << std::endl;
 	Numeric *n = new Numeric();
-//	setType(typeConvert(other->type()));
+	n->setType(Util::polyTypeToNumeric(_type));
 	n->setIsArray(_isArray);
 	n->setSlices(_slices);
 	n->setIntValues(intValues());
@@ -312,7 +313,7 @@ Numeric *PolyValue::copyToNumeric(){
 
 void PolyValue::copyFromBool(Bool *other){
 //	std::cout << "PolyValue.copyFromBool" << std::endl;
-	setType(typeConvert(other->type()));
+	setType(Util::boolTypeToPoly(other->type()));
 	_isArray = other->isArray();
 	_slices = other->slices();
 	std::vector<bool> vals = other->boolValues();
@@ -322,7 +323,7 @@ void PolyValue::copyFromBool(Bool *other){
 
 Bool *PolyValue::copyToBool(){
 	Bool *b = new Bool();
-//	b->setType(convertType(_type));
+	b->setType(Util::polyTypeToBool(_type));
 	b->setIsArray(_isArray);
 	b->setSlices(_slices);
 	std::vector<bool> vals = boolValues();
@@ -334,6 +335,7 @@ Bool *PolyValue::copyToBool(){
 void PolyValue::copyFromString(String *other){
 //	std::cout << "PolyValue.copyFromString" << std::endl;
 //	_type = typeConvert(other->type());
+	setType(Util::stringTypeToPoly(other->type()));
 	_isArray = other->isArray();
 	_slices = other->slices();
 	setStringValues(other->stringValues());
@@ -342,7 +344,7 @@ void PolyValue::copyFromString(String *other){
 
 String *PolyValue::copyToString(){
 	String *s = new String();
-//	s->setType(typeConvert(_type));
+	s->setType(Util::polyTypeToString(_type));
 	s->setIsArray(_isArray);
 	s->setSlices(_slices);
 	std::vector<std::string> vals = stringValues();
@@ -351,64 +353,6 @@ String *PolyValue::copyToString(){
 	s->setPathValues(vals);
 	s->resize(size());
 	return s;
-}
-
-PolyValue::ValueType PolyValue::typeConvert(String::Type type){
-	switch (type){
-	case String::stringTypeAny:
-		return PolyValue::stringTypeAny;
-	case String::stringType:
-		return PolyValue::stringType;
-	case String::stringTypeArray:
-		return PolyValue::stringTypeArray;
-	case String::pathType:
-		return PolyValue::pathType;
-	case String::pathTypeArray:
-		return PolyValue::pathTypeArray;
-	}
-}
-
-PolyValue::ValueType PolyValue::typeConvert(Bool::Type type){
-//	std::cout << "PolyValue.typeConvert (Bool)" << std::endl;
-	switch(type){
-	case Bool::boolTypeAny:
-		return PolyValue::boolTypeAny;
-	case Bool::boolType:
-		return PolyValue::boolType;
-	case Bool::boolTypeArray:
-		return PolyValue::boolTypeArray;
-	}
-}
-
-PolyValue::ValueType PolyValue::typeConvert(Numeric::Type type){
-	switch(type){
-	case Numeric::numericTypeAny:
-		return PolyValue::numericTypeAny;
-	case Numeric::numericTypeInt:
-		return PolyValue::numericTypeInt;
-	case Numeric::numericTypeIntArray:
-		return PolyValue::numericTypeIntArray;
-	case Numeric::numericTypeFloat:
-		return PolyValue::numericTypeFloat;
-	case Numeric::numericTypeFloatArray:
-		return PolyValue::numericTypeFloatArray;
-	case Numeric::numericTypeVec3:
-		return PolyValue::numericTypeVec3;
-	case Numeric::numericTypeVec3Array:
-		return PolyValue::numericTypeVec3Array;
-	case Numeric::numericTypeCol4:
-		return PolyValue::numericTypeCol4;
-	case Numeric::numericTypeCol4Array:
-		return PolyValue::numericTypeCol4Array;
-	case Numeric::numericTypeMatrix44:
-		return PolyValue::numericTypeMatrix44;
-	case Numeric::numericTypeMatrix44Array:
-		return PolyValue::numericTypeMatrix44Array;
-	case Numeric::numericTypeQuat:
-		return PolyValue::numericTypeQuat;
-	case Numeric::numericTypeQuatArray:
-		return PolyValue::numericTypeQuatArray;
-	}
 }
 
 void PolyValue::resize(unsigned int newSize){

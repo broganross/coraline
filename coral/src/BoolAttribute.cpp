@@ -28,6 +28,9 @@
 #include "BoolAttribute.h"
 #include "stringUtils.h"
 
+#include <typeinfo>
+#include "PolyValue.h"
+
 using namespace coral;
 
 Bool::Bool():
