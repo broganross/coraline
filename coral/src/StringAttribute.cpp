@@ -26,7 +26,10 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // </license>
 
+#include <typeinfo>
 #include "StringAttribute.h"
+#include "PolyValue.h"
+
 
 using namespace coral;
 String::String():
@@ -286,7 +289,14 @@ StringAttribute::StringAttribute(const std::string &name, Node *parent)
 
 String* StringAttribute::value()
 {
-	return (String*)Attribute::value();
+	Value *v = Attribute::value();
+	if (typeid(*v) == typeid(PolyValue)){
+		PolyValue *p = (PolyValue*)v;
+		String *s = p->copyToString();
+		return s;
+	} else {
+		return (String*)Attribute::value();
+	}
 }
 
 String* StringAttribute::outValue()

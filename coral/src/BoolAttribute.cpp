@@ -255,6 +255,7 @@ void Bool::setFromString(const std::string &value){
 	}
 }
 
+
 BoolAttribute::BoolAttribute(const std::string &name, Node *parent) : Attribute(name, parent){
 	setClassName("BoolAttribute");
 
@@ -266,7 +267,14 @@ BoolAttribute::BoolAttribute(const std::string &name, Node *parent) : Attribute(
 }
 
 Bool *BoolAttribute::value(){
-	return (Bool*)Attribute::value();
+	Value *v = Attribute::value();
+	if (typeid(*v) == typeid(PolyValue)){
+		PolyValue *p = (PolyValue*)v;
+		Bool *b = p->copyToBool();
+		return b;
+	} else {
+		return (Bool*)Attribute::value();
+	}
 }
 
 Bool *BoolAttribute::outValue(){

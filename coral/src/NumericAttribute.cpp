@@ -25,8 +25,12 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // </license>
+
+#include <typeinfo>
 #include "NumericAttribute.h"
 #include "stringUtils.h"
+
+#include "PolyValue.h"
 
 using namespace coral;
 
@@ -51,7 +55,17 @@ NumericAttribute::NumericAttribute(const std::string &name, Node *parent) : Attr
 }
 
 Numeric *NumericAttribute::value(){
-	return (Numeric*)Attribute::value();
+//	std::cout << "NumericAttribute.value " << name() << std::endl;
+	Value *v = Attribute::value();
+	if (typeid(*v) == typeid(PolyValue)){
+		PolyValue *p = (PolyValue*)v;
+		Numeric *n = p->copyToNumeric();
+//		std::cout << "NumericAttribute.value: Done" << std::endl;
+		return n;
+	} else {
+		std::cout << "NumericAttribute.value: Done" << std::endl;
+		return (Numeric*)v;
+	}
 }
 
 Numeric *NumericAttribute::outValue(){
@@ -112,6 +126,7 @@ Numeric::Type NumericAttribute::numericTypeFromString(const std::string &typeStr
 }
 
 std::string NumericAttribute::shortDebugInfo(){
+	std::cout << "NumericAttribute.shortDebugInfo" << std::endl;
 	std::string info = Attribute::shortDebugInfo() + "\n";
 
 	Numeric *val = value();
@@ -149,6 +164,6 @@ std::string NumericAttribute::shortDebugInfo(){
 			break;
 		}
 	}
-
+	std::cout << "NumericAttribute.shortDebugInfo: Done" << std::endl;
 	return info;
 }
