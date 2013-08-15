@@ -12,5 +12,8 @@ ATTRIBUTE_COLORS = { "Any"              : QtGui.QColor(255, 255, 255),
                      "Quat"             : QtGui.QColor(0, 255, 0),
                      "Matrix44"         : QtGui.QColor(179, 102, 255),
                      "PassThrough"      : QtGui.QColor(100, 100, 100),
-                     "Bool"             : QtGui.QColor(255, 160, 130)
+                     "Bool"             : QtGui.QColor(255, 160, 130),
+                     "StringAny"        : QtGui.QColor(204, 255, 102),
+                     "String"           : QtGui.QColor(194, 255, 102),
+                     "Path"             : QtGui.QColor(214, 255, 102)
                     }
