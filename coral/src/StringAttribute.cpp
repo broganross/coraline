@@ -211,6 +211,7 @@ void String::resizeSlices(unsigned int slices){
 	}
 }
 
+
 StringAttribute::StringAttribute(const std::string &name, Node *parent)
 	: Attribute(name, parent)
 	, _longString(false)

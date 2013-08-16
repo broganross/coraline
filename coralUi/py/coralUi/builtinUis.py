@@ -41,6 +41,7 @@ from nodeEditor.connection import Connection
 from nodeEditor.nodeEditor import NodeEditor
 from nodeInspector.fields import IntValueField, FloatValueField, BoolValueField, StringValueField, ColorField
 from nodeInspector.nodeInspector import NodeInspector, NodeInspectorWidget, AttributeInspectorWidget
+from nodeInspector  import  custompythonnodeinspector
 import mainWindow
 import viewport
 
@@ -518,5 +519,6 @@ def loadPluginUi():
     plugin.registerInspectorWidget("ProcessSimulation", ProcessSimulationNodeInspectorWidget)
     plugin.registerInspectorWidget("GeoInstanceGenerator", GeoInstanceGeneratorInspectorWidget)
     plugin.registerInspectorWidget("Shader", ShaderNodeInspectorWidget)
+    plugin.registerInspectorWidget("CustomPython", custompythonnodeinspector.CustomPythonNodeInspectorWidget)
     
     return plugin

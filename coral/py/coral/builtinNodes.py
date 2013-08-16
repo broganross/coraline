@@ -29,6 +29,7 @@
 from plugin import Plugin
 import _coral
 import timeNode
+from    nodes   import  custompythonnode
 
 
 def loadPlugin():
@@ -134,5 +135,7 @@ def loadPlugin():
     plugin.registerNode("SplinePoint", _coral.SplinePoint, tags = ["curve"])
     
     plugin.registerNode("SkinWeightDeformer", _coral.SkinWeightDeformer, tags = ["deformers"])
+    
+    plugin.registerNode("CustomPython", custompythonnode.CustomPythonNode, tags=["pipeline"])
     
     return plugin
