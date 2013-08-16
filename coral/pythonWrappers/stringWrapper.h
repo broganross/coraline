@@ -82,13 +82,13 @@ void string_setType(String &self, String::Type type){
 }
 
 void stringWrapper(){
-	boost::python::enum_<String::Type>("Type")
-		.value("stringTypeAny", String::stringTypeAny)
-		.value("stringType", String::stringType)
-		.value("stringTypeArray", String::stringTypeArray)
-		.value("pathType",String::pathType)
-		.value("pathTypeArray", String::pathTypeArray)
-	;
+//	boost::python::enum_<String::Type>("Type")
+//		.value("stringTypeAny", String::stringTypeAny)
+//		.value("stringType", String::stringType)
+//		.value("stringTypeArray", String::stringTypeArray)
+//		.value("pathType",String::pathType)
+//		.value("pathTypeArray", String::pathTypeArray)
+//	;
 	boost::python::class_<String, boost::shared_ptr<String>, boost::python::bases<Value>, boost::noncopyable>("String", boost::python::no_init)
 		.def("__init__", pythonWrapperUtils::__init__<String>)
 		.def("type", string_type)
@@ -102,6 +102,11 @@ void stringWrapper(){
 		.def("stringValues", string_stringValues)
 		.def("createUnwrapped", pythonWrapperUtils::createUnwrapped<String>)
 		.staticmethod("createUnwrapped")
+		.add_static_property("stringTypeAny", string_stringTypeAny)
+		.add_static_property("stringType", string_stringType)
+		.add_static_property("stringTypeArray", string_stringTypeArray)
+		.add_static_property("pathType", string_pathType)
+		.add_static_property("pathTypeArray", string_pathTypeArray)
 	;
 	
 	pythonWrapperUtils::pythonWrapper<StringNode, Node>("StringNode");
