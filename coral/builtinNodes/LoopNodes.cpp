@@ -247,3 +247,169 @@ Node(name, parent){
 unsigned int ForLoopNode::computeSlices(){
 	return _globalArray->value()->sizeSlice(0);
 }
+
+
+StringLoopInputNode::StringLoopInputNode(const std::string &name, Node *parent):
+Node(name, parent),
+_selectedOperation(0){
+	setSliceable(true);
+
+	_globalArray= new StringAttribute("globalArray", this);
+	_localIndex = new NumericAttribute("localIndex", this);
+	_localElement = new StringAttribute("localElement", this);
+
+	addInputAttribute(_globalArray);
+	addOutputAttribute(_localIndex);
+	addOutputAttribute(_localElement);
+
+	setAttributeAffect(_globalArray, _localIndex);
+	setAttributeAffect(_globalArray, _localElement);
+
+	std::vector<std::string> arraySpec;
+	arraySpec.push_back("StringArray");
+	arraySpec.push_back("PathArray");
+	setAttributeAllowedSpecializations(_globalArray, arraySpec);
+
+	std::vector<std::string> elemSpec;
+	elemSpec.push_back("String");
+	elemSpec.push_back("Path");
+	setAttributeAllowedSpecializations(_localElement, elemSpec);
+
+	setAttributeAllowedSpecialization(_localIndex, "Int");
+
+	addAttributeSpecializationLink(_globalArray, _localElement);
+}
+
+void StringLoopInputNode::updateSpecializationLink(Attribute *attrA, Attribute *attrB, std::vector<std::string> &specA, std::vector<std::string> &specB){
+	if (specA.size() < specB.size()){
+		specB.resize(specA.size());
+		for (int i=0; i<specA.size(); ++i){
+			specB[i] = stringUtils::strip(specA[i], "Array");
+		}
+	} else if (specB.size() < specA.size()) {
+		specA.resize(specB.size());
+		for (int i=0; i<specB.size(); ++i){
+			specA[i] = specB[i] + "Array";
+		}
+	}
+}
+
+void StringLoopInputNode::attributeSpecializationChanged(Attribute *attribute){
+	if (attribute == _globalArray){
+		String::Type type = _globalArray->outValue()->type();
+		if (type != String::stringTypeAny){
+			_selectedOperation = &StringLoopInputNode::updateString;
+		}
+	}
+
+}
+
+void StringLoopInputNode::updateString(unsigned int slice, String *globalArray, String *localElement){
+	std::string str = globalArray->stringValueAtSlice(0, slice);
+	localElement->setStringValueAtSlice(slice, 0, str);
+}
+
+//void StringLoopInputNode::updatePath(unsigned int slice, String *globalArray, String *localElement){
+//	localElement->setStringValueAtSlice(slice, 0, globalArray->stringValueAtSlice(0, slice));
+//}
+
+void StringLoopInputNode::updateSlice(Attribute *attr, unsigned int slice){
+	if (_selectedOperation){
+		String *globalArray = _globalArray->value();
+		String *localElement = _localElement->outValue();
+		Numeric *localIndex = _localIndex->outValue();
+
+		localIndex->setIntValueAtSlice(slice, 0, slice);
+
+		(this->*_selectedOperation)(slice, globalArray, localElement);
+	}
+}
+
+
+StringLoopOutputNode::StringLoopOutputNode(const std::string &name, Node* parent):
+Node(name, parent),
+_selectedOperation(0){
+	setSliceable(true);
+	_localElement = new StringAttribute("localElement", this);
+	_globalArray = new StringAttribute("globalArray", this);
+
+	addInputAttribute(_localElement);
+	addOutputAttribute(_globalArray);
+
+	setAttributeAffect(_localElement, _globalArray);
+	std::vector<std::string> elemSpec;
+	elemSpec.push_back("String");
+	elemSpec.push_back("Path");
+	setAttributeAllowedSpecializations(_localElement, elemSpec);
+
+	std::vector<std::string> arraySpec;
+	arraySpec.push_back("StringArray");
+	arraySpec.push_back("PathArray");
+	setAttributeAllowedSpecializations(_globalArray, arraySpec);
+
+	addAttributeSpecializationLink(_localElement, _globalArray);
+
+}
+
+void StringLoopOutputNode::updateSpecializationLink(Attribute *attrA, Attribute *attrB, std::vector<std::string> &specA, std::vector<std::string> &specB){
+	if (specA.size() < specB.size()){
+		specB.resize(specA.size());
+		for (int i=0; i<specA.size(); ++i){
+			specB[i] = specA[i] + "Array";
+		}
+	} else if (specB.size() < specA.size()){
+		specA.resize(specB.size());
+		for (int i=0; i < specB.size(); ++i){
+			specA[i] = stringUtils::strip(specB[i], "Array");
+		}
+	}
+}
+
+void StringLoopOutputNode::attributeSpecializationChanged(Attribute *attr){
+	if (attr == _globalArray){
+		String::Type type = _globalArray->outValue()->type();
+		if (type != String::stringTypeAny){
+			if (type == String::stringTypeArray){
+				_selectedOperation = &StringLoopOutputNode::updateString;
+			}
+		}
+	}
+}
+
+void StringLoopOutputNode::updateString(unsigned int slices, String *elem, String *array){
+	for (int i=0; i<slices; ++i){
+		std::string str = elem->stringValueAtSlice(i, 0);
+		array->setStringValueAtSlice(0, i, str);
+	}
+}
+
+void StringLoopOutputNode::update(Attribute *attr){
+	if (_selectedOperation){
+		String *element = _localElement->value();
+		String *array = _globalArray->outValue();
+
+		unsigned int slices = element->slices();
+		array->resizeSlice(0, slices);
+		(this->*_selectedOperation)(slices, element, array);
+	}
+}
+
+
+StringForLoopNode::StringForLoopNode(const std::string &name, Node *parent):
+Node(name, parent){
+	setAllowDynamicAttributes(true);
+	setIsSlicer(true);
+	setUpdateEnabled(false);
+
+	_globalArray = new StringAttribute("globalArray", this);
+	addInputAttribute(_globalArray);
+
+	std::vector<std::string> arraySpec;
+	arraySpec.push_back("StringArray");
+	arraySpec.push_back("PathArray");
+	setAttributeAllowedSpecializations(_globalArray, arraySpec);
+}
+
+unsigned int StringForLoopNode::computeSlices(){
+	return _globalArray->value()->sizeSlice(0);
+}

@@ -40,6 +40,9 @@ void loopNodesWrapper(){
 	pythonWrapperUtils::pythonWrapper<LoopInputNode, Node>("LoopInputNode");
 	pythonWrapperUtils::pythonWrapper<LoopOutputNode, Node>("LoopOutputNode");
 	pythonWrapperUtils::pythonWrapper<ForLoopNode, Node>("ForLoopNode");
+	pythonWrapperUtils::pythonWrapper<StringForLoopNode, Node>("StringForLoopNode");
+	pythonWrapperUtils::pythonWrapper<StringLoopInputNode, Node>("StringLoopInputNode");
+	pythonWrapperUtils::pythonWrapper<StringLoopOutputNode, Node>("StringLoopOutputNode");
 }
 
 #endif
