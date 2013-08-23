@@ -40,6 +40,10 @@ std::vector<std::string> string_stringValues(String &self){
 	return self.stringValues();
 }
 
+std::vector<std::string> string_pathValues(String &self){
+	return self.pathValues();
+}
+
 int string_stringTypeAny(){
 	return int(String::stringTypeAny);
 }
@@ -67,6 +71,15 @@ void string_setStringValues(String &self, boost::python::list pyList){
 		convertedList.push_back(val);
 	}
 	self.setStringValues(convertedList);
+}
+
+void string_setPathValues(String &self, boost::python::list pyList){
+	std::vector<std::string> convertedList;
+	for (int i=0; i < boost::python::len(pyList); i++){
+		std::string val = boost::python::extract<std::string>(pyList[i]);
+		convertedList.push_back(val);
+	}
+	self.setPathValues(convertedList);
 }
 
 void string_setStringValueAt(String &self, unsigned int id, std::string value){
@@ -98,8 +111,11 @@ void stringWrapper(){
 		.def("resize", &String::resize)
 		.def("setStringValueAt", string_setStringValueAt)
 		.def("setStringValues", string_setStringValues)
+		.def("setPathValues", string_setPathValues)
 		.def("stringValueAt", &String::stringValueAt)
+		.def("pathValueAt", &String::pathValueAt)
 		.def("stringValues", string_stringValues)
+		.def("pathValues", string_pathValues)
 		.def("createUnwrapped", pythonWrapperUtils::createUnwrapped<String>)
 		.staticmethod("createUnwrapped")
 		.add_static_property("stringTypeAny", string_stringTypeAny)

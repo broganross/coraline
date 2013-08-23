@@ -41,24 +41,25 @@ class CORAL_EXPORT Bool : public Value{
 public:
 	Bool();
 	unsigned int size();
+	void setIsArray(bool value);
+	bool isArray();
+	unsigned int slices();
+	void resize(unsigned int size);
+	unsigned int sizeSlice(unsigned int slice);
+	void resizeSlices(unsigned int slices);
+	std::string asString();
+	std::string sliceAsString(unsigned int slice);
+	void setFromString(const std::string &value);
+
 	void setBoolValueAt(unsigned int id, bool value);
 	bool boolValueAt(unsigned int id);
 	const std::vector<bool> &boolValues();
 	void setBoolValues(const std::vector<bool> &values);
-	void setIsArray(bool value);
-	bool isArray();
-	void resize(unsigned int size);
-	std::string asString();
-	void setFromString(const std::string &value);
-	unsigned int slices();
-
-	unsigned int sizeSlice(unsigned int slice);
-	void resizeSlices(unsigned int slices);
 	void setBoolValueAtSlice(unsigned int slice, unsigned int id, bool value);
 	bool boolValueAtSlice(unsigned int slice, unsigned int id);
 	void setBoolValuesSlice(unsigned int slice, const std::vector<bool> &values);
 	const std::vector<bool> &boolValuesSlice(unsigned int slice);
-	std::string sliceAsString(unsigned int slice);
+
 
 private:
 	std::vector<std::vector<bool> > _boolValuesSliced;
