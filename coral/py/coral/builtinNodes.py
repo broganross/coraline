@@ -30,7 +30,7 @@ from plugin import Plugin
 import _coral
 import timeNode
 from    nodes   import  custompythonnode
-
+from    nodes   import  fileopnode
 
 def loadPlugin():
     plugin = Plugin("builtinNodes")
@@ -136,8 +136,13 @@ def loadPlugin():
     
     plugin.registerNode("SkinWeightDeformer", _coral.SkinWeightDeformer, tags = ["deformers"])
     
+    plugin.registerNode("FindFiles", fileopnode.FindFilesNode, tags=["pipeline", "fileops"])
+    plugin.registerNode("CopyFiles", fileopnode.CopyFilesNode, tags=["pipeline", "fileops"])
+    plugin.registerNode("MoveFiles", fileopnode.MoveFilesNode, tags=["pipeline", "fileops"])
+
     plugin.registerNode("CustomPython", custompythonnode.CustomPythonNode, tags=["pipeline"])
     plugin.registerNode("ForLoop (String)", _coral.StringForLoopNode, tags=["pipeline"])
     plugin.registerNode("LoopInput (String)", _coral.StringLoopInputNode, tags=["pipeline"])
     plugin.registerNode("LoopOutput (String)", _coral.StringLoopOutputNode, tags=["pipeline"])
+
     return plugin
