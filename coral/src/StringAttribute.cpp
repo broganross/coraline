@@ -268,3 +268,41 @@ String::Type StringAttribute::stringTypeFromString(const std::string &typeStr){
 	}
 	return type;
 }
+
+std::string StringAttribute::shortDebugInfo(){
+	std::string info = Attribute::shortDebugInfo() + "\n";
+
+	String *val = value();
+	int slices = val->slices();
+	bool isArray = val->isArray();
+
+	info += "slices: " + stringUtils::intToString(slices) + "\n";
+	for (int i=0; i< val->slices(); ++i){
+		info += "slice: " + stringUtils::intToString(i) + ", ";
+		if(isArray){
+			info += "size: " + stringUtils::intToString(val->sizeSlice(i)) + ", ";
+		}
+
+		std::string valStr = val->sliceAsString(i);
+		std::cout << valStr << std::endl;
+		std::vector<std::string> split;
+		stringUtils::split(valStr, split, " ");
+		valStr = split[0];
+
+		std::string trimmedValStr;
+		if(valStr.size() < 100){
+			trimmedValStr = valStr;
+		} else {
+			for (int i=0; i < 100; i++){
+				trimmedValStr += valStr[i];
+			}
+			trimmedValStr += "...]";
+		}
+		info += trimmedValStr + "\n";
+		if (i > 3){
+			info += "(trimming remaining slices)\n";
+			break;
+		}
+	}
+	return info;
+}
