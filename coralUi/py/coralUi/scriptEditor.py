@@ -32,6 +32,17 @@ from PyQt4 import QtGui, QtCore
 
 from mainWindow import MainWindow
 
+class ConsoleIn(QtGui.QPlainTextEdit):
+    execute = QtCore.pyqtSignal()
+    def keyPressEvent(self, ev):
+        if QtCore.Qt.ControlModifier & ev.modifiers():
+            if ev.key() == QtCore.Qt.Key_Return:
+                self.execute.emit()
+            else:
+                super(ConsoleIn, self).keyPressEvent(ev)
+        else:
+            super(ConsoleIn, self).keyPressEvent(ev)
+
 class ConsoleOut(object):
     def __init__(self, textEdit, out, color):
         self._textEdit = textEdit
@@ -44,6 +55,7 @@ class ConsoleOut(object):
         self._textEdit.insertPlainText(stream)
         
         self._out.write(stream)
+
 
 class ScriptEditorBar(QtGui.QWidget):
     def __init__(self, parent):
@@ -60,7 +72,8 @@ class ScriptEditorBar(QtGui.QWidget):
     
     def executeButton(self):
         return self._executeButton
-        
+
+
 class ScriptEditor(QtGui.QWidget):
     def __init__(self, parent):
         QtGui.QWidget.__init__(self)
@@ -69,7 +82,8 @@ class ScriptEditor(QtGui.QWidget):
         self._stdOut = ConsoleOut(self._consoleTextEdit, sys.stdout, QtGui.QColor(200, 190, 200))
         self._stdErr = ConsoleOut(self._consoleTextEdit, sys.stderr, QtGui.QColor(255, 92, 133))
         self._bar = ScriptEditorBar(self)
-        self._scriptTextEdit = QtGui.QPlainTextEdit(self)
+#         self._scriptTextEdit = QtGui.QPlainTextEdit(self)
+        self._scriptTextEdit = ConsoleIn(self)
         
         self.setWindowTitle("script editor")
         self.setLayout(QtGui.QVBoxLayout(self))
@@ -90,6 +104,7 @@ class ScriptEditor(QtGui.QWidget):
         sys.stderr = self._stdErr
         
         self.connect(self._bar.executeButton(), QtCore.SIGNAL("clicked()"), self._executeScript)
+        self._scriptTextEdit.execute.connect(self._executeScript)
         
         self._restoreSettings()
     
