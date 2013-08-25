@@ -208,25 +208,7 @@ class NodeBox(QtGui.QWidget):
         self._restoreSettings()
     
     def __del__(self):
-        self._storeSettings()
         NodeBox._globalInstance = None
-
-    def _restoreSettings(self):
-        mainWin = mainWindow.MainWindow.globalInstance()
-        geometry = str(mainWin.settings().value(self.windowTitle() + "_geometry"))
-        if geometry:
-            geometry = eval(geometry)
-            if geometry:
-                self.move(geometry[0], geometry[1])
-                self.resize(geometry[2], geometry[3])
-
-    def _storeSettings(self):
-        mainWin = mainWindow.MainWindow.globalInstance()
-        mainWin.settings().setValue(self.windowTitle() + "_geometry", str([self.pos().x(), self.pos().y(), self.size().width(), self.size().height()]))
-
-    def closeEvent(self, event):
-        self._storeSettings()
-        self.close()
 
     def _searchFieldMovedUpDown(self, direction):
         if direction == "up":
