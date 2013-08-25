@@ -114,6 +114,7 @@ void LoopInputNode::updateSlice(Attribute *attribute, unsigned int slice){
 	}
 }
 
+
 LoopOutputNode::LoopOutputNode(const std::string &name, Node* parent): 
 Node(name, parent),
 _selectedOperation(0){

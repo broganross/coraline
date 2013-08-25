@@ -27,8 +27,9 @@
 # </license>
 
 from plugin import Plugin
-import _coral
-import timeNode
+import  _coral
+import  timeNode
+import  nodes
 from    nodes   import  custompythonnode
 from    nodes   import  fileopnode
 
@@ -117,6 +118,7 @@ def loadPlugin():
     plugin.registerNode("String", _coral.StringNode, tags = ["generic"])
     plugin.registerNode("FilePath", _coral.FilePathNode, tags=["generic"])
     plugin.registerNode("Time", timeNode.TimeNode, tags = ["generic"])
+    plugin.registerNode("Regex", nodes.RegexNode, tags=["generic"])
     plugin.registerNode("ImportCIOTransforms", _coral.ImportCIOTransforms, tags = ["generic"])
     plugin.registerNode("ImportCIOSkinWeights", _coral.ImportCIOSkinWeights, tags = ["generic"])
     
