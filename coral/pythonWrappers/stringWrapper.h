@@ -44,6 +44,18 @@ std::vector<std::string> string_pathValues(String &self){
 	return self.pathValues();
 }
 
+std::string string_stringValueAtSlice(String &self, unsigned int slice, unsigned int id){
+	return self.stringValueAtSlice(slice, id);
+}
+
+std::vector<std::string> string_stringValuesSlice(String &self, unsigned int slice){
+	return self.stringValuesSlice(slice);
+}
+
+std::vector<std::string> string_pathValuesSlice(String &self, unsigned int slice){
+	return self.pathValuesSlice(slice);
+}
+
 int string_stringTypeAny(){
 	return int(String::stringTypeAny);
 }
@@ -82,6 +94,24 @@ void string_setPathValues(String &self, boost::python::list pyList){
 	self.setPathValues(convertedList);
 }
 
+void string_setStringValuesSlice(String &self, unsigned int slice, boost::python::list pyList){
+	std::vector<std::string> convertedList;
+	for (int i=0; i <boost::python::len(pyList); i++){
+		std::string val = boost::python::extract<std::string>(pyList[i]);
+		convertedList.push_back(val);
+	}
+	self.setStringValuesSlice(slice, convertedList);
+}
+
+void string_setPathValuesSlice(String &self, unsigned int slice, boost::python::list pyList){
+	std::vector<std::string> convertedList;
+	for (int i=0; i < boost::python::len(pyList); i++){
+		std::string val = boost::python::extract<std::string>(pyList[i]);
+		convertedList.push_back(val);
+	}
+	self.setPathValuesSlice(slice, convertedList);
+}
+
 void string_setStringValueAt(String &self, unsigned int id, std::string value){
 	self.setStringValueAt(id, value);
 }
@@ -112,10 +142,15 @@ void stringWrapper(){
 		.def("setStringValueAt", string_setStringValueAt)
 		.def("setStringValues", string_setStringValues)
 		.def("setPathValues", string_setPathValues)
+		.def("setStringValuesSlice", string_setStringValuesSlice)
+		.def("setPathValuesSlice", string_setPathValuesSlice)
 		.def("stringValueAt", &String::stringValueAt)
 		.def("pathValueAt", &String::pathValueAt)
 		.def("stringValues", string_stringValues)
 		.def("pathValues", string_pathValues)
+		.def("stringValueAtSlice", string_stringValueAtSlice)
+		.def("stringValuesSlice", string_stringValuesSlice)
+		.def("pathValuesSlice", string_stringValuesSlice)
 		.def("createUnwrapped", pythonWrapperUtils::createUnwrapped<String>)
 		.staticmethod("createUnwrapped")
 		.add_static_property("stringTypeAny", string_stringTypeAny)

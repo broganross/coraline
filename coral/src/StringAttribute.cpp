@@ -231,12 +231,20 @@ void String::setPathValuesSlice(unsigned int slice, const std::vector<std::strin
 	setStringValuesSlice(slice, values);
 }
 
-const std::vector<std::string> &String::valuesSlice(unsigned int slice){
+const std::vector<std::string> &String::stringValuesSlice(unsigned int slice){
 	if(slice >= _stringValuesSliced.size()){
 		slice = _stringValuesSliced.size() - 1;
 	}
 	return _stringValuesSliced[slice];
 }
+
+const std::vector<std::string> &String::pathValuesSlice(unsigned int slice){
+	if (slice >= _stringValuesSliced.size()){
+		slice = _stringValuesSliced.size() - 1;
+	}
+	return _stringValuesSliced[slice];
+}
+
 
 void String::resizeSlice(unsigned int slice, unsigned int newSize){
 	if (_type != stringTypeAny){
