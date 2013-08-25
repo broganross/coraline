@@ -171,7 +171,8 @@ class Profiler(QtGui.QWidget):
 class VisualDebugger(QtGui.QWidget):
     def __init__(self, parent):
         QtGui.QWidget.__init__(self)
-        
+       
+        self.setWindowTitle("visual debugger") 
         self.setLayout(QtGui.QVBoxLayout(self))
         self._tabWidget = QtGui.QTabWidget(self)
         self.layout().addWidget(self._tabWidget)

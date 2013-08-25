@@ -89,7 +89,7 @@ class NodeBoxMenu(QtGui.QMenu):
     
     def _done(self):
         self.close()
-            
+
 class NodeBox(QtGui.QWidget):
     _globalInstance = None
     
@@ -197,10 +197,29 @@ class NodeBox(QtGui.QWidget):
         NodeBox._globalInstance = weakref.ref(self)
         
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        self._restoreSettings()
     
     def __del__(self):
+        self._storeSettings()
         NodeBox._globalInstance = None
-    
+
+    def _restoreSettings(self):
+        mainWin = mainWindow.MainWindow.globalInstance()
+        geometry = str(mainWin.settings().value(self.windowTitle() + "_geometry"))
+        if geometry:
+            geometry = eval(geometry)
+            if geometry:
+                self.move(geometry[0], geometry[1])
+                self.resize(geometry[2], geometry[3])
+
+    def _storeSettings(self):
+        mainWin = mainWindow.MainWindow.globalInstance()
+        mainWin.settings().setValue(self.windowTitle() + "_geometry", str([self.pos().x(), self.pos().y(), self.size().width(), self.size().height()]))
+
+    def closeEvent(self, event):
+        self._storeSettings()
+        self.close()
+
     def _searchFieldMovedUpDown(self, direction):
         if direction == "up":
             nextItem = self._nodeShelf.item(self._nodeShelf.currentRow() - 1)
@@ -316,7 +335,7 @@ class NodeBox(QtGui.QWidget):
         if filter and self._nodeShelf.count():
             self._nodeShelf.setCurrentRow(1)
             self._nodeShelfItemClicked(self._nodeShelf.currentItem())
-            
+
     def sizeHint(self):
         return QtCore.QSize(200, 400)
     

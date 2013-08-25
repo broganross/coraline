@@ -26,13 +26,17 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # </license>
 
-import math
-import weakref
-import os
-from PyQt4 import QtGui, QtCore
-from .. import coralApp
-from ..observer import Observer
-import dockWidget
+import  math
+import  weakref
+import  os
+
+from    PyQt4   import  QtGui
+from    PyQt4   import  QtCore
+
+from    coral           import  coralApp
+from    coral.observer  import  Observer
+import  dockWidget
+import  nodeBox
 
 class InfoBox(QtGui.QWidget):
     def __init__(self, parent):
@@ -247,6 +251,8 @@ class MainWindow(QtGui.QMainWindow):
         dockWidgets = []
         for obj in self.children():
             if type(obj) is dockWidget.DockWidget:
+                dockWidgets.append(obj)
+            elif isinstance(obj, nodeBox.NodeBox):
                 dockWidgets.append(obj)
         
         return dockWidgets
