@@ -32,12 +32,13 @@ import copy
 import fnmatch
 from PyQt4 import QtGui, QtCore
 
-from ..observer import Observer
-from .. import coralApp
-import coralUi
-import mainWindow
+from    coral.observer  import  Observer
+from    coral           import  coralApp
+import  coralUi
+import  mainWindow
 
 class NodeSearchField(QtGui.QLineEdit):
+    movedEntry = QtCore.pyqtSignal(str)
     def __init__(self, parent):
         QtGui.QLineEdit.__init__(self, parent)
         
@@ -57,7 +58,8 @@ class NodeSearchField(QtGui.QLineEdit):
         
     def keyPressEvent(self, qKeyEvent):
         if qKeyEvent.key() == QtCore.Qt.Key_Up:
-            self.emit(QtCore.SIGNAL("nodeSearchFieldMovedEntry(QString)"), "up")
+            self.movedEntry.emit("up")
+#             self.emit(QtCore.SIGNAL("nodeSearchFieldMovedEntry(QString)"), "up")
         elif qKeyEvent.key() == QtCore.Qt.Key_Down:
             self.emit(QtCore.SIGNAL("nodeSearchFieldMovedEntry(QString)"), "down")
         else:
@@ -66,7 +68,7 @@ class NodeSearchField(QtGui.QLineEdit):
 class NodeShelf(QtGui.QListWidget):
     def __init__(self, parent):
         QtGui.QListWidget.__init__(self, parent)
-        
+
         self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.setDragEnabled(True)
 
@@ -183,11 +185,17 @@ class NodeBox(QtGui.QWidget):
         palette.setColor(QtGui.QPalette.Text, QtGui.QColor(200, 190, 200))
         self._nodeHelp.setPalette(palette)
         
-        self.connect(self._nodeSearchField, QtCore.SIGNAL("textChanged(QString)"), self._searchTextChanged)
-        self.connect(self._nodeSearchField, QtCore.SIGNAL("returnPressed()"), self._shelfReturnPressed)
-        self.connect(self._nodeSearchField, QtCore.SIGNAL("nodeSearchFieldMovedEntry(QString)"), self._searchFieldMovedUpDown)
-        self.connect(self._nodeShelf, QtCore.SIGNAL("itemPressed (QListWidgetItem *)"), self._nodeShelfItemClicked)
-        self.connect(self._nodeShelf, QtCore.SIGNAL("currentRowChanged (int)"), self._nodeShelfRowChanged)
+#         self.connect(self._nodeSearchField, QtCore.SIGNAL("textChanged(QString)"), self._searchTextChanged)
+        self._nodeSearchField.textChanged.connect(self._searchTextChanged)
+#         self.connect(self._nodeSearchField, QtCore.SIGNAL("returnPressed()"), self._shelfReturnPressed)
+        self._nodeSearchField.returnPressed.connect(self._shelfReturnPressed)
+#         self.connect(self._nodeSearchField, QtCore.SIGNAL("nodeSearchFieldMovedEntry(QString)"), self._searchFieldMovedUpDown)
+        self._nodeSearchField.movedEntry.connect(self._searchFieldMovedUpDown)
+#         self.connect(self._nodeShelf, QtCore.SIGNAL("itemPressed (QListWidgetItem *)"), self._nodeShelfItemClicked)
+        self._nodeShelf.itemPressed.connect(self._nodeShelfItemClicked)
+#         self.connect(self._nodeShelf, QtCore.SIGNAL("currentRowChanged (int)"), self._nodeShelfRowChanged)
+        self._nodeShelf.currentRowChanged.connect(self._nodeShelfRowChanged)
+        self._nodeShelf.doubleClicked.connect(self._nodeShelfDblClick)
         self.connect(mainWindow.MainWindow.globalInstance(), QtCore.SIGNAL("coralDataDropped"), self._dropEnd)
         
         coralApp.addRegisteredNodeClassesObserver(self._registeredNodeClassesObserver, self._registeredNodeClassesCallback)
@@ -243,9 +251,21 @@ class NodeBox(QtGui.QWidget):
             if not str(className).startswith("::"):
                 self._nodeShelfItemClicked(item)
     
-    def _shelfReturnPressed(self):
+    def _nodeShelfDblClick(self):
+        """ When an item in the node list is double clicked, create a new node """
         from nodeEditor import nodeEditor
-        
+        item = self._nodeShelf.currentItem()
+        if item:
+            if not str(item.text()).startswith("::"):
+                itemData = self._itemData(item)
+                sceneItem = NodeBox._createFromItemData(itemData)
+                if sceneItem:
+                    nodeView = nodeEditor.NodeEditor.focusedInstance().nodeView()
+    
+    def _shelfReturnPressed(self):
+        """ When return is pressed on a selected node in list, create the new node """
+        from nodeEditor import nodeEditor
+
         item = self._nodeShelf.currentItem()
         if item:
             className = str(item.text())
@@ -289,7 +309,7 @@ class NodeBox(QtGui.QWidget):
     def _nodeShelfItemClicked(self, item):
         data = self._itemData(item)
         coralUi.setDropData(data, "nodeBoxItemData")
-        
+
         type = "Node"
         className = data["data"]["className"]
         if data["type"] == "attributeClassName":
