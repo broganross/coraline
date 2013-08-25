@@ -38,11 +38,13 @@ import  coralUi
 import  mainWindow
 
 class NodeSearchField(QtGui.QLineEdit):
+    """ Custom search input for nodes by name or tag """
     movedEntry = QtCore.pyqtSignal(str)
     def __init__(self, parent):
-        QtGui.QLineEdit.__init__(self, parent)
-        
+        super(NodeSearchField, self).__init__(parent)
         self._originalPalette = self.palette()
+        tt = "Used to search through avialable nodes.  Note: can search by tags by starting your search with '@'"
+        self.setToolTip(tt)
         
     def focusInEvent(self, event):
         QtGui.QLineEdit.focusInEvent(self, event)
@@ -59,9 +61,8 @@ class NodeSearchField(QtGui.QLineEdit):
     def keyPressEvent(self, qKeyEvent):
         if qKeyEvent.key() == QtCore.Qt.Key_Up:
             self.movedEntry.emit("up")
-#             self.emit(QtCore.SIGNAL("nodeSearchFieldMovedEntry(QString)"), "up")
         elif qKeyEvent.key() == QtCore.Qt.Key_Down:
-            self.emit(QtCore.SIGNAL("nodeSearchFieldMovedEntry(QString)"), "down")
+            self.movedEntry.emit("down")
         else:
             QtGui.QLineEdit.keyPressEvent(self, qKeyEvent)
 
@@ -71,6 +72,8 @@ class NodeShelf(QtGui.QListWidget):
 
         self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.setDragEnabled(True)
+        tt = "List of available nodes.  Can be double clicked or drag and dropped into node view."
+        self.setToolTip(tt)
 
 class NodeBoxMenu(QtGui.QMenu):
     def __init__(self, parent):
@@ -184,16 +187,11 @@ class NodeBox(QtGui.QWidget):
         palette.setColor(QtGui.QPalette.Base, QtGui.QColor(97, 108, 117))
         palette.setColor(QtGui.QPalette.Text, QtGui.QColor(200, 190, 200))
         self._nodeHelp.setPalette(palette)
-        
-#         self.connect(self._nodeSearchField, QtCore.SIGNAL("textChanged(QString)"), self._searchTextChanged)
+
         self._nodeSearchField.textChanged.connect(self._searchTextChanged)
-#         self.connect(self._nodeSearchField, QtCore.SIGNAL("returnPressed()"), self._shelfReturnPressed)
         self._nodeSearchField.returnPressed.connect(self._shelfReturnPressed)
-#         self.connect(self._nodeSearchField, QtCore.SIGNAL("nodeSearchFieldMovedEntry(QString)"), self._searchFieldMovedUpDown)
         self._nodeSearchField.movedEntry.connect(self._searchFieldMovedUpDown)
-#         self.connect(self._nodeShelf, QtCore.SIGNAL("itemPressed (QListWidgetItem *)"), self._nodeShelfItemClicked)
         self._nodeShelf.itemPressed.connect(self._nodeShelfItemClicked)
-#         self.connect(self._nodeShelf, QtCore.SIGNAL("currentRowChanged (int)"), self._nodeShelfRowChanged)
         self._nodeShelf.currentRowChanged.connect(self._nodeShelfRowChanged)
         self._nodeShelf.doubleClicked.connect(self._nodeShelfDblClick)
         self.connect(mainWindow.MainWindow.globalInstance(), QtCore.SIGNAL("coralDataDropped"), self._dropEnd)
@@ -205,7 +203,6 @@ class NodeBox(QtGui.QWidget):
         NodeBox._globalInstance = weakref.ref(self)
         
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-        self._restoreSettings()
     
     def __del__(self):
         NodeBox._globalInstance = None
@@ -304,10 +301,34 @@ class NodeBox(QtGui.QWidget):
         
     def _registeredNodeClassesCallback(self):
         self._rebuildNodeShelf()
-        
+
+    def _rebuildNodeShelfByTag(self, search):
+        classTags = copy.copy(coralApp.classNameTags())
+        self._nodeShelf.clear()
+        wildcard = "*" + search + "*"
+        for tag, classNames in sorted(classTags.items()):
+            if fnmatch.fnmatch(tag, wildcard):
+                tagItem = QtGui.QListWidgetItem(":: " + tag + " ::")
+                tagItem.setFlags(QtCore.Qt.NoItemFlags)
+                tagItem.setTextColor(QtGui.QColor(QtCore.Qt.darkCyan))
+                self._nodeShelf.addItem(tagItem)
+
+                for className in classNames:
+                    classItem = QtGui.QListWidgetItem(className)
+                    classItem.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsDropEnabled)
+                    self._nodeShelf.addItem(classItem)
+
     def _rebuildNodeShelf(self, filter = ""):
-        wildcard = "*" + str(filter).lower() + "*"
+        if str(filter).lower().startswith("@"):
+            self._rebuildNodeShelfByTag(str(filter).lower()[1:])
+        else:
+            self._rebuildNodeShelfByNode("*" + str(filter).lower() + "*")
+
+        if filter and self._nodeShelf.count():
+            self._nodeShelf.setCurrentRow(1)
+            self._nodeShelfItemClicked(self._nodeShelf.currentItem())
         
+    def _rebuildNodeShelfByNode(self, wildcard):
         classNameTags = copy.copy(coralApp.classNameTags())
         if "InputAttribute" not in classNameTags["encapsulation"] and "OutputAttribute" not in classNameTags["encapsulation"]:
             classNameTags["encapsulation"].extend(["InputAttribute", "OutputAttribute"])
@@ -334,9 +355,6 @@ class NodeBox(QtGui.QWidget):
                 for classNameItem in classNameItems:
                     self._nodeShelf.addItem(classNameItem)
         
-        if filter and self._nodeShelf.count():
-            self._nodeShelf.setCurrentRow(1)
-            self._nodeShelfItemClicked(self._nodeShelf.currentItem())
 
     def sizeHint(self):
         return QtCore.QSize(200, 400)
