@@ -4,23 +4,28 @@ import  fnmatch
 import  shutil
 import  os
 
+from    coral   import  nodes
 from    coral   import  coralApp
+from    coral   import  BoolAttribute
 from    coral   import  StringAttribute
 from    coral   import  coralApp
 from    coral   import  Node
+
 
 # from    coral.attributes    import  iteratorattribute
 # from    coral.nodes         import  pipelinenode
 
 
-class CopyFilesNode(Node):
+class CopyFilesNode(nodes.ExecutableNode):
     def __init__(self, name, parent):
         super(CopyFilesNode, self).__init__(name, parent)
         self._inFiles = StringAttribute("input", self)
         self._outdir = StringAttribute("outDir", self)
         self._outfiles = StringAttribute("output", self)
         self._setAttributeAllowedSpecializations(self._inFiles, ["PathArray"])
-        self._setAttributeAllowedSpecializations(self._outdir, ["PathArray"])
+        self._setAttributeAllowedSpecializations(self._outdir, ["Path"])
+        self._setAttributeAllowedSpecializations(self._outfiles, ["PathArray"])
+
         self.addInputAttribute(self._inFiles)
         self.addInputAttribute(self._outdir)
         self.addOutputAttribute(self._outfiles)
@@ -29,24 +34,34 @@ class CopyFilesNode(Node):
         self.initDone()
 
     def _copyFiles(self, inData, outData):
-        for fromPath in inData["files"]:
-            toPath = os.path.join(inData["outdir"],
-                                  os.path.basename(fromPath))
-            shutil.copy2(fromPath, toPath)
-            outData.append(toPath)
+        """ Do the actual file copy """
+        for fromPath in inData["inFiles"]:
+            toPath = os.path.join(inData["outDir"], os.path.basename(fromPath))
+            if not os.path.isfile(fromPath):
+                coralApp.logError("File doesn't exist: %s"%fromPath)
+                self.setLog("File doesn't exist: %s"%fromPath)
+                return
+            elif not os.path.exists(inData["outDir"]):
+                coralApp.logError("Folder doesn't exist: %s"%inData["outDir"])
+                self.setLog("Folder doesn't exist: %s"%inData["outDir"])
+                return
+            else:
+                shutil.copy2(fromPath, toPath)
+                outData.append(toPath)
+        self._outfiles.outValue().setPathValues(outData)
 
     def update(self, attribute):
-        inp = self._inFiles.value().list()
-        outdir = self._outdir.value().stringValue()
-        indata = {}
-        indata["files"] = inp
-        indata["outdir"] = outdir
+        inp = self._inFiles.value().pathValues()
+        outdir = self._outdir.value().pathValueAt(0)
+        inData = {"inFiles" : inp,
+                  "outDir" : outdir}
         out = []
-        self.enqueueTask(self._copyFiles, indata, out)
-        self.processTassk()
-        self._outfiles.outValue().setList(out)
-        self.setLog("\n".join(out))
-      
+        self.addProcToQueue(self._copyFiles, inData, out)
+
+    def process(self):
+        self.run()
+        self._outfiles.value().pathValues()
+
 
 class FindFilesNode(Node):
     """ This node uses fnmatch to find matching file paths in the given folder
@@ -74,13 +89,17 @@ class FindFilesNode(Node):
 
         self._setSliceable(True)
     
-    def updateSlice(self, attribute, slice):
-        location = self._location.value().stringValueAt(1)
-        pattern = self._pattern.value().stringValueAt(1)
+    def update(self, attribute):
+        coralApp.logDebug("FindFiles.update")
+        location = self._location.value().stringValueAt(0)
+        pattern = self._pattern.value().stringValueAt(0)
 
         assets = []
+        if location == "":
+            return
         if not os.path.isdir(location):
             coralApp.logError("Location does not exist.")
+            return
         filenames = os.listdir(location)
         for filename in filenames:
             if fnmatch.fnmatch(filename, pattern):
@@ -88,20 +107,22 @@ class FindFilesNode(Node):
                 if os.path.isfile(fullPath):
                     assets.append(fullPath)
 
-        self._files.outValue().setStringValuesAtSlice(slice, assets)
-
+        self._files.outValue().setPathValues(assets)
+        coralApp.logDebug("FindFiles.update: Done")
 #         if assets:
 #             self.setLog("Found files:\n" + "\n".join(assets))
     
 
-class MoveFilesNode(Node):
+class MoveFilesNode(nodes.ExecutableNode):
     def __init__(self, name, parent):
         super(MoveFilesNode, self).__init__(name, parent)
-        self._inFiles = iteratorattribute.ListAttribute("input", self)
+        self._inFiles = StringAttribute("input", self)
         self._outdir = StringAttribute("outDir", self)
-        self._outfiles = iteratorattribute.ListAttribute("output", self)
+        self._outfiles = StringAttribute("output", self)
 
+        self._setAttributeAllowedSpecializations(self._inFiles, ["PathArray"])
         self._setAttributeAllowedSpecializations(self._outdir, ["Path"])
+        self._setAttributeAllowedSpecializations(self._outfiles, ["PathArray"])
 
         self.addInputAttribute(self._inFiles)
         self.addInputAttribute(self._outdir)
@@ -113,25 +134,32 @@ class MoveFilesNode(Node):
         
     def _moveFiles(self, inData, out):
         for fromPath in inData["files"]:
-            toPath = os.path.join(inData["outdir"],
+            toPath = os.path.join(inData["outDir"],
                                   os.path.basename(fromPath))
-            shutil.move(fromPath, toPath)
-            out.append(toPath)
+            if not os.path.isfile(fromPath):
+                coralApp.logError("File doesn't exist: %s"%fromPath)
+                self.setLog("File doesn't exist: %s"%fromPath)
+                return
+            elif not os.path.exists(inData["outDir"]):
+                coralApp.logError("Folder doesn't exist: %s"%inData["outDir"])
+                self.setLog("Folder doesn't exist: %s"%inData["outDir"])
+                return
+            else:
+                shutil.move(fromPath, toPath)
+                out.append(toPath)
+        self._outfiles.outValue().setPathValues(out)
         
     def update(self, attribute):
-        inp = self._inFiles.value().list()
-        outdir = self._outdir.value().stringValue()
+        inp = self._inFiles.value().stringValues()
+        outdir = self._outdir.value().stringValueAt(0)
         indata = {}
         indata["files"] = inp
-        indata["outdir"] = outdir
-        out = []
-        self.enqueueTask(self._moveFiles, indata, out)
-        self.processTasks()
-        self._outfiles.outValue().setList(out)
-        self.setLog("\n".join(out))        
+        indata["outDir"] = outdir
+        self.addProcToQueue(self._moveFiles, indata, [])
 
     def process(self):
-        self._outfiles.value().list()
+        self.run()
+        self._outfiles.value()
 
 
 

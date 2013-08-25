@@ -109,6 +109,4 @@ class CustomPythonNode(Node):
         coralApp.logDebug("CustomPythonNode.update: Done")
 
     def process(self):
-        coralApp.logDebug("CustomPythonNode.process")
-        self._filter.value().stringValues()[0]
-        coralApp.logDebug("CustomPythonNode.process: Done")
+        self.run()

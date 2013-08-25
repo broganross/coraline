@@ -26,24 +26,29 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # </license>
 
-import sys
-import weakref
-from PyQt4 import QtGui, QtCore
+import  traceback
+import  weakref
 
-from .. import coralApp
-from .. import utils
-from ..observer import Observer
-from pluginUi import PluginUi 
-from nodeEditor.nodeUi import NodeUi
-from nodeEditor.attributeUi import AttributeUi
-from nodeEditor.connectionHook import ConnectionHook
-from nodeEditor.connection import Connection
-from nodeEditor.nodeEditor import NodeEditor
-from nodeInspector.fields import IntValueField, FloatValueField, BoolValueField, StringValueField, ColorField
-from nodeInspector.nodeInspector import NodeInspector, NodeInspectorWidget, AttributeInspectorWidget
-from nodeInspector  import  custompythonnodeinspector
-import mainWindow
-import viewport
+from    PyQt4   import  QtCore
+from    PyQt4   import  QtGui
+
+import  viewport
+from    coral                       import  coralApp
+from    coral                       import  utils
+from    coral.observer              import  Observer
+from    nodeEditor.attributeUi      import  AttributeUi
+from    nodeEditor.nodeEditor       import  NodeEditor
+from    nodeEditor.nodeUi           import  NodeUi
+from    nodeInspector               import  custompythonnodeinspector
+from    nodeInspector.fields        import  IntValueField
+from    nodeInspector.fields        import  FloatValueField
+from    nodeInspector.fields        import  BoolValueField
+from    nodeInspector.fields        import  StringValueField
+from    nodeInspector.fields        import  ColorField
+from    nodeInspector.nodeInspector import  NodeInspectorWidget
+from    nodeInspector.nodeInspector import  AttributeInspectorWidget
+from    pluginUi                    import  PluginUi
+
 
 class GeoInstanceArrayAttributeUi(AttributeUi):
     def __init__(self, coralAttribute, parentNodeUi):
@@ -358,6 +363,7 @@ class StringAttributeUi(AttributeUi):
     def hooksColor(self, specialization):
         return QtGui.QColor(204, 255, 102)
 
+
 class BoolAttributeUi(AttributeUi):
     def __init__(self, coralAttribute, parentNodeUi):
         AttributeUi.__init__(self, coralAttribute, parentNodeUi)
@@ -370,6 +376,7 @@ class BoolAttributeUi(AttributeUi):
         
         return color
 
+
 class ForLoopNodeUi(NodeUi):
     def __init__(self, coralNode):
         NodeUi.__init__(self, coralNode)
@@ -379,6 +386,7 @@ class ForLoopNodeUi(NodeUi):
     
     def color(self):
         return QtGui.QColor(245, 181, 118)
+
         
 class CollapsedNodeUi(NodeUi):
     def __init__(self, coralNode):
@@ -452,6 +460,7 @@ class CollapsedNodeUi(NodeUi):
                         finalPos = hookPos - (proxyAttr.inputHook().scenePos() - proxyAttr.scenePos())
                         proxyAttr.setPos(finalPos)
 
+
 class ShaderNodeInspectorWidget(NodeInspectorWidget):
     def __init__(self, coralNode, parentWidget):
         NodeInspectorWidget.__init__(self, coralNode, parentWidget)
@@ -495,6 +504,166 @@ class ShaderNodeInspectorWidget(NodeInspectorWidget):
     def timerEvent(self, event):
         self._log.setText(self.coralNode().recompileShaderLog())
 
+
+class ExecutableNodeInspectorWidget(NodeInspectorWidget):
+    def build(self):
+        super(ExecutableNodeInspectorWidget, self).build()
+
+        self._nodeProcess = None
+
+        processButton = QtGui.QPushButton("process!", self)
+        self.layout().addWidget(processButton)
+        processButton.clicked.connect(self._processButtonClicked)
+
+        resetButton = QtGui.QPushButton("reset", self)
+        self.layout().addWidget(resetButton)
+        resetButton.clicked.connect(self._resetButtonClicked)
+
+        self._log = QtGui.QTextEdit(self)
+        self.layout().addWidget(self._log)
+        self.layout().setAlignment(self._log, QtCore.Qt.AlignTop)
+        self._log.setMaximumHeight(100)
+        self._log.setReadOnly(True)
+        self._log.setLineWrapMode(QtGui.QTextEdit.NoWrap)
+        
+        palette = self._log.palette()
+        palette.setColor(QtGui.QPalette.Base, QtGui.QColor(50, 55, 60))
+        self._log.setPalette(palette)
+        self._log.setTextColor(QtGui.QColor(200, 190, 200))
+
+        node = self.coralNode()
+        self._log.setText(node.log())
+
+    def _resetButtonClicked(self):
+        node = self.coralNode()
+
+        for outAttr in node.outputAttributes():
+            outAttr.valueChanged()
+        
+        self._log.setText(node.log())
+
+    def _processButtonClicked(self):
+        node = self.coralNode()
+
+        self._nodeProcess = ExecutableNodeProcess(node)
+        self._nodeProcess.finished.connect(self._processDone)
+        self._nodeProcess.start()
+
+    def _processDone(self):
+        node = self.coralNode()
+        self._log.setText(node.log())
+
+class ExecutableNodeUi(NodeUi):
+    def __init__(self, coralNode):
+        super(ExecutableNodeUi, self).__init__(coralNode)
+
+        self._progressBarPen = QtGui.QPen(QtCore.Qt.NoPen)
+        self._progressBarBrush = QtGui.QBrush(QtGui.QColor(255, 204, 102))
+        self._progressText = QtGui.QGraphicsSimpleTextItem(self)
+        self._processModeTimer = -1
+
+        self._progressText.setBrush(QtGui.QColor(100, 100, 100))
+        self._progressText.setText("dirty")
+        self._progressText.setPos(2, 100)
+
+        coralNode.setNodeUi(self)
+    
+    def executableNodeChanged(self):
+        node = self.coralNode()
+        progressMessage = node.progressMessage()
+
+        if progressMessage == "clean":
+            self._progressBarBrush.setColor(QtGui.QColor(0, 255, 191))
+        elif progressMessage == "dirty":
+            self._progressBarBrush.setColor(QtGui.QColor(255, 204, 102))
+        elif progressMessage == "queued":
+            self._progressBarBrush.setColor(QtGui.QColor(230, 255, 102)) 
+        else:
+            self._progressBarBrush.setColor(QtGui.QColor(189, 0, 47))
+
+        self._progressText.setText(progressMessage)
+        
+        self.update()
+    
+    def startProcess(self):
+        coralNode = self.coralNode()
+        if coralNode.progressMessage() != "clean":
+            coralNode.setQueued()
+            self._processModeTimer = self.startTimer(500)
+    
+    def endProcess(self):
+        if self._processModeTimer > -1:
+            self.killTimer(self._processModeTimer)
+            self._processModeTimer = -1
+        
+        self.executableNodeChanged()
+
+    def timerEvent(self, event):
+        self.pipelineNodeChanged()
+
+    def updateLayout(self):
+        super(ExecutableNodeUi, self).updateLayout()
+        self.resize(self.rect().width(), self.rect().height() + 20)
+        self._progressText.setPos(2, self.rect().height() - 20)
+    
+    def paint(self, painter, option, widget):
+        super(ExecutableNodeUi, self).paint(painter, option, widget)
+
+        progressBarRect = QtCore.QRectF(self.rect())
+        progressBarRect.setY(progressBarRect.height() - 19)
+        progressBarRect.setHeight(17)
+        progressBarRect.setX(2)
+        progressBarRect.setWidth(progressBarRect.width() - 2)
+
+        shape = QtGui.QPainterPath()
+        shape.addRoundedRect(progressBarRect, 2, 2)
+        
+        painter.setPen(self._progressBarPen)
+        painter.setBrush(self._progressBarBrush)
+        painter.drawPath(shape)
+
+
+class ExecutableNodeProcess(QtCore.QThread):
+    def __init__(self, node):
+        super(ExecutableNodeProcess, self).__init__()
+        self._node = weakref.ref(node)
+        self._nodesToUpdate = []
+        self._collectNodesToUpdate(node, self._nodesToUpdate, [])
+    
+    def _collectNodesToUpdate(self, node, nodesToUpdate, walkedNodes):
+        walkedNodes.append(node)
+
+        if "ExecutableNode" in node.classNames():
+            uiNode = weakref.ref(NodeEditor.findNodeUi(node.id()))
+            if uiNode not in nodesToUpdate:
+                nodesToUpdate.append(uiNode)
+        
+        for inputAttr in node.inputAttributes():
+            connectedInput = inputAttr.input()
+            if connectedInput:
+                parentNode = connectedInput.parent()
+                if parentNode not in walkedNodes:
+                    self._collectNodesToUpdate(parentNode, nodesToUpdate, walkedNodes)
+
+        for childNode in node.nodes():
+            if childNode not in walkedNodes:
+                self._collectNodesToUpdate(childNode, nodesToUpdate, walkedNodes)
+    
+    def run(self):
+        try:
+            for nodeToUpdateRef in self._nodesToUpdate:
+                nodeToUpdate = nodeToUpdateRef()
+                nodeToUpdate.startProcess()
+    
+            node = self._node()
+            node.process()
+    
+            for nodeToUpdateRef in self._nodesToUpdate:
+                nodeToUpdate = nodeToUpdateRef()
+                nodeToUpdate.endProcess()
+        except:
+            print traceback.format_exc()
+
 def loadPluginUi():
     plugin = PluginUi("builtinUis")
     
@@ -509,6 +678,8 @@ def loadPluginUi():
     
     plugin.registerNodeUi("CollapsedNode", CollapsedNodeUi)
     plugin.registerNodeUi("ForLoop", ForLoopNodeUi)
+    plugin.registerNodeUi("ForLoop (String)", ForLoopNodeUi)
+    plugin.registerNodeUi("ExecutableNode", ExecutableNodeUi)
     
     plugin.registerInspectorWidget("NumericAttribute", NumericAttributeInspectorWidget)
     plugin.registerInspectorWidget("StringAttribute", StringAttributeInspectorWidget)
@@ -520,5 +691,6 @@ def loadPluginUi():
     plugin.registerInspectorWidget("GeoInstanceGenerator", GeoInstanceGeneratorInspectorWidget)
     plugin.registerInspectorWidget("Shader", ShaderNodeInspectorWidget)
     plugin.registerInspectorWidget("CustomPython", custompythonnodeinspector.CustomPythonNodeInspectorWidget)
+    plugin.registerInspectorWidget("ExecutableNode", ExecutableNodeInspectorWidget)
     
     return plugin
