@@ -4,6 +4,7 @@ import os
 import platform
 import sconsUtils
 
+msStudioPath = r'"C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\amd64\cl.exe"'
 msvc_version = ""
 if os.environ.has_key("MSVC_VERSION"):
     msvc_version = os.environ["MSVC_VERSION"]

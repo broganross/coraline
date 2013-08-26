@@ -1,2 +1,3 @@
-THis folder is used to store the various build environment files.  Find the file for your OS, duplicate it, and rename it buildEnv.py.
+This folder is used to store the various build environment files.  Find the file for your OS, duplicate it, and rename it buildEnv.py
 
+Please check the BUILD file for more instructions

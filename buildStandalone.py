@@ -117,9 +117,10 @@ def buildSdkLibs(coralLib, coralUiLib, buildDir):
     
     sourceCoralLibName = os.path.split(coralLib)[-1]
     sourceCoralUiLibName = os.path.split(coralUiLib)[-1]
-    
-    os.symlink(os.path.join(os.pardir, os.pardir, os.pardir, "coral", sourceCoralLibName), os.path.join(coralLibsDir, targetCoralLibName))
-    os.symlink(os.path.join(os.pardir, os.pardir, os.pardir, "coral", "coralUi", sourceCoralUiLibName), os.path.join(coralUiLibsDir, targetCoralUiLibName))
+
+    if not sys.platform.startswith("win"):
+        os.symlink(os.path.join(os.pardir, os.pardir, os.pardir, "coral", sourceCoralLibName), os.path.join(coralLibsDir, targetCoralLibName))
+        os.symlink(os.path.join(os.pardir, os.pardir, os.pardir, "coral", "coralUi", sourceCoralUiLibName), os.path.join(coralUiLibsDir, targetCoralUiLibName))
     
     ImathLibName = str(SharedLibrary(sconsUtils.getEnvVar("CORAL_IMATH_LIB"))[0])
     ImathIexLibName = str(SharedLibrary(sconsUtils.getEnvVar("CORAL_IMATH_IEX_LIB"))[0])
