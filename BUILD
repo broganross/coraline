@@ -65,8 +65,10 @@ Install dependencies:
         Unzip a VC folder to Visual Studio path: C:\Program Files (x86)\Microsoft Visual Studio 10.0
 
     Download additional coral files:
-        https://www.google.com/url?q=https%3A%2F%2Fdl.dropbox.com%2Fu%2F10965660%2Fcoral_site%2Fdownload%2Fcoral-repo.zip&sa=D&sntz=1&usg=AFQjCNHbaN9S9UpZflMBjVWuLpO3lgM8EQ
-        unzip to cloned repo folder
+        Clone the coraline_win_libs repo
+        Either:
+            Set the environment variable: "CORAL_WIN_LIBS_PATH" to the repo location or
+            override the environment in the buildEnv_win.py
 
 Building:
     Tell Scons where VC is:
@@ -82,4 +84,5 @@ Building:
     Change directory into the "coral" subfolder of the repository and run:
         scons -f buildStandalone.py
 
+    
                 
