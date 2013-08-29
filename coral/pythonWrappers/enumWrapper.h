@@ -42,6 +42,7 @@ void enumWrapper(){
 		.def("createUnwrapped", pythonWrapperUtils::createUnwrapped<Enum>)
 		.staticmethod("createUnwrapped")
 		.def("addEntry", &Enum::addEntry)
+		.def("clear", &Enum::clear)
 		.def("indices", &Enum::indices)
 		.def("entries", &Enum::entries)
 		.def("setCurrentIndex", &Enum::setCurrentIndex)

@@ -13,6 +13,11 @@ void Enum::addEntry(int id, const std::string &value){
 	_enum[id] = value;
 }
 
+void Enum::clear(){
+	_enum.clear();
+	_currentIndex = 0;
+}
+
 std::vector<int> Enum::indices(){
 	std::vector<int> ids;
 	for(std::map<int, std::string>::iterator i = _enum.begin(); i != _enum.end(); ++i){

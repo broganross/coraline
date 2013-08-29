@@ -52,6 +52,7 @@ public:
 	void setFromString(const std::string &value);
 	void setCurrentIndexChangedCallback(Node * parentNode, void(*callback)(Node *, Enum *));
 	std::string currentText(int id);
+	void clear();
 
 private:
 	int _currentIndex;
