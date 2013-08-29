@@ -31,6 +31,7 @@
 
 #include "../src/Node.h"
 #include "../src/StringAttribute.h"
+#include "../src/containerUtils.h"
 
 namespace coral{
 
@@ -55,6 +56,22 @@ public:
 	}
 private:
 	StringAttribute *_string;
+};
+
+class AddStringNode : public Node {
+public:
+	AddStringNode(const std::string &name, Node *parent);
+	void updateSpecializationLink(Attribute *attrA, Attribute *attrB, std::vector<std::string> &specA, std::vector<std::string> &specB);
+	void attributeSpecializationChanged(Attribute *attr);
+	void updateSlice(Attribute *attr, unsigned int slice);
+private:
+	StringAttribute *_in0;
+	StringAttribute *_in1;
+	StringAttribute *_out;
+	void(AddStringNode::*_selectedOperation)(String*, String*, String*, unsigned int);
+
+	void updatePath(String *in0, String* in1, String *out, unsigned int slice);
+	void updateString(String *in0, String *in1, String *out, unsigned int slice);
 };
 
 }

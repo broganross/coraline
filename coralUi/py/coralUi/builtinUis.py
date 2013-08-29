@@ -50,6 +50,27 @@ from    nodeInspector.nodeInspector import  AttributeInspectorWidget
 from    pluginUi                    import  PluginUi
 
 
+def _findFirstConnectedAtributeNonPassThrough(coralAttribute, processedAttributes):
+    foundAttr = None
+    if coralAttribute not in processedAttributes:
+        processedAttributes.append(coralAttribute)
+        
+        if coralAttribute.isPassThrough() == False:
+            return coralAttribute
+        else:
+            if coralAttribute.input():
+                foundAttr = _findFirstConnectedAtributeNonPassThrough(coralAttribute.input(), processedAttributes)
+                if foundAttr:
+                    return foundAttr
+                    
+            for out in coralAttribute.outputs():
+                foundAttr = _findFirstConnectedAtributeNonPassThrough(out, processedAttributes)
+                if foundAttr:
+                    return foundAttr
+
+    return foundAttr
+
+
 class GeoInstanceArrayAttributeUi(AttributeUi):
     def __init__(self, coralAttribute, parentNodeUi):
         AttributeUi.__init__(self, coralAttribute, parentNodeUi)
@@ -57,12 +78,14 @@ class GeoInstanceArrayAttributeUi(AttributeUi):
     def hooksColor(self, specialization):
         return QtGui.QColor(240, 230, 250)
 
+
 class GeoAttributeUi(AttributeUi):
     def __init__(self, coralAttribute, parentNodeUi):
         AttributeUi.__init__(self, coralAttribute, parentNodeUi)
         
     def hooksColor(self, specialization):
         return QtGui.QColor(200, 200, 250)
+
 
 class NumericAttributeUi(AttributeUi):
     typeColor = {
@@ -97,6 +120,7 @@ class NumericAttributeUi(AttributeUi):
                 color = color.lighter(110)
         
         return color
+
 
 class NumericAttributeInspectorWidget(AttributeInspectorWidget):
     def __init__(self, coralAttribute, parentWidget, sourceCoralAttributes = []):
@@ -158,31 +182,13 @@ class NumericAttributeInspectorWidget(AttributeInspectorWidget):
         self._clear()
         self._update()
 
-def _findFirstConnectedAtributeNonPassThrough(coralAttribute, processedAttributes):
-    foundAttr = None
-    if coralAttribute not in processedAttributes:
-        processedAttributes.append(coralAttribute)
-        
-        if coralAttribute.isPassThrough() == False:
-            return coralAttribute
-        else:
-            if coralAttribute.input():
-                foundAttr = _findFirstConnectedAtributeNonPassThrough(coralAttribute.input(), processedAttributes)
-                if foundAttr:
-                    return foundAttr
-                    
-            for out in coralAttribute.outputs():
-                foundAttr = _findFirstConnectedAtributeNonPassThrough(out, processedAttributes)
-                if foundAttr:
-                    return foundAttr
-
-    return foundAttr
 
 class EnumAttributeUi(AttributeUi):
     def __init__(self, coralAttribute, parentNodeUi):
         AttributeUi.__init__(self, coralAttribute, parentNodeUi)
-        
+
         self.setVisible(False)
+
 
 class EnumAttributeInspectorWidget(AttributeInspectorWidget):
     def __init__(self, coralAttribute, parentWidget):
@@ -204,11 +210,12 @@ class EnumAttributeInspectorWidget(AttributeInspectorWidget):
             i += 1
         
         self._combo.setCurrentIndex(coralEnum.currentIndex())
-        self.connect(self._combo, QtCore.SIGNAL("currentIndexChanged(int)"), self._comboChanged)
+        self._combo.currentIndexChanged.connect(self._comboChanged)
     
     def _comboChanged(self, index):
         self.coralAttribute().outValue().setCurrentIndex(index)
         self.coralAttribute().valueChanged()
+
     
 class BoolAttributeInspectorWidget(AttributeInspectorWidget):
     def __init__(self, coralAttribute, parentWidget):
@@ -220,6 +227,7 @@ class BoolAttributeInspectorWidget(AttributeInspectorWidget):
         else:
             label = QtGui.QLabel(coralAttribute.name(), self)
             self.layout().addWidget(label)
+
 
 class StringAttributeInspectorWidget(AttributeInspectorWidget):
     def __init__(self, coralAttribute, parentWidget):

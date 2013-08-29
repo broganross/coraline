@@ -160,11 +160,12 @@ void stringWrapper(){
 		.add_static_property("pathTypeArray", string_pathTypeArray)
 	;
 	
-	pythonWrapperUtils::pythonWrapper<StringNode, Node>("StringNode");
 	pythonWrapperUtils::pythonWrapper<StringAttribute, Attribute>("StringAttribute")
 		.def("setLongString", &StringAttribute::setLongString)
 		.def("longString", &StringAttribute::longString);
+	pythonWrapperUtils::pythonWrapper<StringNode, Node>("StringNode");
 	pythonWrapperUtils::pythonWrapper<FilePathNode, Node>("FilePathNode");
+	pythonWrapperUtils::pythonWrapper<AddStringNode, Node>("AddStringNode");
 }
 
 #endif

@@ -376,7 +376,7 @@ class NodeUi(QtGui.QGraphicsWidget):
         
     def paint(self, painter, option, widget):
         shape = QtGui.QPainterPath()
-        shape.addRoundedRect(self.rect(), 2, 2)
+        shape.addRoundedRect(self.rect(), 6, 6)
         
         painter.setPen(self._shapePen)
         painter.setBrush(self._brush)
