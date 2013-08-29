@@ -102,7 +102,7 @@ namespace coral{
 		void setLongString(bool value);
 		bool longString();
 		void onSettingSpecialization(const std::vector<std::string> &specialization);
-		String::Type stringTypeFromString(const std::string &typeStr);
+		static String::Type stringTypeFromString(const std::string &typeStr);
 		std::string shortDebugInfo();
 
 	private:

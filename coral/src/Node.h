@@ -52,28 +52,28 @@ public:
 	void addInputAttribute(Attribute *attribute);
 	void addOutputAttribute(Attribute *attribute);
 	void addNode(Node *node);
+	void removeAttribute(Attribute *attribute);
+	void removeNode(Node *node);
 	Node *parent();
 	void setParent(Node *parent);
 	Node *nodeAt(int position);
 	Attribute *inputAttributeAt(int position);
 	Attribute *outputAttributeAt(int position);
-	void removeNode(Node *node);
-	void removeAttribute(Attribute *attribute);
 	bool containsNode(Node *node);
 	std::vector <Node*> nodes();
+	std::vector<Attribute*> attributes();
 	const std::vector<Attribute*> &inputAttributes();
 	const std::vector<Attribute*> &outputAttributes();
+	const std::vector<Attribute*> &dynamicAttributes();
 	Node *findNode(const std::string &name);
 	Attribute *findAttribute(const std::string &name);
 	bool isInvalid();
 	bool isValid();
 	std::string invalidityMessage();
-	std::vector<Attribute*> attributes();
 	bool updateEnabled();
 	int computeTimeTicks();
 	int computeTimeMilliseconds();
 	int computeTimeSeconds();
-	const std::vector<Attribute*> &dynamicAttributes();
 	bool allowDynamicAttributes();
 	void enableSpecializationPreset(const std::string &preset);
 	std::string enabledSpecializationPreset();
@@ -144,6 +144,7 @@ protected:
 	void setAllowDynamicAttributes(bool value);
 	void updateAttributeSpecialization(Attribute *attribute);
 	void setSpecializationPreset(const std::string &presetName, Attribute *attribute, const std::string &specialization);
+	//! This sets an attribute to call attributeDirtied when it gets changed
 	void catchAttributeDirtied(Attribute *attribute, bool value = true);
 
 	//! In order for this node to be nested under a slicer node, such as a ForLoop node, it has to be declared as sliceable(true).

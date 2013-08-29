@@ -421,7 +421,6 @@ void Node::setAttributeAffect(Attribute *source, Attribute *destination){
 	}
 }
 
-
 void Node::setAttributeIsClean(Attribute *attribute, bool value){
 	if(containerUtils::elementInContainer((NestedObject*)attribute, _objects)){
 		attribute->setIsClean(value);
