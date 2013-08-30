@@ -74,6 +74,21 @@ private:
 	void updateString(String *in0, String *in1, String *out, unsigned int slice);
 };
 
+class BuildArrayStringNode :public Node{
+public:
+	BuildArrayStringNode(const std::string &name, Node *parent);
+	void updateSpecializationLink(Attribute *attrA, Attribute *attrB, std::vector<std::string> &specA, std::vector<std::string> &specB);
+	void attributeSpecializationChanged(Attribute *attr);
+	void updateSlice(Attribute *attr, unsigned int slice);
+	void addStringAttribute();
+
+private:
+	StringAttribute *_array;
+	void (BuildArrayStringNode::*_selectedOperation)(const std::vector<Attribute*>&, int, String*, unsigned int);
+	void updatePath(const std::vector<Attribute*> &inAttrs, int arraySize, String *array, unsigned int slice);
+	void updateString(const std::vector<Attribute*> &inAttrs, int arraySize, String *array, unsigned int slice);
+};
+
 }
 
 #endif

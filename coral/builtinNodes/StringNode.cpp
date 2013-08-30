@@ -88,3 +88,85 @@ void AddStringNode::updatePath(String *in0, String *in1, String *out, unsigned i
 	}
 	out->setPathValuesSlice(slice, outVals);
 }
+
+
+BuildArrayStringNode::BuildArrayStringNode(const std::string &name, Node *parent):
+	Node(name, parent),
+	_selectedOperation(0){
+	setSliceable(true);
+	setAllowDynamicAttributes(true);
+	_array = new StringAttribute("array", this);
+	addOutputAttribute(_array);
+}
+
+void BuildArrayStringNode::addStringAttribute(){
+	std::string numStr = stringUtils::intToString(inputAttributes().size());
+	StringAttribute *attr = new StringAttribute("in" + numStr, this);
+	addInputAttribute(attr);
+	setAttributeAffect(attr, _array);
+
+	std::vector<std::string> specs;
+	specs.push_back("String");
+	specs.push_back("Path");
+	setAttributeAllowedSpecializations(attr, specs);
+	addAttributeSpecializationLink(attr, _array);
+
+	addDynamicAttribute(attr);
+	updateAttributeSpecialization(attr);
+}
+
+void BuildArrayStringNode::updateSpecializationLink(Attribute *attrA, Attribute *attrB, std::vector<std::string> &specA, std::vector<std::string> &specB){
+	if (specA.size() <= specB.size()){
+		specB.resize(specA.size());
+		for (int i=0; i < specA.size(); ++i){
+			specB[i] = specA[i] + "Array";
+		}
+	} else {
+		specA.resize(specB.size());
+		for (int i=0; specB.size(); ++i){
+			specA[i] = stringUtils::strip(specB[i], "Array");
+		}
+	}
+}
+
+void BuildArrayStringNode::attributeSpecializationChanged(Attribute *attr){
+	if (attr == _array){
+		_selectedOperation = 0;
+		String::Type type = _array->outValue()->type();
+		if (type != String::stringTypeAny){
+			if (type == String::stringTypeArray){
+				_selectedOperation = &BuildArrayStringNode::updateString;
+			}
+			else if (type == String::pathTypeArray){
+				_selectedOperation = &BuildArrayStringNode::updatePath;
+			}
+		}
+	}
+}
+
+void BuildArrayStringNode::updateString(const std::vector<Attribute*> &inAttrs, int arraySize, String *array, unsigned int slice){
+	std::vector<std::string> arrayValues(arraySize);
+	for (int i=0; i < arraySize; ++i){
+		String *inStr = (String*)inAttrs[i]->value();
+		arrayValues[i] = inStr->stringValueAtSlice(slice, 0);
+	}
+	array->setStringValuesSlice(slice, arrayValues);
+}
+
+void BuildArrayStringNode::updatePath(const std::vector<Attribute*> &inAttrs, int arraySize, String *array, unsigned int slice){
+	std::vector<std::string> arrayValues(arraySize);
+	for (int i=0; i < arraySize; ++i){
+		String *inStr = (String*)inAttrs[i]->value();
+		arrayValues[i] = inStr->pathValueAtSlice(slice, 0);
+	}
+	array->setPathValuesSlice(slice, arrayValues);
+}
+
+void BuildArrayStringNode::updateSlice(Attribute *attr, unsigned int slice){
+	if (_selectedOperation){
+		std::vector<Attribute*> inAttrs = inputAttributes();
+		int arraySize = inAttrs.size();
+		String *array = _array->outValue();
+		(this->*_selectedOperation)(inAttrs, arraySize, array, slice);
+	}
+}

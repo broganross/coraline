@@ -212,7 +212,7 @@ class NodeInspectorWidget(QtGui.QWidget):
                         return foundAttr
 
         return foundAttr
-    
+
     def build(self):
         coralNode = self.coralNode()
         

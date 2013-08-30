@@ -166,6 +166,8 @@ void stringWrapper(){
 	pythonWrapperUtils::pythonWrapper<StringNode, Node>("StringNode");
 	pythonWrapperUtils::pythonWrapper<FilePathNode, Node>("FilePathNode");
 	pythonWrapperUtils::pythonWrapper<AddStringNode, Node>("AddStringNode");
+	pythonWrapperUtils::pythonWrapper<BuildArrayStringNode, Node>("BuildArrayStringNode")
+		.def("addStringAttribute", &BuildArrayStringNode::addStringAttribute);
 }
 
 #endif
