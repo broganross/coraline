@@ -90,9 +90,10 @@ public:
 		Node::update(attribute);
 	}
 	
-	void updateSpecializationLink(Attribute *attributeA, Attribute *attributeB, std::vector<std::string> &specializationA, std::vector<std::string> &specializationB){
-		boost::python::object attrA = PythonDataCollector::findPyObject(attributeA->id());
-		boost::python::object attrB = PythonDataCollector::findPyObject(attributeB->id());
+	void updateSpecializationLink(boost::python::object attrA, boost::python::object attrB, std::vector<std::string> &specializationA, std::vector<std::string> &specializationB){
+//	void updateSpecializationLink(Attribute *attributeA, Attribute *attributeB, std::vector<std::string> &specializationA, std::vector<std::string> &specializationB){
+//		boost::python::object attrA = PythonDataCollector::findPyObject(attributeA->id());
+//		boost::python::object attrB = PythonDataCollector::findPyObject(attributeB->id());
 		boost::python::object self = PythonDataCollector::findPyObject(id());
 		
 		boost::python::list specA;

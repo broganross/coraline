@@ -66,6 +66,9 @@ public:
 	static void _setAllowedSpecialization(Attribute &self, const std::vector<std::string> &specialization){
 		self.setAllowedSpecialization(specialization);
 	}
+	static void _setSpecialization(Attribute &self, const std::vector<std::string> &specialization){
+		self.setSpecialization(specialization);
+	}
 };
 
 }
