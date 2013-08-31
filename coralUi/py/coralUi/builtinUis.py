@@ -191,6 +191,7 @@ class EnumAttributeUi(AttributeUi):
 
 
 class EnumAttributeInspectorWidget(AttributeInspectorWidget):
+    valueChanged    = QtCore.pyqtSignal(int)
     def __init__(self, coralAttribute, parentWidget):
         AttributeInspectorWidget.__init__(self, coralAttribute, parentWidget)
         
@@ -211,10 +212,14 @@ class EnumAttributeInspectorWidget(AttributeInspectorWidget):
         
         self._combo.setCurrentIndex(coralEnum.currentIndex())
         self._combo.currentIndexChanged.connect(self._comboChanged)
-    
+
     def _comboChanged(self, index):
         self.coralAttribute().outValue().setCurrentIndex(index)
         self.coralAttribute().valueChanged()
+        self.valueChanged.emit(index)
+
+    def combo(self):
+        return self._combo
 
     
 class BoolAttributeInspectorWidget(AttributeInspectorWidget):
@@ -236,6 +241,7 @@ class StringAttributeInspectorWidget(AttributeInspectorWidget):
         valueField = StringValueField(coralAttribute, self)
         self.layout().addWidget(valueField)
 
+
 class ProcessSimulationNodeInspectorWidget(NodeInspectorWidget):
     def __init__(self, coralNode, parentWidget):
         NodeInspectorWidget.__init__(self, coralNode, parentWidget)
@@ -252,6 +258,7 @@ class ProcessSimulationNodeInspectorWidget(NodeInspectorWidget):
         node.addInputData()
         
         self.nodeInspector().refresh()
+
 
 class AttributeSpecializationComboBox(QtGui.QComboBox):
     def __init__(self, coralAttribute, parent):
@@ -288,6 +295,7 @@ class AttributeSpecializationComboBox(QtGui.QComboBox):
         
         self._currentItemChangedCallbackEnabled = True
 
+
 class GeoInstanceGeneratorInspectorWidget(NodeInspectorWidget):
     def __init__(self, coralNode, parentWidget):
         NodeInspectorWidget.__init__(self, coralNode, parentWidget)
@@ -306,6 +314,38 @@ class GeoInstanceGeneratorInspectorWidget(NodeInspectorWidget):
 
         self.nodeInspector().refresh()
 
+
+class RegexNodeInspectorWidget(NodeInspectorWidget):
+    def build(self):
+        super(RegexNodeInspectorWidget, self).build()
+        self._typeWidget = self.attributeWidget("type")
+        self._typeWidget.valueChanged.connect(self._typeValueChanged)
+        self._groupWidget = self.attributeWidget("group")
+        if self._typeWidget.combo().currentIndex() != 0:
+            self._groupWidget.hide()
+        self._subWidget = self.attributeWidget("sub")
+        if self._typeWidget.combo().currentIndex() != 1:
+            self._subWidget.hide()
+
+    def _typeValueChanged(self):
+        combo = self._typeWidget.combo()
+        if combo.currentIndex() == 0:
+            if self._groupWidget.isHidden():
+                self._groupWidget.show()
+            if not self._subWidget.isHidden():
+                self._subWidget.hide()
+        elif combo.currentIndex() == 1:
+            if not self._groupWidget.isHidden():
+                self._groupWidget.hide()
+            if self._subWidget.isHidden():
+                self._subWidget.show()
+        elif combo.currentIndex() == 2:
+            if not self._groupWidget.isHidden():
+                self._groupWidget.hide()
+            if not self._subWidget.isHidden():
+                self._subWidget.hide()
+
+
 class BuildArrayInspectorWidget(NodeInspectorWidget):
     def __init__(self, coralNode, parentWidget):
         NodeInspectorWidget.__init__(self, coralNode, parentWidget)
@@ -322,6 +362,20 @@ class BuildArrayInspectorWidget(NodeInspectorWidget):
         node.addNumericAttribute()
         
         self.nodeInspector().refresh()
+
+
+class BuildArrayStringInspectorWidget(NodeInspectorWidget):
+    def build(self):
+        super(BuildArrayStringInspectorWidget, self).build()
+        addAttrButton = QtGui.QPushButton("Add Input", self)
+        self.layout().addWidget(addAttrButton)
+        addAttrButton.clicked.connect(self._addInputClicked)
+        
+    def _addInputClicked(self):
+        node = self.coralNode()
+        node.addStringAttribute()
+        self.nodeInspector().refresh()
+        
 
 class TimeNodeInspectorWidget(NodeInspectorWidget):
     def __init__(self, coralNode, parentWidget):
@@ -347,6 +401,7 @@ class TimeNodeInspectorWidget(NodeInspectorWidget):
         else:
             self.coralNode().play(False)
             viewport.ViewportWidget._activateImmediateRefresh()
+
             
 class PassThroughAttributeUi(AttributeUi):
     def __init__(self, coralAttribute, parentNodeUi):
@@ -363,6 +418,7 @@ class PassThroughAttributeUi(AttributeUi):
                 color = connectedAttributeUi.hooksColor(self.coralAttribute().specialization())
         
         return color
+
 
 class StringAttributeUi(AttributeUi):
     def __init__(self, coralAttribute, parentNodeUi):
@@ -561,6 +617,7 @@ class ExecutableNodeInspectorWidget(NodeInspectorWidget):
         node = self.coralNode()
         self._log.setText(node.log())
 
+
 class ExecutableNodeUi(NodeUi):
     def __init__(self, coralNode):
         super(ExecutableNodeUi, self).__init__(coralNode)
@@ -607,7 +664,7 @@ class ExecutableNodeUi(NodeUi):
         self.executableNodeChanged()
 
     def timerEvent(self, event):
-        self.pipelineNodeChanged()
+        self.nodeChanged()
 
     def updateLayout(self):
         super(ExecutableNodeUi, self).updateLayout()
@@ -631,6 +688,112 @@ class ExecutableNodeUi(NodeUi):
         painter.drawPath(shape)
 
 
+class CollapsedExecutableNodeUi(ExecutableNodeUi):
+    def __init__(self, node):
+        super(CollapsedExecutableNodeUi, self).__init__(node)
+        self._nodes = []
+        self.setCanOpenThis(True)
+        self.setAttributesProxyEnabled(True)
+        self._progressText.setText("dirty")
+
+    def color(self):
+        return QtGui.QColor(73, 153, 115)
+
+    def startProcess(self):
+        super(CollapsedExecutableNodeUi, self).startProcess()
+        self._collectChildNodes()
+
+    def _collectChildNodes(self):
+        self._nodes = []
+
+        node = self.coralNode()
+        for node in node.nodes():
+            if "ExecutableNode" in node.classNames():
+                self._nodes.append(node)
+
+    def nodeChanged(self):
+        cleanNodes = 0
+        dirtyNodes = 0
+        nodesProcessing = 0
+
+        for node in self._nodes:
+            progressMsg = node.progressMessage()
+            if progressMsg == "clean":
+                cleanNodes += 1
+            elif progressMsg == "dirty":
+                dirtyNodes += 1
+            else:
+                nodesProcessing += 1
+        
+        if nodesProcessing:
+            self._progressBarBrush.setColor(QtGui.QColor(189, 0, 47))
+            self._progressText.setText("nodes " + str(dirtyNodes + nodesProcessing))
+        elif dirtyNodes == 0:
+            self._progressBarBrush.setColor(QtGui.QColor(0, 255, 191))
+            self._progressText.setText("clean")
+        else:
+            self._progressText.setText("dirty")
+            self._progressBarBrush.setColor(QtGui.QColor(255, 204, 102))
+        
+        self.update()
+
+    def repositionAmongConnectedNodes(self):
+        self._collectChildNodes()
+        self.nodeChanged()
+
+        fixedDistance = QtCore.QPointF(self.boundingRect().width() * 2.0, 0.0)
+        nNodes = 0
+        pos = QtCore.QPointF(0.0, 0.0)
+        for attrUi in self.attributeUis():
+            if attrUi.outputHook():
+                for conn in attrUi.outputHook().connections():
+                    pos += conn.endHook().scenePos() - fixedDistance
+                    nNodes += 1
+                
+            elif attrUi.inputHook():
+                if attrUi.inputHook().connections():
+                    pos += attrUi.inputHook().connections()[0].startHook().scenePos() + fixedDistance
+                    nNodes += 1
+        
+        if nNodes:
+            pos /= nNodes
+        
+        finalPos = pos - self.boundingRect().center()
+        self.setPos(finalPos)
+        
+    def repositionContainedProxys(self):
+        for attrUi in self.attributeUis():
+            proxyAttr = attrUi.proxy()
+            if proxyAttr.pos() == QtCore.QPointF(0.0, 0.0):
+                if proxyAttr.outputHook():
+                    positions = []
+                    for conn in proxyAttr.outputHook().connections():
+                        positions.append(conn.endHook().scenePos())
+                    
+                    averagePos = QtCore.QPointF(0.0, 0.0)
+                    for pos in positions:
+                        averagePos += pos
+                    
+                    nPositions = len(positions)
+                    if nPositions:
+                        averagePos /= nPositions
+                    
+                    averagePos.setX(averagePos.x() - (proxyAttr.boundingRect().width() * 2.0))
+                    
+                    finalPos = averagePos - (proxyAttr.outputHook().scenePos() - proxyAttr.scenePos())
+                    
+                    proxyAttr.setPos(proxyAttr.mapFromScene(finalPos))
+                
+                elif proxyAttr.inputHook():
+                    connections = proxyAttr.inputHook().connections()
+                    if connections:
+                        hookPos = connections[0].startHook().scenePos()
+                        hookPos.setX(hookPos.x() + proxyAttr.boundingRect().width() * 2.0)
+                        finalPos = hookPos - (proxyAttr.inputHook().scenePos() - proxyAttr.scenePos())
+                        proxyAttr.setPos(finalPos)
+
+        
+        
 class ExecutableNodeProcess(QtCore.QThread):
     def __init__(self, node):
         super(ExecutableNodeProcess, self).__init__()
@@ -688,11 +851,14 @@ def loadPluginUi():
     plugin.registerNodeUi("ForLoop", ForLoopNodeUi)
     plugin.registerNodeUi("ForLoop (String)", ForLoopNodeUi)
     plugin.registerNodeUi("ExecutableNode", ExecutableNodeUi)
+    plugin.registerNodeUi("CollapsedExecutableNode", CollapsedExecutableNodeUi)
     
     plugin.registerInspectorWidget("NumericAttribute", NumericAttributeInspectorWidget)
     plugin.registerInspectorWidget("StringAttribute", StringAttributeInspectorWidget)
     plugin.registerInspectorWidget("BoolAttribute", BoolAttributeInspectorWidget)
     plugin.registerInspectorWidget("BuildArray", BuildArrayInspectorWidget)
+    plugin.registerInspectorWidget("BuildArray (String)", BuildArrayStringInspectorWidget)
+    plugin.registerInspectorWidget("Regex", RegexNodeInspectorWidget)
     plugin.registerInspectorWidget("Time", TimeNodeInspectorWidget)
     plugin.registerInspectorWidget("EnumAttribute", EnumAttributeInspectorWidget)
     plugin.registerInspectorWidget("ProcessSimulation", ProcessSimulationNodeInspectorWidget)
