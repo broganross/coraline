@@ -19,44 +19,64 @@ from    coral   import  Node
 class CopyFilesNode(nodes.ExecutableNode):
     def __init__(self, name, parent):
         super(CopyFilesNode, self).__init__(name, parent)
-        self._inFiles = StringAttribute("input", self)
-        self._outdir = StringAttribute("outDir", self)
-        self._outfiles = StringAttribute("output", self)
-        self._setAttributeAllowedSpecializations(self._inFiles, ["PathArray"])
-        self._setAttributeAllowedSpecializations(self._outdir, ["Path"])
-        self._setAttributeAllowedSpecializations(self._outfiles, ["PathArray"])
+        self._filePairs = [] # list of tuples, (fromPath, toPath)
+        self._from = StringAttribute("from", self)
+        self._to = StringAttribute("to", self)
+        self._out = StringAttribute("output", self)
+        self._setAttributeAllowedSpecializations(self._from, ["Path", "PathArray"])
+        self._setAttributeAllowedSpecializations(self._to, ["Path", "PathArray"])
+        self._setAttributeAllowedSpecializations(self._out, ["Path", "PathArray"])
 
-        self.addInputAttribute(self._inFiles)
-        self.addInputAttribute(self._outdir)
-        self.addOutputAttribute(self._outfiles)
-        self._setAttributeAffect(self._inFiles, self._outfiles)
-        self._setAttributeAffect(self._outdir, self._outfiles)
+        self.addInputAttribute(self._from)
+        self.addInputAttribute(self._to)
+        self.addOutputAttribute(self._out)
+        self._setAttributeAffect(self._from, self._out)
+        self._setAttributeAffect(self._to, self._out)
+        
+        self._addAttributeSpecializationLink(self._from, self._to)
+        self._addAttributeSpecializationLink(self._from, self._out)
+        
         self.initDone()
 
     def _copyFiles(self, inData, outData):
         """ Do the actual file copy """
-        for fromPath in inData["inFiles"]:
-            toPath = os.path.join(inData["outDir"], os.path.basename(fromPath))
-            if not os.path.isfile(fromPath):
-                coralApp.logError("File doesn't exist: %s"%fromPath)
-                self.setLog("File doesn't exist: %s"%fromPath)
-                return
-            elif not os.path.exists(inData["outDir"]):
-                coralApp.logError("Folder doesn't exist: %s"%inData["outDir"])
-                self.setLog("Folder doesn't exist: %s"%inData["outDir"])
-                return
-            else:
-                shutil.copy2(fromPath, toPath)
-                outData.append(toPath)
-        self._outfiles.outValue().setPathValues(outData)
+        outPaths = []
+        for fromPath, toPath in self._filePairs:
+            print "from", fromPath
+            print "to  ", toPath
+#             shutil.copy2(fromPath, toPath)
+            outPaths.append(toPath)
+        self._outfiles.outValue().setPathValues(outPaths)
 
     def update(self, attribute):
-        inp = self._inFiles.value().pathValues()
-        outdir = self._outdir.value().pathValueAt(0)
-        inData = {"inFiles" : inp,
-                  "outDir" : outdir}
-        out = []
-        self.addProcToQueue(self._copyFiles, inData, out)
+        self._filePairs = []
+        if self._from.specialization() == "Path":
+            if self._to.specialization() == "Path":
+                fromPath = self._from.value().pathValueAt(0)
+                toPath = self._to.value().pathValueAt(0)
+                if os.path.isdir(toPath):
+                    toPath = os.path.join(toPath, os.path.basename(fromPath))
+                self._filePairs = [(fromPath, toPath)]
+        elif self._from.specialization() == "PathArray":
+            if self._to.specialization() == "Path":
+                fromPaths = self._from.value().pathValues()
+                toBasePath = self._to.value().pathValuesAt(0)
+                if os.path.isfile(toBasePath):
+                    raise ValueError("Can't copy multiple files to one file.  Use directory instead")
+                for path in enumerate(fromPaths):
+                    toPath = os.path.join(toBasePath, os.path.basename(path))
+                    self._filePairs.append((path, toPath))
+            elif self._to.specialization() == "PathArray":
+                fromPaths = self._from.value().pathValues()
+                toPaths = self._to.value().pathValues()
+                if len(fromPaths) != len(toPaths):
+                    raise ValueError("number of paths doesn't match.")
+                for num, fromPath in enumerate(fromPaths):
+                    self._filePairs.append(fromPath, toPaths[num])
+                    
+        out = [tp for fp, tp in self._filePairs]
+        self._out.outValue().setPathValues(out)
+        self.addProcToQueue(self._copyFiles, None, None)
 
     def process(self):
         self.run()
