@@ -188,6 +188,19 @@ void attribute_setAllowedSpecialization(Attribute &self, boost::python::list str
 	}
 }
 
+void attribute_setSpecialization(Attribute &self, boost::python::list stringList){
+	std::vector<std::string> specialization;
+	for (int i=0; i < boost::python::len(stringList); ++i){
+		std::string spec = boost::python::extract<std::string>(stringList[i]);
+		if (!spec.empty()){
+			specialization.push_back(spec);
+		}
+	}
+	if (specialization.size()){
+		AttributeAccessor::_setSpecialization(self, specialization);
+	}
+}
+
 void attributeWrapper(){
 	boost::python::register_ptr_to_python<boost::shared_ptr<Attribute> >();
 	
@@ -222,6 +235,7 @@ void attributeWrapper(){
 		.def("isAffectedBy", &Attribute::isAffectedBy)
 		.def("_setAllowedSpecialization", attribute_setAllowedSpecialization)
 		.def("setSpecializationOverride", &Attribute::setSpecializationOverride)
+		.def("_setSpecialization", attribute_setSpecialization)
 		.def("removeSpecializationOverride", &Attribute::removeSpecializationOverride)
 		.def("forceSpecializationUpdate", &Attribute::forceSpecializationUpdate)
 		.def("specializationOverride", &Attribute::specializationOverride)
