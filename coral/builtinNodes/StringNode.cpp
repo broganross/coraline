@@ -29,15 +29,14 @@ _selectedOperation(0){
 	setAttributeAllowedSpecializations(_out, specs);
 
 	addAttributeSpecializationLink(_in0, _out);
+	addAttributeSpecializationLink(_in1, _out);
 }
+
 
 void AddStringNode::updateSpecializationLink(Attribute *attrA, Attribute *attrB, std::vector<std::string> &specA, std::vector<std::string> &specB){
-	specB.resize(specA.size());
-	for (int i=0; i < specA.size(); ++i){
-		specB[i] = specA[i];
-	}
-
+	Node::updateSpecializationLink(attrA, attrB, specA, specB);
 }
+
 
 void AddStringNode::attributeSpecializationChanged(Attribute *attr){
 	_selectedOperation = 0;
