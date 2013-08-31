@@ -54,6 +54,7 @@ void(*Attribute::_disconnectInputCallback)(Attribute *self) = 0;
 void(*Attribute::_disconnectOutputCallback)(Attribute *self, Attribute *other) = 0;
 void(*Attribute::_deleteItCallback)(Attribute *self) = 0;
 void(*Attribute::_specializationCallBack)(Attribute *self) = 0;
+//void(*Attribute::_valueChangedCallback)(Attribute *self) = 0;
 
 std::vector<void(*)(Attribute *)> _dirtyingDoneCallbackQueue;
 bool _cleaningLocked = false;

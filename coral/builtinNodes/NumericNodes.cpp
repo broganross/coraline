@@ -280,6 +280,7 @@ void Vec3ToFloats::updateSlice(Attribute *attribute, unsigned int slice){
 	setAttributeIsClean(_z, true);
 }
 
+
 Col4Node::Col4Node(const std::string &name, Node* parent): Node(name, parent){
 	setSliceable(true);
 

@@ -186,3 +186,12 @@ def getAllParentClasses(classType):
         parentClasses.pop(-1)
 
     return parentClasses
+
+def specContained(specA, specB):
+    contained = False
+    for spec in specA:
+        contained = True
+        if spec in specB:
+            contained = False
+            break
+    return contained
