@@ -26,11 +26,13 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # </license>
 
+from    _coral  import  Command
+from    _coral  import  NetworkManager
+from    _coral  import  ErrorObject
 
-from _coral import Command
-import coralApp
-from _coral import NetworkManager, ErrorObject
-from plugin import Plugin
+import  coralApp
+from    coral   import  collapser
+from    plugin  import  Plugin
 
 class CreateNode(Command):
     def __init__(self):
@@ -236,6 +238,24 @@ class CollapseNodes(Command):
         
         coralApp.collapseNodes(nodes)
 
+class CollapseExecutableNodes(Command):
+    def __init__(self):
+        super(CollapseExecutableNodes, self).__init__()
+        self.setArgUndefined("node", "[]")
+
+    def doIt(self):
+        nodes = eval(self.argAsString("nodes"))
+        nodeNames = nodes
+        nodes = []
+        for nodeName in nodeNames:
+            node = coralApp.findNode(nodeName)
+            if node:
+                nodes.append(node)
+
+        collapser.setCollapsedNodeClassName("CollapsedExeditableNode")
+        coralApp.collapseNodes(nodes)
+        collapser.setCollapsedNodeClassName("CollapsedNode")
+
 class ExplodeCollapsedNode(Command):
     def __init__(self):
         Command.__init__(self)
@@ -282,6 +302,7 @@ def loadPlugin():
     plugin.registerCommand(ExplodeCollapsedNode)
     plugin.registerCommand(SetAttributeValue)
     plugin.registerCommand(SetupDynamicAttribute)
+    plugin.registerCommand(CollapseExecutableNodes)
 
     return plugin
 
