@@ -883,7 +883,8 @@ def saveNetworkFile(filename):
         file = open(filename, "w")
         file.write(saveScript)
         file.close()
-        
+
+        CoralAppData.currentNetworkDir = filename        
         if CoralAppData.shouldLogInfos:
             logInfo("saved network file: " + filename)
 

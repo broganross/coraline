@@ -1,7 +1,7 @@
 import os
  
 os.environ["CORAL_PARALLEL"] = "CORAL_PARALLEL_TBB"
-
+ 
 os.environ["CORAL_PYTHON_PATH"] = "/usr/bin/python2.7"
 os.environ["CORAL_PYTHON_INCLUDES_PATH"] = "/usr/include/python2.7"
 os.environ["CORAL_PYTHON_LIB"] = "python2.7"

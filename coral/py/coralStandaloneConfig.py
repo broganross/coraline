@@ -89,11 +89,21 @@ def _clearAllClicked():
     if MainWindow.okCancelDialog("Clear the current network?"):
         coralApp.newNetwork()
 
-def _saveNetworkClicked():
+def _saveAsNetworkClicked():
     from coral import coralApp
     from coral.coralUi.mainWindow import MainWindow
     
     filename = MainWindow.saveFileDialog("save network file", "Coral Network (*.crl)")
+    if filename:
+        coralApp.saveNetworkFile(filename)
+
+def _saveNetworkClicked():
+    from coral import coralApp
+    from coral.coralUi.mainWindow import MainWindow
+
+    filename = coralApp.CoralAppData.currentNetworkDir
+    if filename == "":
+        filename = MainWindow.saveFileDialog("save network file", "Coral Network (*.crl)")
     if filename:
         coralApp.saveNetworkFile(filename)
 
@@ -172,6 +182,7 @@ def apply():
     fileMenu = mainWin.menuBar().addMenu("File")
     fileMenu.addAction("Clear All...", _clearAllClicked)
     fileMenu.addAction("Save Netwok...", _saveNetworkClicked)
+    fileMenu.addAction("Save Network As...", _saveAsNetworkClicked)
     fileMenu.addAction("Open Network...", _openNetworkClicked)
     fileMenu.addSeparator()
     fileMenu.addAction("Save CollapsedNode...", _saveCollapsedNodeClicked)
@@ -194,6 +205,7 @@ def apply():
     shprtcutsMap = {
         "Shift+G": _explodeClicked,
         "Ctrl+S": _saveNetworkClicked,
+        "Ctrl+Shift+S": _saveAsNetworkClicked,
         "Ctrl+O": _openNetworkClicked,
         "Tab": _nodeBoxSearch,
         "H": _toggleGrid,
