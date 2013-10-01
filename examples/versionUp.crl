@@ -1,0 +1,204 @@
+# coral save script
+version = 0.1
+
+def runScript(topNode = 'root'):
+    executeCommand('CreateNode', className = 'FilePath', name = 'FilePath_copy', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('SetAttributeValue', attribute = topNode + '.FilePath_copy.filepath', value = '[/home/broganross/Documents/nukeProjects/driveDilate_v001.nk] 3')
+    
+    executeCommand('CreateNode', className = 'CollapsedNode', name = 'VersionUp', specializationPreset = 'none', parentNode = topNode)
+    executeCommand('CreateAttribute', name = 'filepath', className = 'PassThroughAttribute', parentNode = topNode + '.VersionUp', input = True, specializationOverride = 'Path')
+    executeCommand('CreateAttribute', name = 'versionTag', className = 'PassThroughAttribute', parentNode = topNode + '.VersionUp', input = True, specializationOverride = 'String')
+    executeCommand('CreateAttribute', name = 'versionPad', className = 'PassThroughAttribute', parentNode = topNode + '.VersionUp', input = True, specializationOverride = 'Int')
+    executeCommand('CreateAttribute', name = 'output', className = 'PassThroughAttribute', parentNode = topNode + '.VersionUp', output = True, specializationOverride = 'Path')
+    
+    executeCommand('CreateNode', className = 'IntToString', name = 'IntToString', specializationPreset = 'none', parentNode = topNode + '.VersionUp')
+    executeCommand('SetAttributeValue', attribute = topNode + '.VersionUp.IntToString.format', value = '[%03d] 1')
+    
+    executeCommand('CreateNode', className = 'String', name = 'String1', specializationPreset = 'none', parentNode = topNode + '.VersionUp')
+    executeCommand('SetAttributeValue', attribute = topNode + '.VersionUp.String1.string', value = '[\g<1>] 1')
+    
+    executeCommand('CreateNode', className = 'Regex', name = 'SubVerNum', specializationPreset = 'none', parentNode = topNode + '.VersionUp')
+    executeCommand('SetAttributeValue', attribute = topNode + '.VersionUp.SubVerNum.type', value = '[{0:"search",1:"sub",2:"match",},1]')
+    executeCommand('SetAttributeValue', attribute = topNode + '.VersionUp.SubVerNum.group', value = '[{0:"0",1:"1",},0]')
+    
+    executeCommand('CreateNode', className = 'StringToInt', name = 'StringToInt', specializationPreset = 'none', parentNode = topNode + '.VersionUp')
+    
+    executeCommand('CreateNode', className = 'Add (String)', name = 'Add (String)1', specializationPreset = 'none', parentNode = topNode + '.VersionUp')
+    
+    executeCommand('CreateNode', className = 'Add', name = 'Add', specializationPreset = 'none', parentNode = topNode + '.VersionUp')
+    
+    executeCommand('CreateNode', className = 'Regex', name = 'FindVerNum', specializationPreset = 'none', parentNode = topNode + '.VersionUp')
+    executeCommand('SetAttributeValue', attribute = topNode + '.VersionUp.FindVerNum.type', value = '[{0:"search",1:"sub",2:"match",},0]')
+    executeCommand('SetAttributeValue', attribute = topNode + '.VersionUp.FindVerNum.group', value = '[{0:"0",1:"1",},1]')
+    executeCommand('SetAttributeValue', attribute = topNode + '.VersionUp.FindVerNum.sub', value = '[] 0')
+    
+    executeCommand('CreateNode', className = 'Int', name = 'Int', specializationPreset = 'none', parentNode = topNode + '.VersionUp')
+    executeCommand('SetAttributeValue', attribute = topNode + '.VersionUp.Int.out', value = '[1] 1')
+    
+    executeCommand('CreateNode', className = 'Add (String)', name = 'Add (String)', specializationPreset = 'none', parentNode = topNode + '.VersionUp')
+    executeCommand('SetAttributeValue', attribute = topNode + '.VersionUp.Add (String).in0', value = '[_v] 1')
+    executeCommand('SetAttributeValue', attribute = topNode + '.VersionUp.Add (String).in1', value = '[(\d{] 1')
+    
+    executeCommand('CreateNode', className = 'IntToString', name = 'IntToString1', specializationPreset = 'none', parentNode = topNode + '.VersionUp')
+    executeCommand('SetAttributeValue', attribute = topNode + '.VersionUp.IntToString1.in', value = '[3] 1')
+    executeCommand('SetAttributeValue', attribute = topNode + '.VersionUp.IntToString1.format', value = '[] 1')
+    
+    executeCommand('CreateNode', className = 'Add (String)', name = 'Add (String)2', specializationPreset = 'none', parentNode = topNode + '.VersionUp')
+    
+    executeCommand('CreateNode', className = 'Add (String)', name = 'Add (String)3', specializationPreset = 'none', parentNode = topNode + '.VersionUp')
+    executeCommand('SetAttributeValue', attribute = topNode + '.VersionUp.Add (String)3.in1', value = '[})] 1')
+    
+    executeCommand('CreateNode', className = 'Add (String)', name = 'Add (String)4', specializationPreset = 'none', parentNode = topNode + '.VersionUp')
+    executeCommand('SetAttributeValue', attribute = topNode + '.VersionUp.Add (String)4.in0', value = '[(] 1')
+    executeCommand('SetAttributeValue', attribute = topNode + '.VersionUp.Add (String)4.in1', value = '[_v] 1')
+    
+    executeCommand('CreateNode', className = 'Add (String)', name = 'Add (String)5', specializationPreset = 'none', parentNode = topNode + '.VersionUp')
+    executeCommand('SetAttributeValue', attribute = topNode + '.VersionUp.Add (String)5.in1', value = '[)\d{] 1')
+    
+    executeCommand('CreateNode', className = 'Add (String)', name = 'Add (String)6', specializationPreset = 'none', parentNode = topNode + '.VersionUp')
+    
+    executeCommand('CreateNode', className = 'Add (String)', name = 'Add (String)7', specializationPreset = 'none', parentNode = topNode + '.VersionUp')
+    executeCommand('SetAttributeValue', attribute = topNode + '.VersionUp.Add (String)7.in1', value = '[}] 1')
+    
+    executeCommand('CreateNode', className = 'CopyFiles', name = 'CopyFiles', specializationPreset = 'none', parentNode = topNode + '.VersionUp')
+    
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.VersionUp.Add.out', destinationAttribute = topNode + '.VersionUp.IntToString.in')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.VersionUp.filepath', destinationAttribute = topNode + '.VersionUp.SubVerNum.input')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.VersionUp.Add (String)7.out', destinationAttribute = topNode + '.VersionUp.SubVerNum.pattern')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.VersionUp.Add (String)1.out', destinationAttribute = topNode + '.VersionUp.SubVerNum.sub')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.VersionUp.FindVerNum.out', destinationAttribute = topNode + '.VersionUp.StringToInt.in')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.VersionUp.String1.string', destinationAttribute = topNode + '.VersionUp.Add (String)1.in0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.VersionUp.IntToString.out', destinationAttribute = topNode + '.VersionUp.Add (String)1.in1')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.VersionUp.StringToInt.out', destinationAttribute = topNode + '.VersionUp.Add.in0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.VersionUp.Int.out', destinationAttribute = topNode + '.VersionUp.Add.in1')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.VersionUp.filepath', destinationAttribute = topNode + '.VersionUp.FindVerNum.input')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.VersionUp.Add (String)3.out', destinationAttribute = topNode + '.VersionUp.FindVerNum.pattern')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.VersionUp.versionTag', destinationAttribute = topNode + '.VersionUp.Add (String).in0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.VersionUp.versionPad', destinationAttribute = topNode + '.VersionUp.IntToString1.in')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.VersionUp.Add (String).out', destinationAttribute = topNode + '.VersionUp.Add (String)2.in0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.VersionUp.IntToString1.out', destinationAttribute = topNode + '.VersionUp.Add (String)2.in1')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.VersionUp.Add (String)2.out', destinationAttribute = topNode + '.VersionUp.Add (String)3.in0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.VersionUp.versionTag', destinationAttribute = topNode + '.VersionUp.Add (String)4.in1')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.VersionUp.Add (String)4.out', destinationAttribute = topNode + '.VersionUp.Add (String)5.in0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.VersionUp.Add (String)5.out', destinationAttribute = topNode + '.VersionUp.Add (String)6.in0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.VersionUp.IntToString1.out', destinationAttribute = topNode + '.VersionUp.Add (String)6.in1')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.VersionUp.Add (String)6.out', destinationAttribute = topNode + '.VersionUp.Add (String)7.in0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.VersionUp.filepath', destinationAttribute = topNode + '.VersionUp.CopyFiles.from')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.VersionUp.SubVerNum.out', destinationAttribute = topNode + '.VersionUp.CopyFiles.to')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.VersionUp.CopyFiles.output', destinationAttribute = topNode + '.VersionUp.output')
+    executeCommand('CreateNode', className = 'CollapsedExecutableNode', name = 'CollapsedExecutableNode', specializationPreset = 'none', parentNode = topNode)
+    
+    executeCommand('CreateNode', className = 'String', name = 'String1_copy', specializationPreset = 'none', parentNode = topNode + '.CollapsedExecutableNode')
+    executeCommand('SetAttributeValue', attribute = topNode + '.CollapsedExecutableNode.String1_copy.string', value = '[\g<1>] 1')
+    
+    executeCommand('CreateNode', className = 'IntToString', name = 'IntToString_copy', specializationPreset = 'none', parentNode = topNode + '.CollapsedExecutableNode')
+    executeCommand('SetAttributeValue', attribute = topNode + '.CollapsedExecutableNode.IntToString_copy.format', value = '[%03d] 1')
+    
+    executeCommand('CreateNode', className = 'Add (String)', name = 'Add (String)_copy', specializationPreset = 'none', parentNode = topNode + '.CollapsedExecutableNode')
+    executeCommand('SetAttributeValue', attribute = topNode + '.CollapsedExecutableNode.Add (String)_copy.in0', value = '[_v] 1')
+    executeCommand('SetAttributeValue', attribute = topNode + '.CollapsedExecutableNode.Add (String)_copy.in1', value = '[(\d{] 1')
+    
+    executeCommand('CreateNode', className = 'Add (String)', name = 'Add (String)2_copy', specializationPreset = 'none', parentNode = topNode + '.CollapsedExecutableNode')
+    
+    executeCommand('CreateNode', className = 'Add (String)', name = 'Add (String)1_copy', specializationPreset = 'none', parentNode = topNode + '.CollapsedExecutableNode')
+    
+    executeCommand('CreateNode', className = 'Add (String)', name = 'Add (String)7_copy', specializationPreset = 'none', parentNode = topNode + '.CollapsedExecutableNode')
+    executeCommand('SetAttributeValue', attribute = topNode + '.CollapsedExecutableNode.Add (String)7_copy.in1', value = '[}] 1')
+    
+    executeCommand('CreateNode', className = 'Add (String)', name = 'Add (String)4_copy', specializationPreset = 'none', parentNode = topNode + '.CollapsedExecutableNode')
+    executeCommand('SetAttributeValue', attribute = topNode + '.CollapsedExecutableNode.Add (String)4_copy.in0', value = '[(] 1')
+    executeCommand('SetAttributeValue', attribute = topNode + '.CollapsedExecutableNode.Add (String)4_copy.in1', value = '[_v] 1')
+    
+    executeCommand('CreateNode', className = 'Add (String)', name = 'Add (String)3_copy', specializationPreset = 'none', parentNode = topNode + '.CollapsedExecutableNode')
+    executeCommand('SetAttributeValue', attribute = topNode + '.CollapsedExecutableNode.Add (String)3_copy.in1', value = '[})] 1')
+    
+    executeCommand('CreateNode', className = 'Regex', name = 'FindVerNum_copy', specializationPreset = 'none', parentNode = topNode + '.CollapsedExecutableNode')
+    executeCommand('SetAttributeValue', attribute = topNode + '.CollapsedExecutableNode.FindVerNum_copy.type', value = '[{0:"search",1:"sub",2:"match",},0]')
+    executeCommand('SetAttributeValue', attribute = topNode + '.CollapsedExecutableNode.FindVerNum_copy.input', value = '[] 0')
+    executeCommand('SetAttributeValue', attribute = topNode + '.CollapsedExecutableNode.FindVerNum_copy.group', value = '[{0:"0",1:"1",},1]')
+    executeCommand('SetAttributeValue', attribute = topNode + '.CollapsedExecutableNode.FindVerNum_copy.sub', value = '[] 0')
+    
+    executeCommand('CreateNode', className = 'Add (String)', name = 'Add (String)5_copy', specializationPreset = 'none', parentNode = topNode + '.CollapsedExecutableNode')
+    executeCommand('SetAttributeValue', attribute = topNode + '.CollapsedExecutableNode.Add (String)5_copy.in1', value = '[)\d{] 1')
+    
+    executeCommand('CreateNode', className = 'Int', name = 'Int_copy', specializationPreset = 'none', parentNode = topNode + '.CollapsedExecutableNode')
+    executeCommand('SetAttributeValue', attribute = topNode + '.CollapsedExecutableNode.Int_copy.out', value = '[1] 1')
+    
+    executeCommand('CreateNode', className = 'CopyFiles', name = 'CopyFiles_copy', specializationPreset = 'none', parentNode = topNode + '.CollapsedExecutableNode')
+    executeCommand('SetAttributeValue', attribute = topNode + '.CollapsedExecutableNode.CopyFiles_copy.from', value = '[] 3')
+    
+    executeCommand('CreateNode', className = 'Add (String)', name = 'Add (String)6_copy', specializationPreset = 'none', parentNode = topNode + '.CollapsedExecutableNode')
+    
+    executeCommand('CreateNode', className = 'IntToString', name = 'IntToString1_copy', specializationPreset = 'none', parentNode = topNode + '.CollapsedExecutableNode')
+    executeCommand('SetAttributeValue', attribute = topNode + '.CollapsedExecutableNode.IntToString1_copy.in', value = '[3] 1')
+    executeCommand('SetAttributeValue', attribute = topNode + '.CollapsedExecutableNode.IntToString1_copy.format', value = '[] 1')
+    
+    executeCommand('CreateNode', className = 'StringToInt', name = 'StringToInt_copy', specializationPreset = 'none', parentNode = topNode + '.CollapsedExecutableNode')
+    
+    executeCommand('CreateNode', className = 'Regex', name = 'SubVerNum_copy', specializationPreset = 'none', parentNode = topNode + '.CollapsedExecutableNode')
+    executeCommand('SetAttributeValue', attribute = topNode + '.CollapsedExecutableNode.SubVerNum_copy.type', value = '[{0:"search",1:"sub",2:"match",},1]')
+    executeCommand('SetAttributeValue', attribute = topNode + '.CollapsedExecutableNode.SubVerNum_copy.input', value = '[] 0')
+    executeCommand('SetAttributeValue', attribute = topNode + '.CollapsedExecutableNode.SubVerNum_copy.group', value = '[{0:"0",1:"1",},0]')
+    
+    executeCommand('CreateNode', className = 'Add', name = 'Add_copy', specializationPreset = 'none', parentNode = topNode + '.CollapsedExecutableNode')
+    
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.CollapsedExecutableNode.Add_copy.out', destinationAttribute = topNode + '.CollapsedExecutableNode.IntToString_copy.in')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.CollapsedExecutableNode.Add (String)_copy.out', destinationAttribute = topNode + '.CollapsedExecutableNode.Add (String)2_copy.in0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.CollapsedExecutableNode.IntToString1_copy.out', destinationAttribute = topNode + '.CollapsedExecutableNode.Add (String)2_copy.in1')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.CollapsedExecutableNode.String1_copy.string', destinationAttribute = topNode + '.CollapsedExecutableNode.Add (String)1_copy.in0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.CollapsedExecutableNode.IntToString_copy.out', destinationAttribute = topNode + '.CollapsedExecutableNode.Add (String)1_copy.in1')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.CollapsedExecutableNode.Add (String)6_copy.out', destinationAttribute = topNode + '.CollapsedExecutableNode.Add (String)7_copy.in0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.CollapsedExecutableNode.Add (String)2_copy.out', destinationAttribute = topNode + '.CollapsedExecutableNode.Add (String)3_copy.in0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.CollapsedExecutableNode.Add (String)3_copy.out', destinationAttribute = topNode + '.CollapsedExecutableNode.FindVerNum_copy.pattern')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.CollapsedExecutableNode.Add (String)4_copy.out', destinationAttribute = topNode + '.CollapsedExecutableNode.Add (String)5_copy.in0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.CollapsedExecutableNode.SubVerNum_copy.out', destinationAttribute = topNode + '.CollapsedExecutableNode.CopyFiles_copy.to')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.CollapsedExecutableNode.Add (String)5_copy.out', destinationAttribute = topNode + '.CollapsedExecutableNode.Add (String)6_copy.in0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.CollapsedExecutableNode.IntToString1_copy.out', destinationAttribute = topNode + '.CollapsedExecutableNode.Add (String)6_copy.in1')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.CollapsedExecutableNode.FindVerNum_copy.out', destinationAttribute = topNode + '.CollapsedExecutableNode.StringToInt_copy.in')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.CollapsedExecutableNode.Add (String)7_copy.out', destinationAttribute = topNode + '.CollapsedExecutableNode.SubVerNum_copy.pattern')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.CollapsedExecutableNode.Add (String)1_copy.out', destinationAttribute = topNode + '.CollapsedExecutableNode.SubVerNum_copy.sub')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.CollapsedExecutableNode.StringToInt_copy.out', destinationAttribute = topNode + '.CollapsedExecutableNode.Add_copy.in0')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.CollapsedExecutableNode.Int_copy.out', destinationAttribute = topNode + '.CollapsedExecutableNode.Add_copy.in1')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.FilePath_copy.filepath', destinationAttribute = topNode + '.VersionUp.filepath')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.FilePath_copy.filepath', destinationAttribute = topNode + '.VersionUp.filepath')
+    executeCommand('ConnectAttributes', sourceAttribute = topNode + '.VersionUp.CopyFiles.output', destinationAttribute = topNode + '.VersionUp.output')
+    # nodeEditor save data
+    executeCommand('SetNodeUiData', node = topNode, data = {})
+    executeCommand('SetNodeUiData', node = topNode + '.FilePath_copy', data = {'pos': [-475.9999999999999, -146.75]})
+    executeCommand('SetNodeUiData', node = topNode + '.VersionUp', data = {'attributes': [{'name': 'filepath', 'pos': [-579.4045138888889, -423.37301587301624]}, {'name': 'versionPad', 'pos': [-1097.222222222223, 135.1587301587303]}, {'name': 'versionTag', 'pos': [-1082.3015873015875, -119.52380952380962]}, {'name': 'output', 'pos': [675.5555555555562, -151.11111111111128]}], 'pos': [-298.46875, -240.5]})
+    executeCommand('SetNodeUiData', node = topNode + '.VersionUp.IntToString', data = {'pos': [-9.750000000000014, 25.25]})
+    executeCommand('SetNodeUiData', node = topNode + '.VersionUp.String1', data = {'pos': [-3.749999999999986, -60.00000000000002]})
+    executeCommand('SetNodeUiData', node = topNode + '.VersionUp.SubVerNum', data = {'pos': [304.1785714285715, -168.17857142857144]})
+    executeCommand('SetNodeUiData', node = topNode + '.VersionUp.StringToInt', data = {'pos': [-247.24999999999997, -22.750000000000007]})
+    executeCommand('SetNodeUiData', node = topNode + '.VersionUp.Add (String)1', data = {'pos': [155.49999999999997, -41.99999999999999]})
+    executeCommand('SetNodeUiData', node = topNode + '.VersionUp.Add', data = {'pos': [-115.0, -6.750000000000007]})
+    executeCommand('SetNodeUiData', node = topNode + '.VersionUp.FindVerNum', data = {'pos': [-391.49999999999994, -70.80555555555557]})
+    executeCommand('SetNodeUiData', node = topNode + '.VersionUp.Int', data = {'pos': [-233.49999999999997, 69.24999999999999]})
+    executeCommand('SetNodeUiData', node = topNode + '.VersionUp.Add (String)', data = {'pos': [-876.6666666666672, 13.333333333333343]})
+    executeCommand('SetNodeUiData', node = topNode + '.VersionUp.IntToString1', data = {'pos': [-903.3333333333338, 125.00000000000003]})
+    executeCommand('SetNodeUiData', node = topNode + '.VersionUp.Add (String)2', data = {'pos': [-716.666666666667, 130.00000000000006]})
+    executeCommand('SetNodeUiData', node = topNode + '.VersionUp.Add (String)3', data = {'pos': [-565.0000000000005, 166.66666666666674]})
+    executeCommand('SetNodeUiData', node = topNode + '.VersionUp.Add (String)4', data = {'pos': [-870.0000000000005, -264.44444444444446]})
+    executeCommand('SetNodeUiData', node = topNode + '.VersionUp.Add (String)5', data = {'pos': [-731.6666666666672, -243.3333333333334]})
+    executeCommand('SetNodeUiData', node = topNode + '.VersionUp.Add (String)6', data = {'pos': [-566.1111111111113, -216.11111111111123]})
+    executeCommand('SetNodeUiData', node = topNode + '.VersionUp.Add (String)7', data = {'pos': [-378.3333333333336, -199.44444444444454]})
+    executeCommand('SetNodeUiData', node = topNode + '.VersionUp.CopyFiles', data = {'pos': [493.77777777777806, -226.66666666666688]})
+    executeCommand('SetNodeUiData', node = topNode + '.CollapsedExecutableNode', data = {'attributes': [{'name': 'input', 'pos': [-1128.5714285714298, -531.428571428572]}, {'name': 'input1', 'pos': [-1108.5714285714298, -445.7142857142861]}, {'name': 'input2', 'pos': [-1120.0000000000011, -354.2857142857147]}], 'pos': [-298.0, -103.0]})
+    executeCommand('SetNodeUiData', node = topNode + '.CollapsedExecutableNode.String1_copy', data = {'pos': [6.250000000000014, -40.00000000000002]})
+    executeCommand('SetNodeUiData', node = topNode + '.CollapsedExecutableNode.IntToString_copy', data = {'pos': [0.2499999999999858, 45.25]})
+    executeCommand('SetNodeUiData', node = topNode + '.CollapsedExecutableNode.Add (String)_copy', data = {'pos': [-866.6666666666672, 33.33333333333334]})
+    executeCommand('SetNodeUiData', node = topNode + '.CollapsedExecutableNode.Add (String)2_copy', data = {'pos': [-706.666666666667, 150.00000000000006]})
+    executeCommand('SetNodeUiData', node = topNode + '.CollapsedExecutableNode.Add (String)1_copy', data = {'pos': [165.49999999999997, -21.999999999999993]})
+    executeCommand('SetNodeUiData', node = topNode + '.CollapsedExecutableNode.Add (String)7_copy', data = {'pos': [-368.3333333333336, -179.44444444444454]})
+    executeCommand('SetNodeUiData', node = topNode + '.CollapsedExecutableNode.Add (String)4_copy', data = {'pos': [-988.5714285714294, -261.5873015873016]})
+    executeCommand('SetNodeUiData', node = topNode + '.CollapsedExecutableNode.Add (String)3_copy', data = {'pos': [-555.0000000000005, 186.66666666666674]})
+    executeCommand('SetNodeUiData', node = topNode + '.CollapsedExecutableNode.FindVerNum_copy', data = {'pos': [-381.49999999999994, -50.80555555555557]})
+    executeCommand('SetNodeUiData', node = topNode + '.CollapsedExecutableNode.Add (String)5_copy', data = {'pos': [-721.6666666666672, -223.3333333333334]})
+    executeCommand('SetNodeUiData', node = topNode + '.CollapsedExecutableNode.Int_copy', data = {'pos': [-223.49999999999997, 89.24999999999999]})
+    executeCommand('SetNodeUiData', node = topNode + '.CollapsedExecutableNode.CopyFiles_copy', data = {'pos': [503.77777777777806, -206.66666666666688]})
+    executeCommand('SetNodeUiData', node = topNode + '.CollapsedExecutableNode.Add (String)6_copy', data = {'pos': [-556.1111111111113, -196.11111111111123]})
+    executeCommand('SetNodeUiData', node = topNode + '.CollapsedExecutableNode.IntToString1_copy', data = {'pos': [-893.3333333333338, 145.00000000000003]})
+    executeCommand('SetNodeUiData', node = topNode + '.CollapsedExecutableNode.StringToInt_copy', data = {'pos': [-237.24999999999997, -2.750000000000007]})
+    executeCommand('SetNodeUiData', node = topNode + '.CollapsedExecutableNode.SubVerNum_copy', data = {'pos': [314.1785714285715, -148.17857142857144]})
+    executeCommand('SetNodeUiData', node = topNode + '.CollapsedExecutableNode.Add_copy', data = {'pos': [-105.0, 13.249999999999993]})
+    
