@@ -26,7 +26,17 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # </license>
 
+import logging
+
+logger = logging.getLogger("coraline")
+logger.setLevel(logging.ERROR)
+formatter = logging.Formatter("%(levelname)s-%(module)s: %(message)s")
+handler = logging.StreamHandler()
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+
 # init Imath module, don't remove
 import Imath
 
 from _coral import *
+

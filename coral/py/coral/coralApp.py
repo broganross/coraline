@@ -28,11 +28,12 @@
 
 ##@package coral.coralApp
 # Main module to perform the most basic operations.
-import traceback
-import os, sys
 import copy 
-import weakref
+import logging
+import os
+import sys
 import traceback
+import weakref
 
 import _coral
 import utils
@@ -40,11 +41,15 @@ from observer import Observer, ObserverCollector
 from rootNode import RootNode
 from valueChangedObserverCollector import ValueChangedObserverCollector
 
+logger = logging.getLogger("coraline")
+
+
 class VerboseLevel:
     logNothing = 0
     logInfos = 1
     logErrors = 2
     logDebugs = 3
+
 
 class CoralAppData:
     version = 0.4
@@ -65,7 +70,7 @@ class CoralAppData:
     lastCreatedNodes = []
     currentNetworkDir = ""
     verboseLevel = VerboseLevel.logDebugs
-    
+
     #observer lists
     registeredNodeClassesObservers = ObserverCollector()
     createdNodeObservers = ObserverCollector()
@@ -347,6 +352,7 @@ def setShouldLogInfos(value = True):
 def logError(message):
     exc = Exception("# error: " + str(message))
     if(CoralAppData.verboseLevel >= VerboseLevel.logErrors):
+        logger.error(exc, exc_info=True)
         print exc
         _notifyMessageLogged(message, VerboseLevel.logErrors)
     
@@ -832,14 +838,15 @@ def openNetworkFile(filename):
         file.close()
 
         filePath = os.path.split(filename)[0]
-        CoralAppData.currentNetworkDir = filePath
+        CoralAppData.currentNetworkDir = filename
 
         _coral.NetworkManager.addSearchPath(filePath)
         
         _loadNetworkScript(saveScript, topNode = CoralAppData.rootNode.fullName())
         
-        if CoralAppData.shouldLogInfos:
-            logInfo("loaded netowrk file: " + filename)
+        logger.info("Loaded network file: " + filename)
+        # if CoralAppData.shouldLogInfos:
+        #     logInfo("loaded network file: " + filename)
 
 def _generateNetworkScript(topNode, saveTopNode = False):
     saveScript = "# coral save script\n" # idiotic comment to make this file look cool ; )

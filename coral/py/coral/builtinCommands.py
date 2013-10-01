@@ -207,7 +207,8 @@ class ConnectAttributes(Command):
                     errorMessage += "extended info: " + error.message()
                 
             coralApp.logDebug(errorMessage)
-            
+
+
 class DisconnectInput(Command):
     def __init__(self):
         Command.__init__(self)
@@ -219,6 +220,7 @@ class DisconnectInput(Command):
         
         attribute = coralApp.findAttribute(attribute)
         attribute.disconnectInput()
+
 
 class CollapseNodes(Command):
     def __init__(self):
@@ -238,6 +240,7 @@ class CollapseNodes(Command):
         
         coralApp.collapseNodes(nodes)
 
+
 class CollapseExecutableNodes(Command):
     def __init__(self):
         super(CollapseExecutableNodes, self).__init__()
@@ -256,6 +259,7 @@ class CollapseExecutableNodes(Command):
         coralApp.collapseNodes(nodes)
         collapser.setCollapsedNodeClassName("CollapsedNode")
 
+
 class ExplodeCollapsedNode(Command):
     def __init__(self):
         Command.__init__(self)
@@ -273,6 +277,7 @@ class ExplodeCollapsedNode(Command):
             else:
                 coralApp.logDebug("ExplodeCollapsedNode Command: input node must be of type CollapsedNode")
 
+
 class SetAttributeValue(Command):
     def __init__(self):
         Command.__init__(self)
@@ -283,16 +288,17 @@ class SetAttributeValue(Command):
     def doIt(self):
         attribute = self.argAsString("attribute")
         value = self.argAsString("value")
-        
+
         attribute = coralApp.findAttribute(attribute)
         if attribute:
             if attribute.outValue():
                 attribute.outValue().setFromString(value);
                 attribute.valueChanged()
 
+
 def loadPlugin():
     plugin = Plugin("builtinCommands")
-    
+
     plugin.registerCommand(CreateNode)
     plugin.registerCommand(CreateAttribute)
     plugin.registerCommand(DeleteObjects)

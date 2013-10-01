@@ -1,10 +1,14 @@
 """ Base implementation for nodes
 """
 
+import  logging
 import  re
 import  thread
 import  weakref
 
+from    PyQt4   import  QtCore
+
+import  coral
 from    coral   import  coralApp
 from    coral   import  EnumAttribute
 from    coral   import  Node
@@ -12,6 +16,8 @@ from    coral   import  NumericAttribute
 from    coral   import  StringAttribute
 from    coral   import  utils
 
+
+logger = logging.getLogger("coraline")
 
 
 class ExecutableNode(Node):
@@ -21,13 +27,21 @@ class ExecutableNode(Node):
         super(ExecutableNode, self).__init__(name, parent)
         self.setClassName("ExecutableNode")
 
+        self._stop = False
         self._procQueue = []
         self._log = ""
         self._nodeUi = None
         self._state = 0
+        self._thrPool = QtCore.QThreadPool.globalInstance()
+
+    def _execProc(self, func, args, out):
+        func(args, out)
 
     def addProcToQueue(self, func, args, out):
-        self._procQueue.append({"func" : func, "args" : args, "out" : out})
+        d = {"func" : func, "args" : args, "out" : out}
+        if not d in self._procQueue:
+            logger.debug("Added to procQueue: %s"%func)
+            self._procQueue.append(d)
 
     def attributeDirtied(self, attribute):
         self.setLog("ready to process.")
@@ -60,13 +74,16 @@ class ExecutableNode(Node):
             self.setLog("tasks left: " + str(len(self._procQueue)))
             proc = self._procQueue.pop(0)
             proc["func"](proc["args"], proc["out"])
-#             thread.start_new_thread(proc["func"], (proc["args"], proc["out"]))
+
         self._state = 3
-        self.setLog("processing done!")
+        self.setLog("\nprocessing done!")
 
     def setLog(self, log):
         self._log = log
-    
+
+    def appendLog(self, log):
+        self._log += log
+
     def setNodeUi(self, nodeUi):
         self._nodeUi = weakref.ref(nodeUi)
 
@@ -129,7 +146,7 @@ class RegexNode(Node):
         self._catchAttributeDirtied(self._pattern, True)
 
     def _updateGroup(self):
-#         prevIndex = self._groupNum.value().currentIndex()
+        prevIndex = self._groupNum.value().currentIndex()
         try:
             reg = re.compile(self._pattern.value().stringValueAt(0))
         except:
@@ -138,8 +155,8 @@ class RegexNode(Node):
             self._groupNum.value().clear()
             for n in range(reg.groups+1):
                 self._groupNum.value().addEntry(n, str(n))
-#         if prevIndex <= reg.groups+1:
-#             self._groupNum.value().setCurrentIndex(prevIndex)
+        if prevIndex <= reg.groups+1:
+            self._groupNum.value().setCurrentIndex(prevIndex)
 
     def attributeDirtied(self, attr):
         # if the pattern is updated then the group attribute widget needs to be updated as well
