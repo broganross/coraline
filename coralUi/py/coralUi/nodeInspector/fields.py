@@ -26,8 +26,9 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # </license>
 
+import  logging
+import  weakref
 
-import weakref
 from PyQt4 import QtGui, QtCore
 
 import nodeInspector
@@ -37,6 +38,7 @@ from ... import utils
 from ...observer import Observer
 from ... import Imath
 
+logger = logging.getLogger("coraline")
 
 class ObjectField(QtGui.QWidget):
     def __init__(self, label, coralObject, parentWidget):
@@ -184,7 +186,7 @@ class CustomIntSpinBox(QtGui.QSpinBox):
         
         self._wheelCallback()
 
-        
+
 class IntValueField(AttributeField):
     def __init__(self, coralAttribute, parentWidget):
         AttributeField.__init__(self, coralAttribute, parentWidget)
@@ -320,7 +322,6 @@ class FilePathWidget(QtGui.QWidget):
     completed = QtCore.pyqtSignal()
     def __init__(self, parent=None):
         super(FilePathWidget, self).__init__(parent)
-#         self._txt = CustomLineEdit(self)
         self._txt = QtGui.QLineEdit()
         self._btn = QtGui.QPushButton(self)
         self._btn.setText("...")
@@ -329,13 +330,15 @@ class FilePathWidget(QtGui.QWidget):
         self.layout().addWidget(self._txt)
         self.layout().addWidget(self._btn)
 
-#         self._txt.editingFinished.connect(self.completed.emit)
         self._txt.textChanged.connect(self.completed.emit)
         self._btn.clicked.connect(self._fileDialog)
 
     def _fileDialog(self):
-        v = QtGui.QFileDialog.getExistingDirectory(self, "get directory")
-        if v:
+        """ Shows the find file dialog """
+        # need custom filedialog for selecting files or directories
+        v = QtGui.QFileDialog.getOpenFileName(self, "Get file path")
+        if v != "":
+            logger.debug(v)
             self._txt.setText(v)
             self._txt.editingFinished.emit()
 

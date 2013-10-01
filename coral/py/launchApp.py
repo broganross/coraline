@@ -25,6 +25,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # </license>
+import logging
 import sys
 
 import sip
@@ -40,6 +41,10 @@ sip.setapi(u'QVariant', 2)
 from coral import coralApp
 from coral.coralUi import coralUi
 import coralStandaloneConfig
+
+logger = logging.getLogger("coraline")
+if len(sys.argv) and "debug" in sys.argv:
+    logger.setLevel(logging.DEBUG)
 
 coralUi.init(configModule = coralStandaloneConfig)
 coralApp.scanAutoLoadPaths()
