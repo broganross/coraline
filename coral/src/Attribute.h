@@ -127,7 +127,7 @@ public:
 	static void(*_disconnectOutputCallback)(Attribute *self, Attribute *other);
 	static void(*_deleteItCallback)(Attribute *self);
 	static void(*_specializationCallBack)(Attribute *self);
-//	static void(*_valueChangedCallback)(Attribute *self);
+	static void(*_valueChangedCallback)(Attribute *self);
 	static void queueDirtyingDoneCallback(void(*callback)(Attribute *));
 	
 protected:

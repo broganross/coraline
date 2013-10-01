@@ -26,6 +26,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # </license>
 
+import  logging
 import  math
 import  weakref
 import  os
@@ -37,6 +38,8 @@ from    coral           import  coralApp
 from    coral.observer  import  Observer
 import  dockWidget
 import  nodeBox
+
+logger = logging.getLogger("coraline")
 
 class InfoBox(QtGui.QWidget):
     def __init__(self, parent):
@@ -82,11 +85,13 @@ class InfoBox(QtGui.QWidget):
 
     def showMessage(self, message):
         self._message.setText(message)
+        logger.info(message)
         self._color = QtGui.QColor(0, 0, 0, 100)
         self._startAnim()
 
     def showError(self, message):
         self._message.setText(message)
+        logger.error(message)
         self._color = QtGui.QColor(100, 0, 20, 100)
         self._startAnim()
 
@@ -286,3 +291,8 @@ class MainWindow(QtGui.QMainWindow):
 
     def resizeEvent(self, event):
         self._infoBox.updateSize()
+
+    def showError(self, errorMessage):
+        """ Display an error dialog """
+        QtGui.QMessageBox.critical(self, "Error", errorMessage)
+

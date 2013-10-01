@@ -26,6 +26,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # </license>
 
+import  logging
 import  traceback
 import  weakref
 
@@ -48,6 +49,9 @@ from    nodeInspector.fields        import  ColorField
 from    nodeInspector.nodeInspector import  NodeInspectorWidget
 from    nodeInspector.nodeInspector import  AttributeInspectorWidget
 from    pluginUi                    import  PluginUi
+
+
+logger = logging.getLogger("coraline")
 
 
 def _findFirstConnectedAtributeNonPassThrough(coralAttribute, processedAttributes):
@@ -209,7 +213,6 @@ class EnumAttributeInspectorWidget(AttributeInspectorWidget):
         for entry in coralEnum.entries():
             self._combo.insertItem(indices[i], entry)
             i += 1
-        
         self._combo.setCurrentIndex(coralEnum.currentIndex())
         self._combo.currentIndexChanged.connect(self._comboChanged)
 
@@ -611,7 +614,13 @@ class ExecutableNodeInspectorWidget(NodeInspectorWidget):
 
         self._nodeProcess = ExecutableNodeProcess(node)
         self._nodeProcess.finished.connect(self._processDone)
+        self._nodeProcess.error.connect(self._processError)
         self._nodeProcess.start()
+
+    def _processError(self, exc):
+        node = self.coralNode()
+        # show dialog?
+        self._log.setText(node.log())
 
     def _processDone(self):
         node = self.coralNode()
@@ -664,7 +673,7 @@ class ExecutableNodeUi(NodeUi):
         self.executableNodeChanged()
 
     def timerEvent(self, event):
-        self.nodeChanged()
+        self.executableNodeChanged()
 
     def updateLayout(self):
         super(ExecutableNodeUi, self).updateLayout()
@@ -792,15 +801,16 @@ class CollapsedExecutableNodeUi(ExecutableNodeUi):
                         finalPos = hookPos - (proxyAttr.inputHook().scenePos() - proxyAttr.scenePos())
                         proxyAttr.setPos(finalPos)
 
-        
-        
+
 class ExecutableNodeProcess(QtCore.QThread):
+    error       = QtCore.pyqtSignal(Exception)
+    finished    = QtCore.pyqtSignal("PyQt_PyObject")
     def __init__(self, node):
         super(ExecutableNodeProcess, self).__init__()
         self._node = weakref.ref(node)
         self._nodesToUpdate = []
         self._collectNodesToUpdate(node, self._nodesToUpdate, [])
-    
+
     def _collectNodesToUpdate(self, node, nodesToUpdate, walkedNodes):
         walkedNodes.append(node)
 
@@ -819,21 +829,24 @@ class ExecutableNodeProcess(QtCore.QThread):
         for childNode in node.nodes():
             if childNode not in walkedNodes:
                 self._collectNodesToUpdate(childNode, nodesToUpdate, walkedNodes)
-    
+
     def run(self):
+        node = self._node()
         try:
             for nodeToUpdateRef in self._nodesToUpdate:
                 nodeToUpdate = nodeToUpdateRef()
                 nodeToUpdate.startProcess()
-    
-            node = self._node()
+
             node.process()
-    
+
             for nodeToUpdateRef in self._nodesToUpdate:
                 nodeToUpdate = nodeToUpdateRef()
                 nodeToUpdate.endProcess()
-        except:
-            print traceback.format_exc()
+        except Exception as e:
+            exc = traceback.format_exc()
+            node.setLog(exc)
+            self.error.emit(e)
+            # print traceback.format_exc()
 
 def loadPluginUi():
     plugin = PluginUi("builtinUis")

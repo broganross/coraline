@@ -1,6 +1,7 @@
 """ Nodes for executing file operations """
 
 import  fnmatch
+import  logging
 import  shutil
 import  os
 
@@ -12,13 +13,13 @@ from    coral   import  coralApp
 from    coral   import  Node
 
 
-# from    coral.attributes    import  iteratorattribute
-# from    coral.nodes         import  pipelinenode
+logger = logging.getLogger("coraline")
 
 
 class CopyFilesNode(nodes.ExecutableNode):
     def __init__(self, name, parent):
         super(CopyFilesNode, self).__init__(name, parent)
+        self.setClassName("CopyFilesNode")
         self._filePairs = [] # list of tuples, (fromPath, toPath)
         self._from = StringAttribute("from", self)
         self._to = StringAttribute("to", self)
@@ -32,33 +33,36 @@ class CopyFilesNode(nodes.ExecutableNode):
         self.addOutputAttribute(self._out)
         self._setAttributeAffect(self._from, self._out)
         self._setAttributeAffect(self._to, self._out)
-        
+
         self._addAttributeSpecializationLink(self._from, self._to)
         self._addAttributeSpecializationLink(self._from, self._out)
-        
+
         self.initDone()
 
     def _copyFiles(self, inData, outData):
         """ Do the actual file copy """
         outPaths = []
         for fromPath, toPath in self._filePairs:
-            print "from", fromPath
-            print "to  ", toPath
-#             shutil.copy2(fromPath, toPath)
+            logger.info("Copying from: %s\n\tTo: %s"%(fromPath, toPath))
+            shutil.copy2(fromPath, toPath)
             outPaths.append(toPath)
-        self._outfiles.outValue().setPathValues(outPaths)
+        self._out.outValue().setPathValues(outPaths)
 
     def update(self, attribute):
+        logger.debug("update")
         self._filePairs = []
-        if self._from.specialization() == "Path":
-            if self._to.specialization() == "Path":
+        if self._from.specialization() == ["Path"]:
+            if self._to.specialization() == ["Path"]:
                 fromPath = self._from.value().pathValueAt(0)
                 toPath = self._to.value().pathValueAt(0)
                 if os.path.isdir(toPath):
                     toPath = os.path.join(toPath, os.path.basename(fromPath))
                 self._filePairs = [(fromPath, toPath)]
-        elif self._from.specialization() == "PathArray":
-            if self._to.specialization() == "Path":
+            else:
+                raise ValueError("Can't copy one file to multiple locations... yet.")
+
+        elif self._from.specialization() == ["PathArray"]:
+            if self._to.specialization() == ["Path"]:
                 fromPaths = self._from.value().pathValues()
                 toBasePath = self._to.value().pathValuesAt(0)
                 if os.path.isfile(toBasePath):
@@ -66,7 +70,7 @@ class CopyFilesNode(nodes.ExecutableNode):
                 for path in enumerate(fromPaths):
                     toPath = os.path.join(toBasePath, os.path.basename(path))
                     self._filePairs.append((path, toPath))
-            elif self._to.specialization() == "PathArray":
+            elif self._to.specialization() == ["PathArray"]:
                 fromPaths = self._from.value().pathValues()
                 toPaths = self._to.value().pathValues()
                 if len(fromPaths) != len(toPaths):
@@ -77,10 +81,11 @@ class CopyFilesNode(nodes.ExecutableNode):
         out = [tp for fp, tp in self._filePairs]
         self._out.outValue().setPathValues(out)
         self.addProcToQueue(self._copyFiles, None, None)
+        logger.debug("update: complete")
 
     def process(self):
         self.run()
-        self._outfiles.value().pathValues()
+        self._out.value().pathValues()
 
 
 class FindFilesNode(Node):

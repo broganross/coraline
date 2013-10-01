@@ -61,7 +61,7 @@ void Enum::setFromString(const std::string &value){
 			if(entry != ""){
 				std::vector<std::string> keyVal;
 				stringUtils::split(entry, keyVal, ":");
-				
+
 				if(keyVal.size() == 2){
 					int key = stringUtils::parseInt(keyVal[0]);
 					std::string val = stringUtils::strip(keyVal[1], "\"");
@@ -69,7 +69,6 @@ void Enum::setFromString(const std::string &value){
 				}
 			}
 		}
-
 		setCurrentIndex(stringUtils::parseInt(fields[1]));
 	}
 }
