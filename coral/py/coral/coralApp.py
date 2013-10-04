@@ -690,7 +690,7 @@ def collapseNodes(nodes, collapsedNode = None):
     import collapser
     
     if collapsedNode:
-        if collapsedNode.__class__.__name__ != "CollapsedNode":
+        if not collapsedNode.className() in collapser.CollapserData.collapsableNodeNames:
             logError("invalid collapsedNode passed as argument")
             return None
         

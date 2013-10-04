@@ -74,16 +74,16 @@ class CreateAttribute(Command):
         self.setArgBool("input", False)
         self.setArgBool("output", False)
         self.setArgString("specializationOverride", "none")
-        
+
     def doIt(self):
         className = self.argAsString("className")
         name = self.argAsString("name")
         parentNode = self.argAsString("parentNode")
         input = self.argAsBool("input")
         output = self.argAsBool("output")
-        
+
         newAttr = None
-        
+
         parentNode = coralApp.findNode(parentNode)
         if parentNode:
             newAttr = coralApp.createAttribute(className, name, parentNode, input, output)
@@ -91,9 +91,9 @@ class CreateAttribute(Command):
                 specializationOverride = self.argAsString("specializationOverride")
                 if specializationOverride != "" and specializationOverride != "none":
                     newAttr.setSpecializationOverride(specializationOverride)
-                    
+
                 self.setResultString(newAttr.fullName())
-        
+
         if newAttr is None:
             coralApp.logDebug("CreateAttribute Command: failed to create new attribute.")
 
@@ -255,7 +255,7 @@ class CollapseExecutableNodes(Command):
             if node:
                 nodes.append(node)
 
-        collapser.setCollapsedNodeClassName("CollapsedExeditableNode")
+        collapser.setCollapsedNodeClassName("CollapsedExecutableNode")
         coralApp.collapseNodes(nodes)
         collapser.setCollapsedNodeClassName("CollapsedNode")
 
@@ -267,12 +267,11 @@ class ExplodeCollapsedNode(Command):
         self.setArgString("collapsedNode", "")
     
     def doIt(self):
-        from collapsedNode import CollapsedNode
         collapsedNodeName = self.argAsString("collapsedNode")
-        
+
         collapsedNode = coralApp.findNode(collapsedNodeName)
         if collapsedNode:
-            if collapsedNode.__class__ is CollapsedNode:
+            if collapsedNode.className() in collapser.CollapserData.collapsableNodeNames:
                 coralApp.explodeCollapsedNode(collapsedNode)
             else:
                 coralApp.logDebug("ExplodeCollapsedNode Command: input node must be of type CollapsedNode")

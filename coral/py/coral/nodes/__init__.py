@@ -95,13 +95,42 @@ class CollapsedExecutableNode(ExecutableNode):
     def __init__(self, name, parent):
         super(CollapsedExecutableNode, self).__init__(name, parent)
         self.setClassName("CollapsedExecutableNode")
+
+        self._setSliceable(True)
         self._setUpdateEnabled(False)
         self._setAllowDynamicAttributes(True)
+
+    def _attributesAsScript(self):
+        script = ""
+
+        createAttributeCmd = _coral.Command()
+        createAttributeCmd.setName("CreateAttribute")
+        createAttributeCmd.setArgString("className", "PassThroughAttribute")
+        createAttributeCmd.setArgString("name", "")
+        createAttributeCmd.setArgString("parentNode", self.fullName())
+        createAttributeCmd.setArgBool("input", False)
+        createAttributeCmd.setArgBool("output", False)
         
+        for attribute in self.inputAttributes():
+            createAttributeCmd.setArgString("name", attribute.name())
+            createAttributeCmd.setArgBool("input", True)
+            createAttributeCmd.setArgBool("output", False)
+            
+            script += createAttributeCmd.asScript() + "\n"
+        
+        for attribute in self.outputAttributes():
+            createAttributeCmd.setArgString("name", attribute.name())
+            createAttributeCmd.setArgBool("input", False)
+            createAttributeCmd.setArgBool("output", True)
+            
+            script += createAttributeCmd.asScript() + "\n"
+        
+        return script
+
     def addDynamicAttribute(self, attribute):
         if attribute.isOutput():
             self._catchAttributeDirtied(attribute, True)
-            
+
     def process(self):
         for attr in self.outputAttributes():
             attr.value()
@@ -170,9 +199,6 @@ class RegexNode(Node):
         else:
             super(RegexNode, self).attributeDirtied(attr)
 
-    def update(self, attribute):
-        self.updateSlice(attribute, 0)
-
     def updateSlice(self, attribute, slice):
         inp = self._instr.value().stringValues()
         pat = self._pattern.value().stringValueAt(slice)
@@ -224,7 +250,8 @@ class StringToIntNode(Node):
             coralApp.logError("Can't convert '%s' to int"%inStr)
         else:
             self._out.outValue().setIntValueAt(0, out)
-            
+
+
 class IntToStringNode(Node):
     """Node that converts an integer to a string """
     def __init__(self, name, parent):

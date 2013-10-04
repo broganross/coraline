@@ -104,12 +104,14 @@ public:
 	//! This method is invoked by a child attribute when it gets dirtied.
 	//! To enable it for a particular attribute this node must call catchAttributeDirtied(childAttr, true) from its constructor.
 	virtual void attributeDirtied(Attribute *attribute);
-	
+
 	virtual void setName(const std::string &name);
 	virtual void deleteIt();
 	virtual void update(Attribute *attribute);
 	virtual void updateSpecializationLink(Attribute *attributeA, Attribute *attributeB, std::vector<std::string> &specializationA, std::vector<std::string> &specializationB);
 	virtual void attributeConnectionChanged(Attribute *attribute);
+	
+	//! triggered when an attribute's specialization is changed
 	virtual void attributeSpecializationChanged(Attribute *attribute);
 	virtual std::string debugInfo();
 	virtual std::string shortDebugInfo();

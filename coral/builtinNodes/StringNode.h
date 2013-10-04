@@ -30,6 +30,7 @@
 #define STRINGNODE_H
 
 #include "../src/Node.h"
+#include "../src/NumericAttribute.h"
 #include "../src/StringAttribute.h"
 #include "../src/containerUtils.h"
 
@@ -88,6 +89,48 @@ private:
 	void updatePath(const std::vector<Attribute*> &inAttrs, int arraySize, String *array, unsigned int slice);
 	void updateString(const std::vector<Attribute*> &inAttrs, int arraySize, String *array, unsigned int slice);
 };
+
+class StringArrayIndices : public Node
+{
+public:
+	StringArrayIndices(const std::string &name, Node *parent);
+	void updateSlice(Attribute *attribute, unsigned int slice);
+
+private:
+	StringAttribute *_array;
+	NumericAttribute *_indices;
+};
+
+class GetStringArrayElement: public Node
+{
+public:
+	GetStringArrayElement(const std::string &name, Node* parent);
+	void updateSpecializationLink(Attribute *attrA, Attribute *attrB, std::vector<std::string> &specA, std::vector<std::string> &specB);
+	void attributeSpecializationChanged(Attribute *attribute);
+	void updateSlice(Attribute *attribute, unsigned int slice);
+
+private:
+	StringAttribute *_array;
+	NumericAttribute *_index;
+	StringAttribute *_element;
+	void(GetStringArrayElement::*_selectedOperation)(String *, const std::vector<int> &, String *, unsigned int );
+
+	void updateString(String *array, const std::vector<int> &index, String *element, unsigned int slice);
+	void updatePath(String *array, const std::vector<int> &index, String *element, unsigned int slice);
+
+};
+
+class StringArraySize :public Node
+{
+public:
+	StringArraySize(const std::string &name, Node *parent);
+	void updateSlice(Attribute *attribute, unsigned int slice);
+
+private:
+	StringAttribute *_array;
+	NumericAttribute *_size;
+};
+
 
 }
 

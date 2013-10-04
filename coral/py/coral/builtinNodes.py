@@ -122,6 +122,10 @@ def loadPlugin():
     plugin.registerNode("StringToInt", nodes.StringToIntNode, tags=["generic"])
     plugin.registerNode("IntToString", nodes.IntToStringNode, tags=["generic"])
     plugin.registerNode("BuildArray (String)", _coral.BuildArrayStringNode, tags=["generic"])
+    plugin.registerNode("ArrayIndices (String)", _coral.StringArrayIndices, tags=["string"], description="Build an array composed by all the indexes extracted from the given input array.")
+    plugin.registerNode("GetArrayElement (String)", _coral.GetStringArrayElement, tags=["string"])
+    plugin.registerNode("Sort (String)", fileopnode.StringSort, tags=["string"])
+    plugin.registerNode("ArraySize (String)", _coral.StringArraySize, tags=["string"])
 
     plugin.registerNode("Time", timeNode.TimeNode, tags = ["generic"])
     plugin.registerNode("ImportCIOTransforms", _coral.ImportCIOTransforms, tags = ["generic"])
@@ -151,6 +155,9 @@ def loadPlugin():
     plugin.registerNode("ForLoop (String)", _coral.StringForLoopNode, tags=["pipeline"])
     plugin.registerNode("LoopInput (String)", _coral.StringLoopInputNode, tags=["pipeline"])
     plugin.registerNode("LoopOutput (String)", _coral.StringLoopOutputNode, tags=["pipeline"])
+    plugin.registerNode("PathNode", fileopnode.PathNode, tags=["pipeline"])
     plugin.registerNode("CollapsedExecutableNode", nodes.CollapsedExecutableNode, tags=["generic"])
+
+    plugin.registerCollapsableNode("CollapsedExecutableNode")
 
     return plugin

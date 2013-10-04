@@ -8,6 +8,7 @@ import  os
 from    coral   import  nodes
 from    coral   import  coralApp
 from    coral   import  BoolAttribute
+from    coral   import  EnumAttribute
 from    coral   import  StringAttribute
 from    coral   import  coralApp
 from    coral   import  Node
@@ -136,27 +137,27 @@ class FindFilesNode(Node):
         coralApp.logDebug("FindFiles.update: Done")
 #         if assets:
 #             self.setLog("Found files:\n" + "\n".join(assets))
-    
+
 
 class MoveFilesNode(nodes.ExecutableNode):
     def __init__(self, name, parent):
         super(MoveFilesNode, self).__init__(name, parent)
-        self._inFiles = StringAttribute("input", self)
-        self._outdir = StringAttribute("outDir", self)
+        self._from = StringAttribute("input", self)
+        self._out = StringAttribute("outDir", self)
         self._outfiles = StringAttribute("output", self)
 
-        self._setAttributeAllowedSpecializations(self._inFiles, ["PathArray"])
-        self._setAttributeAllowedSpecializations(self._outdir, ["Path"])
+        self._setAttributeAllowedSpecializations(self._from, ["PathArray", "Path"])
+        self._setAttributeAllowedSpecializations(self._to, ["Path", "PathArray"])
         self._setAttributeAllowedSpecializations(self._outfiles, ["PathArray"])
 
-        self.addInputAttribute(self._inFiles)
-        self.addInputAttribute(self._outdir)
+        self.addInputAttribute(self._from)
+        self.addInputAttribute(self._to)
         self.addOutputAttribute(self._outfiles)
-        
+
         self._setAttributeAffect(self._inFiles, self._outfiles)
         self._setAttributeAffect(self._outdir, self._outfiles)
         self.initDone()
-        
+
     def _moveFiles(self, inData, out):
         for fromPath in inData["files"]:
             toPath = os.path.join(inData["outDir"],
@@ -175,6 +176,7 @@ class MoveFilesNode(nodes.ExecutableNode):
         self._outfiles.outValue().setPathValues(out)
         
     def update(self, attribute):
+        self._filePair = []
         inp = self._inFiles.value().stringValues()
         outdir = self._outdir.value().stringValueAt(0)
         indata = {}
@@ -187,4 +189,99 @@ class MoveFilesNode(nodes.ExecutableNode):
         self._outfiles.value()
 
 
+class StringSort(Node):
+    def __init__(self, name, parent):
+        super(StringSort, self).__init__(name, parent)
+        self._setSliceable(True)
 
+        self._input = StringAttribute("input", self)
+        self._key = StringAttribute("key", self)
+        self._output = StringAttribute("output", self)
+
+        self._setAttributeAllowedSpecializations(self._input, ["StringArray", "PathArray"])
+        self._setAttributeAllowedSpecializations(self._key, ["String"])
+        self._setAttributeAllowedSpecializations(self._output, ["StringArray", "PathArray"])
+
+        self.addInputAttribute(self._input)
+        self.addInputAttribute(self._key)
+        self.addOutputAttribute(self._output)
+
+        self._setAttributeAffect(self._input, self._output)
+        self._setAttributeAffect(self._key, self._output)
+        self._addAttributeSpecializationLink(self._input, self._output)
+
+    def updateSlice(self, attribute, slice):
+        inp = self._input.value().stringValuesSlice(slice)
+        key = self._key.value().stringValues()[0]
+        out = []
+        if key:
+            out = sorted(inp, key=eval(key))
+        else:
+            out = sorted(inp)
+        self._output.outValue().setStringValuesSlice(slice, out)
+
+
+class PathNode(Node):
+    """Node for doing different pathing operations
+    """
+    def __init__(self, name, parent):
+        super(PathNode, self).__init__(name, parent)
+        self._setSliceable(True)
+
+        self._inPath = StringAttribute("input", self)
+        self._op = EnumAttribute("operation", self)
+        self._out = StringAttribute("output", self)
+
+        self._allOps = [("split", os.path.split, "StringArray"),
+                        ("splitAll", None, "StringArray"),
+                        ("dirname", os.path.dirname, "Path"),
+                        ("basename", os.path.basename, "String"),
+                        ("splitext", os.path.splitext, "StringArray")
+                        ]
+
+        for n, op in enumerate(self._allOps):
+            self._op.value().addEntry(n, op[0])
+
+        self._setAttributeAllowedSpecializations(self._inPath, ["Path", "PathArray"])
+        self._setAttributeAllowedSpecializations(self._out, ["String", "Path", "StringArray"])
+
+        self.addInputAttribute(self._inPath)
+        self.addInputAttribute(self._op)
+        self.addOutputAttribute(self._out)
+
+        self._setAttributeAffect(self._inPath, self._out)
+        self._setAttributeAffect(self._op, self._out)
+
+        # self._catchAttributeDirtied(self._inPath, True)
+        self._catchAttributeDirtied(self._op, True)
+
+    def attributeDirtied(self, attribute):
+        if attribute == self._op:
+            index = self._op.value().currentIndex()
+            self._out._setSpecialization([self._allOps[index][2]])
+
+    def updateSlice(self, attribute, slice):
+        logger.debug("PathNode - updateSlice")
+        inPaths = self._inPath.value().stringValuesSlice(slice)
+        opIndex = self._op.value().currentIndex()
+        for ip in inPaths:
+            if ip == "":
+                continue
+
+            out = []
+            if self._allOps[opIndex][1] == None:
+                if self._allOps[opIndex][0] == "splitAll":
+                    out = ip.split(os.sep)
+            else:
+                op = self._allOps[opIndex]
+                out = op[1](ip)
+
+            if isinstance(out, tuple):
+                out = list(out)
+
+            if not isinstance(out, list):
+                out = [out]
+
+            self._out.outValue().setPathValuesSlice(slice, out)
+
+        logger.debug("PathNode - updateSlice: complete")

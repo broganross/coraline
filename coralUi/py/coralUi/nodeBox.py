@@ -147,15 +147,18 @@ class NodeBox(QtGui.QWidget):
                 attributeUi = nodeEditor.NodeEditor.findAttributeUi(newAttribute.id())
                 if attributeUi.proxy():
                     sceneItem = attributeUi.proxy()
-        
+
         elif itemData["type"] == "nodeClassName":
-            newNodeName = coralApp.executeCommand("CreateNode", className = className, name = className, parentNode = parentNode)
+            newNodeName = coralApp.executeCommand("CreateNode",
+                                                className = className,
+                                                name = className,
+                                                parentNode = parentNode)
             if newNodeName:
                 newNode = coralApp.findNode(newNodeName)
                 sceneItem = nodeEditor.NodeEditor.findNodeUi(newNode.id())
         
         return sceneItem
-        
+
     def __init__(self, parent):
         QtGui.QWidget.__init__(self, parent)
 

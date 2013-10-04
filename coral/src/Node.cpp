@@ -227,7 +227,7 @@ void Node::updateSlice(Attribute *attribute, unsigned int slice){
 }
 
 void Node::update(Attribute *attribute){
-//	std::cout << "Node.update" << std::endl;
+	// std::cout << "Node.update " << name() << std::endl;
 	if(_slicer){ // this node is nested in a slicer node such as the ForLoop node and this node is supposed to be sliced
 		// here we resize the slices for the output attributes so that the node can put values in each slice.
 
@@ -252,7 +252,7 @@ void Node::update(Attribute *attribute){
 	else{
 		updateSlice(attribute, 0);
 	}
-//	std::cout << "Node.update: Done" << std::endl;
+	// std::cout << "Node.update: Done" << std::endl;
 }
 
 Node *Node::parent(){

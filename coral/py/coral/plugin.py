@@ -28,9 +28,12 @@
 
 
 import coralApp
+import collapser
 
-## Instanciate this object to register new attributes, nodes or commands.
+
 class Plugin(object):
+    """ Instanciate this object to register new attributes, nodes or commands.
+    """
     def __init__(self, name):
         self._name = name
         self._registeredAttributes = []
@@ -45,3 +48,6 @@ class Plugin(object):
     
     def registerCommand(self, commandClass):
         self._registeredCommands.append(commandClass)
+
+    def registerCollapsableNode(self, className):
+        collapser.registerCollapsableNode(className)

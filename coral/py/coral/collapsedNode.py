@@ -29,9 +29,9 @@
 
 import _coral
 
-## A node to enclose other nodes and provide a simplified interface to a more complex network. 
-#@implements Node
 class CollapsedNode(_coral.Node):
+    """ A node to enclose other nodes and provide a simplified interface to a more complex network. 
+    """
     def __init__(self, name, parent):
         _coral.Node.__init__(self, name, parent)
         self.setClassName("CollapsedNode")
@@ -42,7 +42,7 @@ class CollapsedNode(_coral.Node):
 
     def _attributesAsScript(self):
         script = ""
-        
+
         createAttributeCmd = _coral.Command()
         createAttributeCmd.setName("CreateAttribute")
         createAttributeCmd.setArgString("className", "PassThroughAttribute")

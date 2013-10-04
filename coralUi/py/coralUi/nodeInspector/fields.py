@@ -118,7 +118,7 @@ class AttributeField(ObjectField):
         attribute = self.coralObject()
         if attribute.input() or attribute.affectedBy():
             self.label().setText(">" + self.label().text())
-            
+
         self.attributeValueChanged()
     
     def _collectOutAttrsNonPass(self, attribute, outAttrs):

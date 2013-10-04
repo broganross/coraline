@@ -69,6 +69,7 @@ class CustomComboBox(QtGui.QComboBox):
         
         self._currentItemChangedCallbackEnabled = True
 
+
 class SpecializationCombo(QtGui.QWidget):
     def __init__(self, parent):
         QtGui.QWidget.__init__(self, parent)
@@ -81,6 +82,7 @@ class SpecializationCombo(QtGui.QWidget):
         self.layout().setSpacing(0)
         self.layout().addWidget(self._label)
         self.layout().addWidget(self._combo)
+
 
 class NodeInspectorWidget(QtGui.QWidget):
     def __init__(self, coralNode, parent):
@@ -182,17 +184,17 @@ class NodeInspectorWidget(QtGui.QWidget):
         if len(presets) > 1:
             self._presetCombo = SpecializationCombo(self)
             self.layout().addWidget(self._presetCombo)
-            
+
             currentPreset = coralNode.enabledSpecializationPreset()
             self._presetCombo._combo.addItem(currentPreset)
             self._presetCombo._combo.setCurrentIndex(0)
-            
+
             self._presetCombo._combo.setShowPopupCallback(self._populatePresetCombo)
             self._presetCombo._combo.setCurrentItemChangedCallback(self._presetComboItemChanged)
-            
+
             #if self._nodeIsConnected(coralNode):
             #    self._presetCombo._combo.setDisabled(True)
-    
+
     def _findFirstConnectedAtributeNonPassThrough(self, coralAttribute, processedAttributes):
         foundAttr = None
         if coralAttribute not in processedAttributes:

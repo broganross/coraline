@@ -89,6 +89,23 @@ public:
 	void update_default(Attribute *attribute){
 		Node::update(attribute);
 	}
+
+	void updateSlice_default(Attribute *attribute, unsigned int slice){
+		Node::updateSlice(attribute, slice);
+	}
+
+	void updateSlice(Attribute *attribute, unsigned int slice){
+		boost::python::object self = PythonDataCollector::findPyObject(id());
+		boost::python::object attr = PythonDataCollector::findPyObject(attribute->id());
+
+		try{
+			boost::python::call_method<void>(self.ptr(), "updateSlice", attr, slice);
+		}
+		catch(...){
+			PyErr_Print();
+		}
+
+	}
 	
 	void updateSpecializationLink(boost::python::object attrA, boost::python::object attrB, std::vector<std::string> &specializationA, std::vector<std::string> &specializationB){
 //	void updateSpecializationLink(Attribute *attributeA, Attribute *attributeB, std::vector<std::string> &specializationA, std::vector<std::string> &specializationB){
@@ -421,6 +438,7 @@ void nodeWrapper(){
 		.def("removeNode", &Node::removeNode)
 		.def("containsNode", &Node::containsNode)
 		.def("update", &Node::update, &NodeWrapper::update_default)
+		.def("updateSlice", &Node::updateSlice, &NodeWrapper::updateSlice_default)
 		.def("nodes", &Node::nodes)
 		.def("inputAttributes", node_inputAttributes)
 		.def("outputAttributes", node_outputAttributes)

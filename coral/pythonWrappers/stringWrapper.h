@@ -168,6 +168,9 @@ void stringWrapper(){
 	pythonWrapperUtils::pythonWrapper<AddStringNode, Node>("AddStringNode");
 	pythonWrapperUtils::pythonWrapper<BuildArrayStringNode, Node>("BuildArrayStringNode")
 		.def("addStringAttribute", &BuildArrayStringNode::addStringAttribute);
+	pythonWrapperUtils::pythonWrapper<StringArrayIndices, Node>("StringArrayIndices");
+	pythonWrapperUtils::pythonWrapper<GetStringArrayElement, Node>("GetStringArrayElement");
+	pythonWrapperUtils::pythonWrapper<StringArraySize, Node>("StringArraySize");
 }
 
 #endif

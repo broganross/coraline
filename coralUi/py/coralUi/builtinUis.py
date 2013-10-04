@@ -405,7 +405,7 @@ class TimeNodeInspectorWidget(NodeInspectorWidget):
             self.coralNode().play(False)
             viewport.ViewportWidget._activateImmediateRefresh()
 
-            
+
 class PassThroughAttributeUi(AttributeUi):
     def __init__(self, coralAttribute, parentNodeUi):
         AttributeUi.__init__(self, coralAttribute, parentNodeUi)
@@ -454,7 +454,7 @@ class ForLoopNodeUi(NodeUi):
     def color(self):
         return QtGui.QColor(245, 181, 118)
 
-        
+
 class CollapsedNodeUi(NodeUi):
     def __init__(self, coralNode):
         NodeUi.__init__(self, coralNode)
@@ -462,7 +462,7 @@ class CollapsedNodeUi(NodeUi):
         self.setCanOpenThis(True)
         self.setAttributesProxyEnabled(True)
         self.addRightClickMenuItem("include selected nodes", self._includeSelectedNodes)
-                
+
     def toolTip(self):
         tooltip = NodeUi.toolTip(self) + "\n\n"
         tooltip += "(double click to open)"
@@ -578,7 +578,7 @@ class ExecutableNodeInspectorWidget(NodeInspectorWidget):
 
         self._nodeProcess = None
 
-        processButton = QtGui.QPushButton("process!", self)
+        processButton = QtGui.QPushButton("process", self)
         self.layout().addWidget(processButton)
         processButton.clicked.connect(self._processButtonClicked)
 
@@ -691,26 +691,22 @@ class ExecutableNodeUi(NodeUi):
 
         shape = QtGui.QPainterPath()
         shape.addRoundedRect(progressBarRect, 2, 2)
-        
+
         painter.setPen(self._progressBarPen)
         painter.setBrush(self._progressBarBrush)
         painter.drawPath(shape)
 
 
-class CollapsedExecutableNodeUi(ExecutableNodeUi):
+class CollapsedExecutableNodeUi(ExecutableNodeUi, CollapsedNodeUi):
     def __init__(self, node):
         super(CollapsedExecutableNodeUi, self).__init__(node)
+
         self._nodes = []
         self.setCanOpenThis(True)
         self.setAttributesProxyEnabled(True)
+        self.addRightClickMenuItem("include selected nodes", self._includeSelectedNodes)
+
         self._progressText.setText("dirty")
-
-    def color(self):
-        return QtGui.QColor(73, 153, 115)
-
-    def startProcess(self):
-        super(CollapsedExecutableNodeUi, self).startProcess()
-        self._collectChildNodes()
 
     def _collectChildNodes(self):
         self._nodes = []
@@ -719,6 +715,12 @@ class CollapsedExecutableNodeUi(ExecutableNodeUi):
         for node in node.nodes():
             if "ExecutableNode" in node.classNames():
                 self._nodes.append(node)
+
+    def _includeSelectedNodes(self):
+        coralApp.collapsedNodes(NodeEditor.selectedNodes, collapsedNode=self.coralNode())
+
+    def color(self):
+        return QtGui.QColor(73, 153, 115)
 
     def nodeChanged(self):
         cleanNodes = 0
@@ -801,10 +803,22 @@ class CollapsedExecutableNodeUi(ExecutableNodeUi):
                         finalPos = hookPos - (proxyAttr.inputHook().scenePos() - proxyAttr.scenePos())
                         proxyAttr.setPos(finalPos)
 
+    def startProcess(self):
+        super(CollapsedExecutableNodeUi, self).startProcess()
+        self._collectChildNodes()
+
+    def toolTip(self):
+        tt = super(CollapsedExecutableNodeUi, self).toolTip() + "\n\n"
+        tt += "(double click to open)"
+        return tt
+
 
 class ExecutableNodeProcess(QtCore.QThread):
+    """ Threaded process for running Executable nodes
+    """
     error       = QtCore.pyqtSignal(Exception)
     finished    = QtCore.pyqtSignal("PyQt_PyObject")
+
     def __init__(self, node):
         super(ExecutableNodeProcess, self).__init__()
         self._node = weakref.ref(node)
@@ -850,7 +864,7 @@ class ExecutableNodeProcess(QtCore.QThread):
 
 def loadPluginUi():
     plugin = PluginUi("builtinUis")
-    
+
     plugin.registerAttributeUi("GeoInstanceArrayAttribute", GeoInstanceArrayAttributeUi)
     plugin.registerAttributeUi("GeoAttribute", GeoAttributeUi)
     plugin.registerAttributeUi("NumericAttribute", NumericAttributeUi)
@@ -859,13 +873,13 @@ def loadPluginUi():
     plugin.registerAttributeUi("StringAttribute", StringAttributeUi)
     plugin.registerAttributeUi("BoolAttribute", BoolAttributeUi)
     plugin.registerAttributeUi("EnumAttribute", EnumAttributeUi)
-    
+
     plugin.registerNodeUi("CollapsedNode", CollapsedNodeUi)
     plugin.registerNodeUi("ForLoop", ForLoopNodeUi)
     plugin.registerNodeUi("ForLoop (String)", ForLoopNodeUi)
     plugin.registerNodeUi("ExecutableNode", ExecutableNodeUi)
     plugin.registerNodeUi("CollapsedExecutableNode", CollapsedExecutableNodeUi)
-    
+
     plugin.registerInspectorWidget("NumericAttribute", NumericAttributeInspectorWidget)
     plugin.registerInspectorWidget("StringAttribute", StringAttributeInspectorWidget)
     plugin.registerInspectorWidget("BoolAttribute", BoolAttributeInspectorWidget)
@@ -879,5 +893,5 @@ def loadPluginUi():
     plugin.registerInspectorWidget("Shader", ShaderNodeInspectorWidget)
     plugin.registerInspectorWidget("CustomPython", custompythonnodeinspector.CustomPythonNodeInspectorWidget)
     plugin.registerInspectorWidget("ExecutableNode", ExecutableNodeInspectorWidget)
-    
+
     return plugin

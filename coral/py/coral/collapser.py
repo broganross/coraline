@@ -32,10 +32,14 @@ import utils
 from _coral import NetworkManager
 
 class CollapserData:
+    collapsableNodeNames = []
     collapsedNodeClassName = "CollapsedNode"
 
 def setCollapsedNodeClassName(className):
     CollapserData.collapsedNodeClassName = className
+
+def registerCollapsableNode(className):
+    CollapserData.collapsableNodeNames.append(className)
 
 def _checkNodesShareSameParent(nodes):
     parentNode = None
